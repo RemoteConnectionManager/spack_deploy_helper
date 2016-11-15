@@ -5,9 +5,15 @@
 # although users can override these settings in their ~/.spack/modules.yaml.
 # -------------------------------------------------------------------------
 modules:
+  enable:
+    - tcl
   tcl:
-    naming_scheme: '{name}/{version}-{compiler.name}-{compiler.version}'
-    delim_format: ' '
-    all:
-#      conflict: '{name}'
+    naming_scheme:  '${PACKAGE}/${VERSION}-${COMPILERNAME}-${COMPILERVER}'
+     all:
+       environment:
+        set:
+          '${PACKAGE}_HOME': '${PATH}'
+      conflict: '${PACKAGE}'
+    ^python:
       autoload: 'direct'
+
