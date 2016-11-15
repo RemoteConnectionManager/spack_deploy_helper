@@ -9,11 +9,15 @@ modules:
     - tcl
   tcl:
     naming_scheme:  '${PACKAGE}/${VERSION}-${COMPILERNAME}-${COMPILERVER}'
-     all:
-       environment:
+    whitelist: ['turbovnc', 'nasm', 'cmake']
+    blacklist: ['%gcc@4.8.5']
+    hash_length: 2
+    all:
+      environment:
         set:
-          '${PACKAGE}_HOME': '${PATH}'
-      conflict: '${PACKAGE}'
-    ^python:
+          '${PACKAGE}_HOME': '${PREFIX}'
+      conflict: ['${PACKAGE}']
+#    ^python:
+    rcm:
       autoload: 'direct'
 
