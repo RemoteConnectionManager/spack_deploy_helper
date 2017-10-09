@@ -1,0 +1,44 @@
+# this is
+
+
+defaults:
+  debug : 'info'
+  cache : '../../cache'
+  install : '../install'
+  dry_run : 'False'
+  integration : 'False'
+  do_update : 'False'
+  clearconfig : 'False'
+  platformconfig : 'False'
+  origin :
+    url : 'https://github.com/RemoteConnectionManager/spack.git'
+    master : 'develop'
+    branches :
+      - 'clean/develop'
+    pull_flags :
+      - 'ff-only'
+  upstream :
+    url : 'https://github.com/LLNL/spack.git'
+    master : 'develop'
+    prs : []
+
+
+
+configurations:
+  base_folder : 'recipes'
+  host_folder : 'hosts'
+  config_dir : 'config'
+  spack_yaml_files :
+    - 'packages.yaml'
+    - 'modules.yaml'
+    - 'compilers.yaml'
+    - 'config.yaml'
+  host_tags :
+    galileo : 'galileo'
+    eni : 'eni'
+    calori : 'ws_mint'
+    marconi : 'marconi'
+
+build:
+  build_folder : build
+

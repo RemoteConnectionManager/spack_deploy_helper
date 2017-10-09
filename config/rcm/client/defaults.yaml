@@ -1,0 +1,20 @@
+# this is
+
+
+defaults:
+  integration : 'True'
+  cache : '../cache'
+  install : '../../install'
+  clearconfig : 'True'
+  origin :
+    master : 'integrate/rcm/client'
+    branches :
+      - 'clean/develop'
+      - 'pr/turbovnc'
+
+
+#  upstream :
+#    prs :    ["2771" ,'3224']
+
+
+
