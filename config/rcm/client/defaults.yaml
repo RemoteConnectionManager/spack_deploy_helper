@@ -11,10 +11,13 @@ defaults:
     branches :
       - 'clean/develop'
       - 'pr/turbovnc'
+      - 'pr/fix/flake8_configparser_backport'
+      - 'pr/pyinstaller'
 
 
-#  upstream :
-#    prs :    ["2771" ,'3224']
+
+  upstream :
+    prs :    ["5787" ]
 
 
 
