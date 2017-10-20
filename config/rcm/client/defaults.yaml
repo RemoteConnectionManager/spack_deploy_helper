@@ -13,11 +13,15 @@ defaults:
       - 'pr/turbovnc'
       - 'pr/fix/flake8_configparser_backport'
       - 'pr/pyinstaller'
+      - 'pull/rebased/2771'
 
 
 
   upstream :
-    prs :    ["5787" ]
+    prs :
+      - '5787'
+
+
 
 
 
