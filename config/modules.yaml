@@ -9,16 +9,19 @@ modules:
     - tcl
   tcl:
     naming_scheme:  '${PACKAGE}/${VERSION}-${COMPILERNAME}-${COMPILERVER}'
-    whitelist: ['rcm','turbovnc', 'nasm', 'cmake']
-    blacklist: ['%gcc@4.8.5']
+    whitelist:
+    - python
+    - '^python'
+    - nasm
+    - perl
+    - cmake
+    verbose_autoload: False
     hash_length: 2
     all:
       environment:
         set:
           '${PACKAGE}_HOME': '${PREFIX}'
       conflict: ['${PACKAGE}']
-#    ^python:
-#    rcm:
-#      autoload: 'direct'  #it print on stderr and this hurts RCM
-#      load ['turbovnc']   #this cause spack module refresh to crash
+    ^python:
+      autoload: 'direct'
 
