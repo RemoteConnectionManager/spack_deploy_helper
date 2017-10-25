@@ -10,6 +10,7 @@ defaults:
       - 'pr/fix/flake8_configparser_backport'
       - 'pull/rebased/2771'
       - 'pr/fix/perl-dependent-modules'
+      - 'pr/fix/bdftopcf'
 
 
   upstream :

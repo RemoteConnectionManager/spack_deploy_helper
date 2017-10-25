@@ -1,25 +1,12 @@
-# this is
+# this are specific defaults for rcm client 
 
 
 defaults:
-  integration : 'True'
-  cache : '../cache'
-  install : '../../install'
-  clearconfig : 'True'
   origin :
     master : 'integrate/rcm/client'
     branches :
-      - 'clean/develop'
-      - 'pr/turbovnc'
-      - 'pr/fix/flake8_configparser_backport'
       - 'pr/pyinstaller'
-      - 'pull/rebased/2771'
 
-
-
-  upstream :
-    prs :
-      - '5787'
 
 
 
