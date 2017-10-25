@@ -1,0 +1,16 @@
+# this is specific defaults  for different spack instances sharing same install path
+
+
+defaults:
+  integration : 'True'
+  cache : '../cache'
+  install : '../../install'
+  clearconfig : 'True'
+  origin :
+    branches :
+      - 'clean/develop'
+
+
+
+
+

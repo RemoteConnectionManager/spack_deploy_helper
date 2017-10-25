@@ -1,0 +1,14 @@
+# this are specific defaults for rcm headless
+
+
+defaults:
+  origin :
+    master : 'integrate/rcm/headless'
+    branches :
+      - 'pr/fix-mesa-urls'
+      - 'pr/fix-qt5-opengl'
+
+
+
+
+
