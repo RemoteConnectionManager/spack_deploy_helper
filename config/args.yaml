@@ -1,4 +1,4 @@
-# this is
+# these are the definitions of the possible arguments
 
 args:
   debug:
@@ -61,5 +61,9 @@ args:
     action: 'store_true'
     default : "{{ defaults.platformconfig }}"
     help: 'search for host platform specific configuration'
+  runconfig :
+    action: 'store_true'
+    default : "{{ defaults.runconfig }}"
+    help: 'run config.sh files present in config folders'
 
 

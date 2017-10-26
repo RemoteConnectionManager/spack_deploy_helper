@@ -10,6 +10,7 @@ defaults:
   do_update : 'False'
   clearconfig : 'False'
   platformconfig : 'False'
+  runconfig : 'False'
   origin :
     url : 'https://github.com/RemoteConnectionManager/spack.git'
     master : 'develop'
