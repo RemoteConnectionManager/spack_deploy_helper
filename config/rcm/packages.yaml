@@ -1,0 +1,12 @@
+packages:
+  pango:
+    variants: +X
+  gtkplus:
+    variants: +X
+  cairo:
+    variants: +X
+  rcm:
+    version: [develop]
+    variants:
+      - +linksource
+

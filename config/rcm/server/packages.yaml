@@ -1,0 +1,8 @@
+packages:
+  qt:
+    variants: +examples+mesa
+    version: [4.8.6, 5.7.0]
+  rcm:
+    variants:
+      - +server 
+
