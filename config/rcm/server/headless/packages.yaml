@@ -2,3 +2,7 @@ packages:
   mesa:
     variants: +llvm
 
+  rcm:
+    variants:
+      - +mesa
+ 

@@ -5,4 +5,5 @@ packages:
   rcm:
     variants:
       - +server 
+      - configdir=@{RCM_DEPLOY_HOSTPATH}/rcm
 
