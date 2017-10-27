@@ -1,7 +1,6 @@
 packages:
   qt:
-    variants: +examples+mesa
-    version: [4.8.6, 5.7.0]
+    variants: +examples+opengl+dbus
   rcm:
     variants:
       - +server 
