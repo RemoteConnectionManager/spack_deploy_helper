@@ -7,14 +7,8 @@ defaults:
   origin :
     branches :
       - 'pr/turbovnc'
-      - 'pr/fix/flake8_configparser_backport'
-      - 'pr/fix/perl-dependent-modules'
       - 'pr/fix/bdftopcf'
 
-
-  upstream :
-    prs :
-      - '5963'
 
 
 

@@ -1,0 +1,8 @@
+packages:
+  python:
+    variants: +tk
+  environment-modules:
+    variants: ~X
+
+
+

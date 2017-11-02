@@ -1,0 +1,8 @@
+config:
+  build_stage:
+  - $tempdir
+
+  source_cache: "@{RCM_DEPLOY_ROOTPATH}/cache"
+  install_tree: "@{RCM_DEPLOY_INSTALLPATH}"
+
+
