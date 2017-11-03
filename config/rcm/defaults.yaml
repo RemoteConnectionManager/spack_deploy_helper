@@ -7,7 +7,7 @@ defaults:
   origin :
     branches :
       - 'pr/turbovnc'
-      - 'pr/fix/bdftopcf'
+#      - 'pr/fix/bdftopcf'
 
 
 
