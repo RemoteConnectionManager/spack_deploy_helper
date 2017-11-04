@@ -11,7 +11,18 @@ modules:
     naming_scheme:  '${PACKAGE}/${VERSION}-${COMPILERNAME}-${COMPILERVER}'
     whitelist:
     - python
-    - '^python'
+#    - '^python'
+    - py-mccabe
+    - py-enum34
+    - py-pyflakes
+    - py-pycodestyle
+    - py-configparser
+    - py-setuptools
+    - py-six
+    - py-appdirs
+    - py-pyparsing
+    - py-packaging
+    - py-flake8
     - nasm
     - perl
     - cmake
