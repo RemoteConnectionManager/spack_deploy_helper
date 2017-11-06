@@ -1,0 +1,5 @@
+packages:
+  rcm:
+    variants:
+      - +virtualgl
+ 
