@@ -1,0 +1,3 @@
+modules:
+  tcl:
+    whitelist: ['xauth', 'xkbcomp', 'xedit', 'xlsfonts', 'xdpyinfo', 'xfontsel']
