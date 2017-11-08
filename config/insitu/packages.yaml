@@ -1,0 +1,9 @@
+packages:
+  paraview:
+    variants:
+     -  +opengl2
+     -  +mpi
+     -  +python
+     -  +qt
+     -  +examples
+
