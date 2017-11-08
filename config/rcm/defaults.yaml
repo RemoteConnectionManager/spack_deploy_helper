@@ -7,8 +7,8 @@ defaults:
   origin :
     branches :
       - 'pr/turbovnc'
-#      - 'pr/fix/bdftopcf'
-      - 'pr/fix/xinput'
+#merged      - 'pr/fix/bdftopcf'
+#merged      - 'pr/fix/xinput'
 
 
 
