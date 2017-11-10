@@ -5,7 +5,7 @@ defaults:
   origin :
     master : 'integrate/rcm/gpu'
     branches :
-      - 'pr/fix-mesa-urls'
+#merged      - 'pr/fix-mesa-urls'
       - 'pr/fix-qt5-opengl'
 
 
