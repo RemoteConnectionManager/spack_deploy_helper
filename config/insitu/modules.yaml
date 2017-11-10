@@ -1,3 +1,19 @@
 modules:
   tcl:
-    whitelist: ['paraview','qt']
+    whitelist:
+    - paraview
+    - qt
+    - openmpi
+    - py-matplotlib
+    - py-cycler
+    - py-six
+    - py-dateutil
+    - py-functools32
+    - py-numpy
+    - py-pillow
+    - py-pyparsing
+    - py-pytz
+    - py-setuptools
+    - py-appdirs
+    - py-packaging
+    - py-subprocess32
