@@ -5,8 +5,11 @@ defaults:
   integration : 'True'
   clearconfig : 'True'
   origin :
+    master : 'integrate/develop'
     branches :
       - 'pr/turbovnc'
+      - 'pr/pyinstaller'
+      - 'pr/fix-qt5-opengl'
 #merged      - 'pr/fix/bdftopcf'
 #merged      - 'pr/fix/xinput'
 
