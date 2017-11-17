@@ -1,0 +1,22 @@
+modules:
+  tcl:
+    whitelist:
+    - py-pexpect
+    - py-ptyprocess
+    - py-paramiko
+    - py-cryptography
+    - py-packaging
+    - py-cffi
+    - py-asn1crypto
+    - py-idna
+    - py-ipaddress
+    - py-pyasn1
+    - tk
+    - py-pyinstaller
+    - py-dis3
+    - py-macholib
+    - py-pefile
+    - py-altgraph
+    - py-future
+
+
