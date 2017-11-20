@@ -13,8 +13,7 @@ Some preliminary step for packagin java turbovnc:
     
 Esperiment for finding all the files opening
 
-    strace -f -t -e trace=file -e abbrev=all /tmp/provapack/bundles/VncV
-iewer/VncViewer 2>&1 | cut  -d' ' -f 4- | grep 'open(' | cut -d'"' -f 2 | grep provapack
+    strace -f -t -e trace=file /tmp/provapack/bundles/VncViewer/VncViewer 2>&1 | cut  -d' ' -f 4- | grep 'open(' | cut -d'"' -f 2 | grep provapack
 
 
 Some link for java packaging:
