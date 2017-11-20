@@ -12,6 +12,7 @@ modules:
     - py-ipaddress
     - py-pyasn1
     - tk
+    - jdk
     - py-pyinstaller
     - py-dis3
     - py-macholib
