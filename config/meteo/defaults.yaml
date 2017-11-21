@@ -1,0 +1,18 @@
+# this is
+
+
+defaults:
+  integration : 'True'
+  clearconfig : 'True'
+  origin :
+    master : 'integrate/meteo'
+  upstream :
+    prs :
+      - '6275'
+
+
+
+
+
+
+

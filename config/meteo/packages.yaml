@@ -1,0 +1,7 @@
+packages:
+  magics:
+    variants:
+     -  +qt
+     -  +python
+     -  +metview
+
