@@ -1,0 +1,6 @@
+packages:
+  openmpi:
+    variants:
+    - schedulers=tm,slurm
+    - fabrics=psm2
+

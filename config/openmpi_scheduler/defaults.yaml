@@ -1,0 +1,13 @@
+# this is specific defaults  for openmpi custom scheduler setup ( pbs,slurm marconi )
+
+
+defaults:
+  origin :
+    branches :
+      - 'pr/openmpi-schedulers'
+
+
+
+
+
+
