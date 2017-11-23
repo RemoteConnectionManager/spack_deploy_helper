@@ -1,0 +1,13 @@
+# this is specific defaults  for openfoam 
+
+
+defaults:
+  origin :
+    branches :
+      - 'pr/fix/cgal'
+
+
+
+
+
+
