@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
-spack install --verbose py-flake8
+spack spec py-flake8
+#spack install --verbose py-flake8
