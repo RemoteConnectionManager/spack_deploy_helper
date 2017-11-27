@@ -8,7 +8,8 @@ defaults:
     branches :
       - 'pr/insitu-paraview-catalyst'
       - 'pr/fix-qt5-opengl'
-#merged      - 'pr/fix-mesa-urls'
+    master : 'integrate/insitu'
+
 
 
 

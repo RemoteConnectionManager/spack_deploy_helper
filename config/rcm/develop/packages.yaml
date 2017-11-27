@@ -1,0 +1,6 @@
+packages:
+  rcm:
+    version: [develop]
+    variants:
+      - +linksource
+

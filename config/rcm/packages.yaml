@@ -5,8 +5,4 @@ packages:
     variants: +X
   cairo:
     variants: +X
-  rcm:
-    version: [develop]
-    variants:
-      - +linksource
 
