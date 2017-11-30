@@ -1,4 +1,7 @@
 modules:
   tcl:
-    whitelist: ['rcm','turbovnc','fluxbox', 'lxde-lxterminal', 'lxde-libfm', 'lxde-menu-cache']
+    whitelist:
+    -  rcm
+    - turbovnc
+
     blacklist: ['%gcc']
