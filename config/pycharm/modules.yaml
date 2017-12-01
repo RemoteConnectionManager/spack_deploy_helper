@@ -1,0 +1,4 @@
+modules:
+  tcl:
+    whitelist:
+    - pycharm
