@@ -3,10 +3,8 @@
 
 defaults:
   debug : 'info'
-  cache : '../cache'
-  linkcache : '../../cache'
+  cache : '../../cache'
   install : '../install'
-  linkinstall : '../../install'
   dry_run : 'False'
   integration : 'False'
   do_update : 'False'
