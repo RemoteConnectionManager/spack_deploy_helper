@@ -1,0 +1,6 @@
+modules:
+  tcl:
+    whitelist:
+    - libxslt
+    - rstudio
+    - r
