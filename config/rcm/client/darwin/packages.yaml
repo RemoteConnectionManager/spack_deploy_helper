@@ -1,0 +1,15 @@
+packages:
+  python:
+    variants:
+    - +tk
+    - +shared
+
+  environment-modules:
+    variants: ~X
+
+  jdk:
+    paths:
+      jdk@8u141-b15: /Users/luigicalori/java/Contents/Home
+    buildable: False
+
+
