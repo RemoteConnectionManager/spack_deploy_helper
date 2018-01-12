@@ -6,7 +6,7 @@ defaults:
   clearconfig : 'True'
   origin :
     branches :
-      - 'pr/insitu-paraview-catalyst'
+      - 'pr/catalyst-package'
       - 'pr/fix-qt5-opengl'
     master : 'integrate/insitu'
 
