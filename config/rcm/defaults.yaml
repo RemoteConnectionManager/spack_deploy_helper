@@ -9,6 +9,7 @@ defaults:
     branches :
       - 'pr/turbovnc'
       - 'pr/pyinstaller'
+      - 'pr/fix/glib_dtrace_pythonhome'
       - 'pr/fix-qt5-opengl'
 #merged      - 'pr/fix/bdftopcf'
 #merged      - 'pr/fix/xinput'
