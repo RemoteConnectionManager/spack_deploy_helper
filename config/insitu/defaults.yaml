@@ -6,7 +6,6 @@ defaults:
   clearconfig : 'True'
   origin :
     branches :
-      - 'pr/catalyst-package'
       - 'pr/fix-qt5-opengl'
     master : 'integrate/insitu'
 
