@@ -45,3 +45,38 @@ configurations:
 build:
   build_folder : build
 
+
+logging_configs:
+  version: 1
+  disable_existing_loggers: False
+
+  formatters:
+    short:
+      format: "#ooo%(levelname)-5s %(name)s[#%(message)s"
+    base:
+      format: "[%(levelname)-5s %(name)s # %(pathname)s:%(lineno)s] %(message)s"
+    long:
+      format: "[%(filename)s:%(lineno)s - %(funcName)20s() %(asctime)s] %(message)s"
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: DEBUG
+      formatter: short
+      stream: ext://sys.stdout
+  loggers:
+    root:
+      # other configuration for logger 'foo.bar.baz'
+      handlers: [console]
+      level: DEBUG
+    utils.external.hiyapyco:
+      handlers: [console]
+      level: INFO
+      propagate: False
+    external.hiyapyco:
+      handlers: [console]
+      level: INFO
+      propagate: False
+    __main__:
+      handlers: [console]
+      level: DEBUG
+      propagate: False
