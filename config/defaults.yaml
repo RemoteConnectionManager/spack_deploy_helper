@@ -67,7 +67,7 @@ logging_configs:
     root:
       # other configuration for logger 'foo.bar.baz'
       handlers: [console]
-      level: DEBUG
+      level: INFO
     utils.external.hiyapyco:
       handlers: [console]
       level: INFO
@@ -78,5 +78,5 @@ logging_configs:
       propagate: False
     __main__:
       handlers: [console]
-      level: DEBUG
+      level: INFO
       propagate: False
