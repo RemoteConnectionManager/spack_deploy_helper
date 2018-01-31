@@ -1,6 +1,7 @@
 modules:
   tcl:
     whitelist:
+    - catalyst
     - paraview
     - qt
     - openmpi

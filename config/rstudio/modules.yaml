@@ -4,3 +4,7 @@ modules:
     - libxslt
     - rstudio
     - r
+    - r-curl
+    - r-rcurl
+    - r-bitops
+
