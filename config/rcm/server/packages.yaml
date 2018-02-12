@@ -1,6 +1,8 @@
 packages:
   qt:
     variants: +examples+opengl+dbus
+  emacs:
+    variants: +X toolkit=gtk
   rcm:
     variants:
       - +server 
