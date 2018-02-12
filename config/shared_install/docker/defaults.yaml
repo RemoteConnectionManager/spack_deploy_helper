@@ -1,0 +1,12 @@
+# this is specific defaults docker based build 
+
+defaults:
+  origin :
+    branches :
+      - 'pr/pull/5871/share_cache_install'
+      - 'pr/fix/envmodule_multiarch'
+  upstream :
+    prs :
+      - '5871'
+      - '7204'
+
