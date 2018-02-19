@@ -1,4 +1,13 @@
 packages:
+  all:
+    providers:
+      gl:
+        - opengl
+        - mesa
+  opengl:
+    paths:
+      opengl@4.5.0: /usr
+    buildable: False
   rcm:
     variants:
       - +virtualgl
