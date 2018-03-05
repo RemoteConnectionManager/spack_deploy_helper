@@ -2,6 +2,7 @@ modules:
   tcl:
     whitelist:
     - xauth
+    - xhost
     - xkbcomp
     - xedit
     - emacs
