@@ -5,7 +5,7 @@ defaults:
   integration : 'True'
   clearconfig : 'True'
   origin :
-    master : 'integrate/develop'
+    master : 'integrate/rcm'
     branches :
       - 'pr/turbovnc'
       - 'pr/pyinstaller'
