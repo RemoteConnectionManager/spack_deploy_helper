@@ -1,0 +1,10 @@
+# Here we set up defaults for production builds
+# Disable upstream update integration
+defaults:
+  integration : 'False'
+
+
+
+
+
+
