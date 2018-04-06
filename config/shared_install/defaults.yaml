@@ -16,6 +16,7 @@ defaults:
   upstream :
     prs :
       - '5963'
+      - '7622'
 
 
 
