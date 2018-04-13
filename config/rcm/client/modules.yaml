@@ -8,6 +8,7 @@ modules:
     - py-packaging
     - py-cffi
     - py-asn1crypto
+    - py-pycrypto
     - py-idna
     - py-ipaddress
     - py-pyasn1
