@@ -16,7 +16,7 @@ defaults:
   upstream :
     prs :
       - '5963'
-      - '7622'
+#not mergeable and do not know what use for      - '7622'
 
 
 
