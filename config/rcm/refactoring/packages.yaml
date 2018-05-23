@@ -1,0 +1,6 @@
+packages:
+  rcm:
+    version: [refactoring]
+    variants:
+      - +linksource
+
