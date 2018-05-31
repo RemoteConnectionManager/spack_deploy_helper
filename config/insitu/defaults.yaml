@@ -5,9 +5,14 @@ defaults:
   integration : 'True'
   clearconfig : 'True'
   origin :
-    branches :
-      - 'pr/fix-qt5-opengl'
     master : 'integrate/insitu'
+    branches :
+      - 'packages/qt5-dbus'
+      - 'packages/qt5-virtualgl'
+      - 'packages/update_paraview'
+  upstream :
+    prs :
+      - '8070'
 
 
 
