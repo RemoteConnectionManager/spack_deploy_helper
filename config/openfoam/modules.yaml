@@ -1,0 +1,4 @@
+modules:
+  tcl:
+    whitelist:
+    - openfoam-com
