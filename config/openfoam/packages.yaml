@@ -2,4 +2,8 @@ packages:
   openfoam-com:
     variants:
     - +metis
+  flex:
+    version:
+    - 2.6.4
+
 
