@@ -1,5 +1,11 @@
 packages:
+  all:
+    providers:
+      pkgconfig:
+      - pkg-config
   paraview:
+    version:
+     - 5.4.1
     variants:
      -  +opengl2
      -  +mpi
@@ -7,11 +13,17 @@ packages:
      -  +qt
      -  +hdf5
      -  +examples
+     -  +netcdf
+     -  +expat
   catalyst:
     variants:
     - +essentials
     - +extras
     - +python
     - +rendering
+  py-pillow:
+    version:
+    - 3.2.0
+
 
 
