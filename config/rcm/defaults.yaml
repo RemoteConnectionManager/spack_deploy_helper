@@ -10,7 +10,7 @@ defaults:
       - 'pr/turbovnc'
       - 'pr/pyinstaller'
 #fixed with merged 7493#      - 'pr/fix/glib_dtrace_pythonhome'
-      - 'pr/fix-qt5-opengl'
+      - 'packages/qt5-dbus'
 #merged      - 'pr/fix/bdftopcf'
 #merged      - 'pr/fix/xinput'
 
