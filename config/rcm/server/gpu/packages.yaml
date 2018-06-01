@@ -4,6 +4,10 @@ packages:
       gl:
         - opengl
         - mesa
+  mesa:
+    variants:
+    - +hwrender
+    - ~swrender
   opengl:
     paths:
       opengl@4.5.0: /usr
