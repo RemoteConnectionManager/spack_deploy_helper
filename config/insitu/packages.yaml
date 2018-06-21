@@ -3,9 +3,11 @@ packages:
     providers:
       pkgconfig:
       - pkg-config
+  mesa:
+    variants: +llvm
   paraview:
     version:
-     - 5.4.1
+     - 5.5.1
     variants:
      -  +opengl2
      -  +mpi
@@ -16,6 +18,8 @@ packages:
      -  +netcdf
      -  +expat
   catalyst:
+    version:
+     - 5.5.1
     variants:
     - +essentials
     - +extras
