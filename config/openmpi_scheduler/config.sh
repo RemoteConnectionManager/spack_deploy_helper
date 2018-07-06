@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-spack spec openmpi
+spack spec --install-status openmpi
 
