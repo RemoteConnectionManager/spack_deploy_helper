@@ -26,6 +26,7 @@ modules:
     - nasm
     - perl
     - cmake
+    - gcc
     - git
     - subversion
     verbose_autoload: False
