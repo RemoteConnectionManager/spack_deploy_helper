@@ -2,3 +2,4 @@ modules:
   tcl:
     whitelist:
     - openfoam-com
+    - of-catalyst

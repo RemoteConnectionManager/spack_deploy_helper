@@ -28,6 +28,7 @@ packages:
   py-pillow:
     version:
     - 3.2.0
+# to check... paraview with gcc7.3 needs 2.6.1, pined also to satisfy openfoam
   flex:
     version:
     - 2.6.1
