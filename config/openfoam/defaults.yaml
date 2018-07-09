@@ -1,7 +1,8 @@
 defaults:
   origin :
     branches :
-      - 'pr/fix_from_sourcing_file'
+#removed      - 'pr/fix_from_sourcing_file'
+      - 'packages/of-catalyst'
 
 
 
