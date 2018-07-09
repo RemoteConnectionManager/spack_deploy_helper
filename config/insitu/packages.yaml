@@ -28,6 +28,10 @@ packages:
   py-pillow:
     version:
     - 3.2.0
+  flex:
+    version:
+    - 2.6.1
+
 
 
 
