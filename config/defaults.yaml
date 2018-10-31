@@ -41,6 +41,7 @@ configurations:
     eni : 'eni'
     calori : 'ws_mint'
     marconi : 'marconi'
+    davide : 'davide'
 
 build:
   build_folder : build
