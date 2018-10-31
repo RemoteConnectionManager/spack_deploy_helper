@@ -2,7 +2,13 @@ packages:
   pango:
     variants: +X
   gtkplus:
+    version:
+    - 2.24.32
     variants: +X
   cairo:
     variants: +X
+  vte:
+    version:
+    - 0.28.2
+
 
