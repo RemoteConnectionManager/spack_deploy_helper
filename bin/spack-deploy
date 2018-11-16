@@ -4,6 +4,7 @@ import os
 import sys
 import argparse
 
+
 # Find spack's location and its prefix.
 spack_file = os.path.realpath(os.path.expanduser(__file__))
 spack_prefix = os.path.dirname(os.path.dirname(spack_file))
@@ -22,6 +23,11 @@ parser_workspace = subparsers.add_parser('workspace', help='A workspace is an in
 subparser_workspace = parser_workspace.add_subparsers(dest='sub_sub_parser_name')
 subparser_workspace.add_parser('list', help='list the workspaces')
 subparser_workspace.add_parser('create', help='create a new workspace')
+
+subparser_workspace_git_deploy=subparser_workspace.add_parser('git_deploy', help='deploy git here ')
+subparser_workspace_git_deploy.add_argument('dry_run', help="run in dry mode")
+subparser_workspace_git_deploy.add_argument('origin', help='set the origin')
+
 subparser_workspace_remove = subparser_workspace.add_parser('remove', help='remove a workspace')
 subparser_workspace_remove.add_argument('uuid')
 
@@ -39,3 +45,5 @@ if args.subparser_name == 'workspace':
         manager.create()
     elif args.sub_sub_parser_name == 'remove':
         manager.remove(args.uuid)
+    elif args.sub_sub_parser_name == 'git_deploy':
+        manager.git_deploy()
