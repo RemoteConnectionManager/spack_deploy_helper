@@ -62,7 +62,7 @@ logging_configs:
     console:
       class: logging.StreamHandler
       level: DEBUG
-      formatter: short
+      formatter: base
       stream: ext://sys.stdout
   loggers:
     root:
