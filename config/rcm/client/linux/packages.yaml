@@ -3,6 +3,11 @@ packages:
     variants: +tk
   environment-modules:
     variants: ~X
-
+  jdk:
+    version:
+     - 1.8.0_141-b15
+  libjpeg-turbo:
+    version:
+     - 1.5.3
 
 
