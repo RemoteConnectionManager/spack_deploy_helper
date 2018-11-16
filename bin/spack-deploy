@@ -1,6 +1,16 @@
 #!/usr/bin/env python
 
+import os
+import sys
 import argparse
+
+# Find spack's location and its prefix.
+spack_file = os.path.realpath(os.path.expanduser(__file__))
+spack_prefix = os.path.dirname(os.path.dirname(spack_file))
+
+# Allow spack libs to be imported in our scripts
+spack_lib_path = os.path.join(spack_prefix, "lib")
+sys.path.insert(0, spack_lib_path)
 
 # create the top-level parser
 parser = argparse.ArgumentParser(prog='spack-deploy')
@@ -12,14 +22,20 @@ parser_workspace = subparsers.add_parser('workspace', help='A workspace is an in
 subparser_workspace = parser_workspace.add_subparsers(dest='sub_sub_parser_name')
 subparser_workspace.add_parser('list', help='list the workspaces')
 subparser_workspace.add_parser('create', help='create a new workspace')
-subparser_workspace.add_parser('remove', help='remove a workspace')
+subparser_workspace_remove = subparser_workspace.add_parser('remove', help='remove a workspace')
+subparser_workspace_remove.add_argument('uuid')
 
 parser_install = subparsers.add_parser('install', help='Install the packages')
 
 args = parser.parse_args()
 
 if args.subparser_name == 'workspace':
+    from workspace import WorkspaceManager
+    manager = WorkspaceManager("./workspace")
+
     if args.sub_sub_parser_name == 'list':
-        print("workspace list command")
+        manager.list()
     elif args.sub_sub_parser_name == 'create':
-        print("workspace create command")
+        manager.create()
+    elif args.sub_sub_parser_name == 'remove':
+        manager.remove(args.uuid)
