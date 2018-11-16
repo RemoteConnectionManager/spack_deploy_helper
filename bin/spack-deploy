@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+
+import argparse
+
+# create the top-level parser
+parser = argparse.ArgumentParser(prog='spack-deploy')
+subparsers = parser.add_subparsers(help='Utility for dealing with many instances of spacks',
+                                   dest='subparser_name')
+
+# create the sub parser workspace
+parser_workspace = subparsers.add_parser('workspace', help='A workspace is an instance of spack')
+subparser_workspace = parser_workspace.add_subparsers(dest='sub_sub_parser_name')
+subparser_workspace.add_parser('list', help='list the workspaces')
+subparser_workspace.add_parser('create', help='create a new workspace')
+subparser_workspace.add_parser('remove', help='remove a workspace')
+
+parser_install = subparsers.add_parser('install', help='Install the packages')
+
+args = parser.parse_args()
+
+if args.subparser_name == 'workspace':
+    if args.sub_sub_parser_name == 'list':
+        print("workspace list command")
+    elif args.sub_sub_parser_name == 'create':
+        print("workspace create command")
