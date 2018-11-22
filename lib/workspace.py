@@ -3,11 +3,12 @@ import sys
 import uuid
 import logging
 
-root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if not root_path in sys.path:
-    sys.path.append(os.path.join(root_path, 'lib'))
+lib_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'lib')
+if not lib_path in sys.path:
+    sys.path.append(lib_path)
 
 import utils
+import cascade_yaml_config
 
 rootLogger = logging.getLogger()
 rootLogger.setLevel(logging.INFO)
@@ -20,7 +21,7 @@ mylogger = logging.getLogger(__name__)
 logging.info("__file__:" + os.path.realpath(__file__))
 #ls.set_args()
 
-class WorkspaceManager():
+class WorkspaceManager(cascade_yaml_config.argparse_subcommand_manager):
     def __init__(self, path):
         self.base_path = path
 

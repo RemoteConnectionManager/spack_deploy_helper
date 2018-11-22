@@ -7,7 +7,7 @@ import platform
 import socket
 import logging
 
-from .run import run
+from run import run
 
 logging.getLogger(__name__).setLevel(logging.DEBUG)
 
@@ -64,6 +64,6 @@ if __name__ == '__main__':
     print("__file__:" + os.path.realpath(__file__))
     for k,v in baseintrospect().sysintro.items() : print("sysintro["+ k +"]=" + v )
     me=myintrospect(tags={'calori': 'ws_mint', 'galileo':'galileo', 'marconi':'marconi', 'eni':'eni' })
-    for k,v in me.commands.items() : print("commands["+ k +"]=" + v )
+    for k,v in me.commands.items() : print("commands["+ k +"]=" + str(v) )
     print("myintrospection:  host->" + me.platform_tag())
 

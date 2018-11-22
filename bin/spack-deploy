@@ -3,23 +3,51 @@
 import os
 import sys
 import argparse
-
+import logging
 
 # Find spack's location and its prefix.
-spack_file = os.path.realpath(os.path.expanduser(__file__))
-spack_prefix = os.path.dirname(os.path.dirname(spack_file))
+current_file = os.path.realpath(os.path.expanduser(__file__))
+current_prefix = os.path.dirname(os.path.dirname(current_file))
 
 # Allow spack libs to be imported in our scripts
-spack_lib_path = os.path.join(spack_prefix, "lib")
-sys.path.insert(0, spack_lib_path)
+current_lib_path = os.path.join(current_prefix, "lib")
+sys.path.insert(0, current_lib_path)
+
+import utils
+import cascade_yaml_config
+from workspace import WorkspaceManager
+
+ls=utils.log_setup()
+logging.debug("__file__:" + os.path.realpath(__file__))
+ls.set_args()
+mylogger = logging.getLogger(__name__)
 
 # create the top-level parser
-parser = argparse.ArgumentParser(prog='spack-deploy')
+base_parser = argparse.ArgumentParser(prog='spack-deploy',add_help=False )
+base_parser.add_argument('-c','--config_paths', nargs='*', help='yaml config folders', default = [os.path.join(current_prefix, 'config')])
+conf = cascade_yaml_config.CascadeYamlConfig(default_paths=['config'], glob_suffix='defaults.yaml' ).conf
+
+parser = argparse.ArgumentParser(prog='spack-deploy',parents=[base_parser],formatter_class=argparse.ArgumentDefaultsHelpFormatter  )
+common_args=conf.get('argparse', dict()).get('common',dict())
+
+cascade_yaml_config.argparse_add_arguments(parser,common_args)
+
 subparsers = parser.add_subparsers(help='Utility for dealing with many instances of spacks',
                                    dest='subparser_name')
 
-# create the sub parser workspace
+manager = WorkspaceManager("./workspace")
+# print(manager.__class__.__name__ + " :: " + str(manager._get_class_methods_defaults()))
+workspace_conf = conf.get('argparse', dict()).get('subparser',dict()).get('workspace',dict())
+
+# print("workspace_conf: " + str(workspace_conf))
+print(manager.__class__.__name__ + " ### " + str(manager._get_argparse_methods(workspace_conf)))
+manager._add_subparser(subparsers, name='workspace_1', conf=manager._get_argparse_methods(workspace_conf), help='A workspace is an instance of spack')
+
 parser_workspace = subparsers.add_parser('workspace', help='A workspace is an instance of spack')
+parser_install = subparsers.add_parser('install', help='Install the packages')
+
+
+# create the sub parser workspace
 subparser_workspace = parser_workspace.add_subparsers(dest='sub_sub_parser_name')
 subparser_workspace.add_parser('list', help='list the workspaces')
 subparser_workspace.add_parser('create', help='create a new workspace')
@@ -31,13 +59,10 @@ subparser_workspace_git_deploy.add_argument('origin', help='set the origin')
 subparser_workspace_remove = subparser_workspace.add_parser('remove', help='remove a workspace')
 subparser_workspace_remove.add_argument('uuid')
 
-parser_install = subparsers.add_parser('install', help='Install the packages')
 
 args = parser.parse_args()
 
 if args.subparser_name == 'workspace':
-    from workspace import WorkspaceManager
-    manager = WorkspaceManager("./workspace")
 
     if args.sub_sub_parser_name == 'list':
         manager.list()
@@ -46,4 +71,5 @@ if args.subparser_name == 'workspace':
     elif args.sub_sub_parser_name == 'remove':
         manager.remove(args.uuid)
     elif args.sub_sub_parser_name == 'git_deploy':
+
         manager.git_deploy()
