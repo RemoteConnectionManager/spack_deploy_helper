@@ -55,7 +55,11 @@ def argparse_add_arguments(parser,argument_dict):
         parser.add_argument('--' + a, **arguments)
 
 
-class argparse_subcommand_manager(object):
+class ArgparseSubcommandManager(object):
+
+    def __init__(self):
+        self.methods_defaults = self._get_class_methods_defaults()
+        # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
     def _get_class_methods_defaults(self):
         # print("class name",self.__class__.__name__)
@@ -69,30 +73,40 @@ class argparse_subcommand_manager(object):
             #signature['getfullargspec'] = inspect.getfullargspec(fn)
             #signature=inspect.getargspec(inspect.getmembers(self.__class__)[method_name])
 
-            print(name," :: ",signature)
+            logger.debug(name + " :: " + str(signature))
             args_with_defaults = dict()
             if signature.defaults:
                 number_of_args_with_defaults = len(signature.defaults)
             else:
                 number_of_args_with_defaults = 0
+            number_of_args_without_defaults = len(signature.args) - number_of_args_with_defaults
             count=0
-            for par in (signature.args[-number_of_args_with_defaults:] if number_of_args_with_defaults > 0 else []) :
-                args_with_defaults[par] = signature.defaults[count]
+            while count < len(signature.args):
+                default_index = count - len(signature.args) + number_of_args_with_defaults
+                par = signature.args[count]
+                if par != 'self':
+                    # print("#########", par)
+                    args_with_defaults[par] = None if default_index < 0 else  signature.defaults[default_index]
                 count += 1
+
+#            for par in (signature.args[-number_of_args_with_defaults:] if number_of_args_with_defaults > 0 else []) :
+#                args_with_defaults[par] = signature.defaults[count]
+#                count += 1
             methods_signature[name]=args_with_defaults
             # print("method: " + name + " args: " + str(args_with_defaults))
+            logger.debug(name + " :: " + str(methods_signature[name]))
         return methods_signature
 
     def _get_argparse_methods(self,conf=None):
         argparse_methods=dict()
         if not conf: conf=dict()
-        methods_defaults = self._get_class_methods_defaults()
+        #methods_defaults = self._get_class_methods_defaults()
 
-        for method in methods_defaults:
+        for method in self.methods_defaults:
             conf_params_defaults = conf.get(method,dict())
             argparse_methods[method] = {'help' : conf_params_defaults.get('help',"help for " + method +" method"),
                                         'args' : dict() }
-            for param in methods_defaults[method]:
+            for param in self.methods_defaults[method]:
                 param_defaults = conf_params_defaults.get(param,dict())
                 arguments = dict()
                 if 'help' in param_defaults:
@@ -110,13 +124,40 @@ class argparse_subcommand_manager(object):
                         if  arguments['action'] == 'store_true': arguments['default'] = eval(d)
                         else: arguments['default'] = str(d)
                 else:
-                    arguments['default'] = methods_defaults[method][param]
-                    if str(arguments['default'])[0]=='[':
-                        arguments['nargs'] = '*'
+                    if self.methods_defaults[method][param]:
+                        arguments['default'] = self.methods_defaults[method][param]
+                        if str(arguments['default'])[0]=='[':
+                            arguments['nargs'] = '*'
                     arguments['action'] = 'store'
                 argparse_methods[method]['args'][param] = arguments
 
         return argparse_methods
+
+    def _get_callback(self, method):
+        # print("_get_callback for ", method)
+        lambda_method = lambda args: self._parse_args(method,args)
+        return lambda_method
+
+    def _parse_args(self, method, args):
+        # print("parse_args for ", method)
+        # getattr(self.__class__, method)(self, *args, **kw)
+        all_args=vars(args)
+        # print("all_args:", all_args)
+        merged_kwargs = dict()
+        merged_args=[]
+        method_args = self.methods_defaults.get(method, dict())
+        print("method_args:",  method_args)
+        for par in method_args:
+            if par in all_args:
+                if method_args[par] != None:
+                    merged_kwargs[par] = all_args[par]
+                else:
+                    merged_args.append(all_args[par])
+
+        # print("@@@@@", merged_args)
+        getattr(self.__class__, method)(self,*merged_args,**merged_kwargs)
+
+
 
     def _add_subparser(self, subparsers, name=None, conf=None, help=''):
         if name:
@@ -128,20 +169,34 @@ class argparse_subcommand_manager(object):
         else:
             self.conf = self._get_argparse_methods()
         self.subparser = subparsers.add_parser(self.subparser_name , help=help, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-        self.subparsers = self.subparser.add_subparsers(dest='sub_' + self.subparser_name)
-
-        methods_subparsers = dict()
+        #self.subparsers = self.subparser.add_subparsers(dest='sub_' + self.subparser_name)
+        subparsers_help = ''
         for method in self.conf:
-            print("---handling method",method)
+            subparsers_help += method + ','
+        subparsers_help = "{ " + subparsers_help + " }"
+        self.subparsers = self.subparser.add_subparsers(dest='sub_' + self.subparser_name, metavar=subparsers_help)
+        self.subparsers.required = True
+        self.metavar='pippo'
+
+        self.methods_subparsers = dict()
+        for method in self.conf:
+            # print("---handling method",method)
             method_conf = self.conf[method]
             methods_conf_args=method_conf.get('args',dict())
-            methods_subparsers[method] = self.subparsers.add_parser(method,
+            self.methods_subparsers[method] = self.subparsers.add_parser(method,
                                                                     help=method_conf.get('help',''),
                                                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
             for par in  methods_conf_args:
                 arguments = methods_conf_args[par]
-                print(method,par," :::"+str(arguments))
-                methods_subparsers[method].add_argument('--' + par, **arguments)
+                # print("add subparser ",name,method,par," :::"+str(arguments))
+                if 'default' in arguments:
+                    self.methods_subparsers[method].add_argument('--' + par, **arguments)
+                else:
+                    self.methods_subparsers[method].add_argument(par, **arguments)
+
+            #labda_method = lambda *args, **kw: getattr(self.__class__, method)(self,*args, **kw)
+            #abda_method = lambda *args, **kw: print()
+            self.methods_subparsers[method].set_defaults(func=self._get_callback(method))
 
 
 class CascadeYamlConfig:

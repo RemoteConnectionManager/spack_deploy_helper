@@ -34,42 +34,14 @@ cascade_yaml_config.argparse_add_arguments(parser,common_args)
 
 subparsers = parser.add_subparsers(help='Utility for dealing with many instances of spacks',
                                    dest='subparser_name')
+subparsers.required=True
 
 manager = WorkspaceManager("./workspace")
 # print(manager.__class__.__name__ + " :: " + str(manager._get_class_methods_defaults()))
 workspace_conf = conf.get('argparse', dict()).get('subparser',dict()).get('workspace',dict())
 
-# print("workspace_conf: " + str(workspace_conf))
-print(manager.__class__.__name__ + " ### " + str(manager._get_argparse_methods(workspace_conf)))
-manager._add_subparser(subparsers, name='workspace_1', conf=manager._get_argparse_methods(workspace_conf), help='A workspace is an instance of spack')
-
-parser_workspace = subparsers.add_parser('workspace', help='A workspace is an instance of spack')
-parser_install = subparsers.add_parser('install', help='Install the packages')
-
-
-# create the sub parser workspace
-subparser_workspace = parser_workspace.add_subparsers(dest='sub_sub_parser_name')
-subparser_workspace.add_parser('list', help='list the workspaces')
-subparser_workspace.add_parser('create', help='create a new workspace')
-
-subparser_workspace_git_deploy=subparser_workspace.add_parser('git_deploy', help='deploy git here ')
-subparser_workspace_git_deploy.add_argument('dry_run', help="run in dry mode")
-subparser_workspace_git_deploy.add_argument('origin', help='set the origin')
-
-subparser_workspace_remove = subparser_workspace.add_parser('remove', help='remove a workspace')
-subparser_workspace_remove.add_argument('uuid')
-
+manager._add_subparser(subparsers, name='workspace', conf=manager._get_argparse_methods(workspace_conf), help='A workspace is an instance of spack')
 
 args = parser.parse_args()
+args.func(args)
 
-if args.subparser_name == 'workspace':
-
-    if args.sub_sub_parser_name == 'list':
-        manager.list()
-    elif args.sub_sub_parser_name == 'create':
-        manager.create()
-    elif args.sub_sub_parser_name == 'remove':
-        manager.remove(args.uuid)
-    elif args.sub_sub_parser_name == 'git_deploy':
-
-        manager.git_deploy()

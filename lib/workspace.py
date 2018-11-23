@@ -10,10 +10,10 @@ if not lib_path in sys.path:
 import utils
 import cascade_yaml_config
 
-rootLogger = logging.getLogger()
-rootLogger.setLevel(logging.INFO)
-consoleHandler = logging.StreamHandler()
-rootLogger.addHandler(consoleHandler)
+# rootLogger = logging.getLogger()
+# rootLogger.setLevel(logging.INFO)
+# consoleHandler = logging.StreamHandler()
+# rootLogger.addHandler(consoleHandler)
 
 mylogger = logging.getLogger(__name__)
 
@@ -21,8 +21,11 @@ mylogger = logging.getLogger(__name__)
 logging.info("__file__:" + os.path.realpath(__file__))
 #ls.set_args()
 
-class WorkspaceManager(cascade_yaml_config.argparse_subcommand_manager):
+
+class WorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
+
     def __init__(self, path):
+        super(WorkspaceManager, self).__init__()
         self.base_path = path
 
     def create(self):
