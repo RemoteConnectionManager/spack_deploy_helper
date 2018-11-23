@@ -59,6 +59,7 @@ class ArgparseSubcommandManager(object):
 
     def __init__(self):
         self.methods_defaults = self._get_class_methods_defaults()
+        logger.debug("@@@@@@@@"+str(self.methods_defaults)+"@@@@@@@@@@")
         # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
     def _get_class_methods_defaults(self):
@@ -94,7 +95,7 @@ class ArgparseSubcommandManager(object):
 #                count += 1
             methods_signature[name]=args_with_defaults
             # print("method: " + name + " args: " + str(args_with_defaults))
-            logger.debug(name + " :: " + str(methods_signature[name]))
+            logger.debug(name + " ## " + str(methods_signature[name]))
         return methods_signature
 
     def _get_argparse_methods(self,conf=None):
@@ -124,10 +125,13 @@ class ArgparseSubcommandManager(object):
                         if  arguments['action'] == 'store_true': arguments['default'] = eval(d)
                         else: arguments['default'] = str(d)
                 else:
-                    if self.methods_defaults[method][param]:
+                    if self.methods_defaults[method][param] != None:
                         arguments['default'] = self.methods_defaults[method][param]
-                        if str(arguments['default'])[0]=='[':
-                            arguments['nargs'] = '*'
+                        if len(str(arguments['default'])) > 0:
+                            if str(arguments['default'])[0]=='[':
+                                arguments['nargs'] = '*'
+                    else:
+                        logger.info("method: " + method + " has positional param " + param + " defaults:>" + str(self.methods_defaults[method][param]) + "<:")
                     arguments['action'] = 'store'
                 argparse_methods[method]['args'][param] = arguments
 
@@ -142,11 +146,11 @@ class ArgparseSubcommandManager(object):
         # print("parse_args for ", method)
         # getattr(self.__class__, method)(self, *args, **kw)
         all_args=vars(args)
-        # print("all_args:", all_args)
+        logger.debug("^^^^^all_args:" + str(all_args))
         merged_kwargs = dict()
         merged_args=[]
         method_args = self.methods_defaults.get(method, dict())
-        print("method_args:",  method_args)
+        logger.debug("method_args: " + str(method_args))
         for par in method_args:
             if par in all_args:
                 if method_args[par] != None:
@@ -154,6 +158,7 @@ class ArgparseSubcommandManager(object):
                 else:
                     merged_args.append(all_args[par])
 
+        logger.debug("@@@@merged_args: " + str(merged_args) + " merged_kw: "+ str(merged_kwargs))
         # print("@@@@@", merged_args)
         getattr(self.__class__, method)(self,*merged_args,**merged_kwargs)
 

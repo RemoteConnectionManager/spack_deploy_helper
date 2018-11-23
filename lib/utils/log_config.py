@@ -5,7 +5,7 @@ import logging.config
 import argparse
 import os
 
-from external import hiyapyco
+#from external import hiyapyco
 import cascade_yaml_config
 
 
@@ -41,7 +41,7 @@ class log_setup:
             logging.getLogger(__name__).debug("logging_conf : " + d + " - " + type(log_configs[d]).__name__ + "<-->" + str(log_configs[d]))
 
         logging.config.dictConfig(log_configs)
-        defaults=conf.get('defaults',{'debug':'info'})
+
 
 
 #################

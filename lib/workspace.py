@@ -10,10 +10,10 @@ if not lib_path in sys.path:
 import utils
 import cascade_yaml_config
 
-# rootLogger = logging.getLogger()
+rootLogger = logging.getLogger()
 # rootLogger.setLevel(logging.INFO)
-# consoleHandler = logging.StreamHandler()
-# rootLogger.addHandler(consoleHandler)
+consoleHandler = logging.StreamHandler()
+rootLogger.addHandler(consoleHandler)
 
 mylogger = logging.getLogger(__name__)
 
@@ -24,9 +24,10 @@ logging.info("__file__:" + os.path.realpath(__file__))
 
 class WorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
-    def __init__(self, path):
+    def __init__(self, path, dry_run=True):
         super(WorkspaceManager, self).__init__()
         self.base_path = path
+        self.dry_run=dry_run
 
     def create(self):
         uuid_ = uuid.uuid4()
@@ -49,20 +50,20 @@ class WorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             print('error: failed to remove the directory ' + path)
 
     def git_deploy(self,
-                   dry_run=False,
                    do_update=False,
                    integration=False,
-                   branches=['clean/develop'],
+                   branches=['clean/master'],
                    prlist=[],
-                   origin='https://github.com/RemoteConnectionManager/spack.git',
-                   origin_master='develop',
+                   origin='',
+                   origin_master='',
                    pull_flags=['ff-only'],
-                   upstream='https://github.com/LLNL/spack.git'):
+                   upstream=''):
 
 
+        # print("@@@@@@@@@@@@@@@@@@@@",self.dry_run)
         dest=os.path.join(self.base_path, 'dummy_spack_folder')
 
-        dev_git = utils.git_repo(dest, logger=mylogger, dry_run=dry_run)
+        dev_git = utils.git_repo(dest, logger=mylogger, dry_run=self.dry_run)
 
         if not os.path.exists(dest):
             mylogger.info("MISSING destintion_dir-->" + dest + "<-- ")
@@ -92,7 +93,7 @@ class WorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             if integration:
                 if len(origin_branches) > 0:
                     upstream_clean = origin_branches[0]
-                    print("--------------------------------------" + upstream_clean + "-----------------------")
+                    # print("--------------------------------------" + upstream_clean + "-----------------------")
                     dev_git.checkout(upstream_clean)
                     dev_git.sync_upstream()
                     dev_git.checkout(upstream_clean, newbranch=origin_master)
@@ -120,7 +121,7 @@ class WorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 dev_git.checkout(origin_master)
 
         else:
-            mylogger.info("Folder ->" + dest + "<- already existing, skipping git stuff")
+            mylogger.warning("Folder ->" + dest + "<- already existing, skipping git stuff")
             if do_update:
                 mylogger.info("Updating Folder ->" + dest + "<-")
                 pull_options = []
