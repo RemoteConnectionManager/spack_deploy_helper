@@ -161,7 +161,7 @@ logging_configs:
       handlers: [console]
       propagate: False
     workspace:
-      level: WARNING
+      level: INFO
       handlers: [console]
       propagate: False
     utils.external.hiyapyco:

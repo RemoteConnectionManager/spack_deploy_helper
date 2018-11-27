@@ -16,22 +16,30 @@ import utils
 root_path = os.path.dirname(lib_path)
 logger = logging.getLogger(__name__)
 
+
+
 def argparse_get_config_paths():
     base_parser = argparse.ArgumentParser(add_help=False)
-    base_parser.add_argument('-c', '--config_paths', nargs='*', help='yaml config folders',
+    base_parser.add_argument('-c', '--config_paths', action='append', help='yaml config folders',
                              default=[os.path.join(root_path, 'config')])
 
     base_args = base_parser.parse_known_args()[0]
     # for name in vars(base_args):
-    #     print(name + " :: " + str(vars(base_args)[name]))
+    #    print(name + " :: " + str(vars(base_args)[name]))
 
     listpaths = []
     for c in base_args.config_paths:
         logger.debug("config folder:" + c)
         if c[0] != '/':
-            c = os.path.abspath(os.path.join(root_path, c))
-            listpaths.append(c)
+            for base in [os.getcwd(), root_path]:
+                if os.path.exists(os.path.join(base, c)) :
+                    if os.path.isdir(os.path.join(base, c)) :
+                        c = os.path.abspath(os.path.join(base, c))
+                        break
+        listpaths.append(c)
+    # print("::::: listpaths::::",listpaths)
     return listpaths
+
 
 def argparse_add_arguments(parser,argument_dict):
     for a in argument_dict:
@@ -55,12 +63,45 @@ def argparse_add_arguments(parser,argument_dict):
         parser.add_argument('--' + a, **arguments)
 
 
+def get_sub_config(conf,nested_keys):
+    curr_conf=conf
+    for key in nested_keys:
+        curr_conf = curr_conf.get(key,dict())
+    return curr_conf
+
+
+def merge_config(merge_conf, base_conf=dict(), nested_keys=[]):
+    out=copy.deepcopy(base_conf)
+    curr=out
+    if len(nested_keys) > 0:
+        for key in nested_keys[:-1]:
+            curr = curr.get(key,OrderedDict())
+        curr[nested_keys[-1]] = copy.deepcopy(merge_conf)
+        return out
+    else:
+        return copy.deepcopy(merge_conf)
+
+
+def ordered_set(in_list):
+    out_list = []
+    added = set()
+    for val in in_list:
+        if not val in added:
+            out_list.append(val)
+            added.add(val)
+    return out_list
+
+
 class ArgparseSubcommandManager(object):
 
     def __init__(self):
         self.methods_defaults = self._get_class_methods_defaults()
+        self.yaml_config_nested_keys=[]
         logger.debug("@@@@@@@@"+str(self.methods_defaults)+"@@@@@@@@@@")
         # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+
+    def _set_yaml_config_nested_keys(self,nested_keys):
+        self.yaml_config_nested_keys = nested_keys
 
     def _get_class_methods_defaults(self):
         # print("class name",self.__class__.__name__)
@@ -159,7 +200,9 @@ class ArgparseSubcommandManager(object):
                     merged_args.append(all_args[par])
 
         logger.debug("@@@@merged_args: " + str(merged_args) + " merged_kw: "+ str(merged_kwargs))
-        # print("@@@@@", merged_args)
+        config_to_merge = merge_config(merged_kwargs, nested_keys=self.yaml_config_nested_keys)
+        out=utils.hiyapyco.dump(config_to_merge, default_flow_style=False)
+        print("@@@@@", out)
         getattr(self.__class__, method)(self,*merged_args,**merged_kwargs)
 
 
@@ -181,7 +224,6 @@ class ArgparseSubcommandManager(object):
         subparsers_help = "{ " + subparsers_help + " }"
         self.subparsers = self.subparser.add_subparsers(dest='sub_' + self.subparser_name, metavar=subparsers_help)
         self.subparsers.required = True
-        self.metavar='pippo'
 
         self.methods_subparsers = dict()
         for method in self.conf:
@@ -204,12 +246,16 @@ class ArgparseSubcommandManager(object):
             self.methods_subparsers[method].set_defaults(func=self._get_callback(method))
 
 
+
 class CascadeYamlConfig:
     """
     singleton ( pattern from https://python-3-patterns-idioms-test.readthedocs.io/en/latest/Singleton.html )
     config class that parse cascading yaml files with hiyapyco
     constructor take a list of files that are parsed hierachically by parse method
     """
+
+    instances = dict()
+
 
     class __CascadeYamlConfig:
         def __init__(self, list_paths,
@@ -239,10 +285,12 @@ class CascadeYamlConfig:
                             for def_path in default_paths:
                                 self.list_paths.extend(glob.glob(os.path.join(root_path, def_path, path, glob_suffix)))
 
+            
             for def_path in default_paths:
                 self.list_paths.extend(glob.glob(os.path.join(root_path, def_path, glob_suffix)))
 
-            self.list_paths.reverse()
+            self.list_paths = ordered_set(self.list_paths)
+            #self.list_paths.reverse()
             #print("list paths: ", self.list_paths)
 
         def parse(self):
@@ -254,6 +302,7 @@ class CascadeYamlConfig:
                     method=utils.hiyapyco.METHOD_MERGE,
                     failonmissingfiles=False
                 )
+                # print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", self._conf['argparse'])
 
         @property
         def conf(self):
@@ -271,9 +320,9 @@ class CascadeYamlConfig:
                     val = val.get(key, OrderedDict())
             return copy.deepcopy(val)
 
-    instances = dict()
 
     def __init__(self, **kwargs):
+
         default_values = {
             'list_paths': None,
             'default_paths' : ['etc', os.path.join('etc', 'defaults')],
@@ -286,16 +335,22 @@ class CascadeYamlConfig:
         if not default_values['list_paths']:
             default_values['list_paths']=argparse_get_config_paths()
         par_hash=hash(str(default_values))
+        logger.debug("CascadeYamlConfig.instances: " + str(CascadeYamlConfig.instances))
+
         if par_hash in  CascadeYamlConfig.instances:
+            logger.info("Reusing CascadeYamlConfig instance hash:" + str(par_hash) + ": par " + str(default_values))
             self.instance = CascadeYamlConfig.instances[par_hash]
         else:
+            logger.info("New CascadeYamlConfig instance hash:" + str(par_hash) + ": par " + str(default_values))
             self.instance = CascadeYamlConfig.__CascadeYamlConfig(**default_values)
             CascadeYamlConfig.instances[par_hash] = self.instance
             self.instance.parse()
+
 
     def __getattr__(self, name):
         return getattr(self.instance, name)
 
     def __getitem__(self, nested_key_list):
         return self.instance.__getitem__(nested_key_list)
+
 

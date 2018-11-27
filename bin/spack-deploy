@@ -15,27 +15,28 @@ sys.path.insert(0, current_lib_path)
 
 import utils
 import cascade_yaml_config
+import log_config
 from workspace import WorkspaceManager
 
-ls=utils.log_setup()
+ls=log_config.log_setup()
 logging.debug("__file__:" + os.path.realpath(__file__))
 ls.set_args()
 mylogger = logging.getLogger(__name__)
 
 # create the top-level parser
 base_parser = argparse.ArgumentParser(prog='spack-deploy',add_help=False )
-base_parser.add_argument('-c','--config_paths', nargs='*', help='yaml config folders', default = [os.path.join(current_prefix, 'config')])
-conf = cascade_yaml_config.CascadeYamlConfig(default_paths=['config'], glob_suffix='defaults.yaml' ).conf
+base_parser.add_argument('-c','--config_paths', action='append', help='yaml config folders', default = [os.path.join(current_prefix, 'config')])
+top_config_dict = cascade_yaml_config.CascadeYamlConfig(default_paths=['config'], glob_suffix='defaults.yaml' ).conf
 
 common_parser = argparse.ArgumentParser(prog='spack-deploy',
                                         parents=[base_parser],
                                         add_help=False,
                                         formatter_class=argparse.ArgumentDefaultsHelpFormatter  )
 
-common_args=conf.get('argparse', dict()).get('common',dict())
+common_args=top_config_dict.get('argparse', dict()).get('common',dict())
 
 cascade_yaml_config.argparse_add_arguments(common_parser,common_args)
-global_args = common_parser.parse_known_args()
+global_args = common_parser.parse_known_args()[0]
 
 parser = argparse.ArgumentParser(prog='spack-deploy',
                                  parents=[common_parser],
@@ -44,11 +45,13 @@ subparsers = parser.add_subparsers(help='Utility for dealing with many instances
                                    dest='subparser_name')
 subparsers.required=True
 
-manager = WorkspaceManager("./workspace", dry_run=global_args[0].dry_run)
+deploy_manager = WorkspaceManager("./workspace", dry_run=global_args.dry_run)
+deploy_manager_subcommand = 'workspace'
+deploy_manager_conf_keys = ['argparse', 'subparser', deploy_manager_subcommand]
 # print(manager.__class__.__name__ + " :: " + str(manager._get_class_methods_defaults()))
-workspace_conf = conf.get('argparse', dict()).get('subparser',dict()).get('workspace',dict())
-
-manager._add_subparser(subparsers, name='workspace', conf=manager._get_argparse_methods(workspace_conf), help='A workspace is an instance of spack')
+deploy_manager_conf = cascade_yaml_config.get_sub_config(top_config_dict, deploy_manager_conf_keys)
+# print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",deploy_manager_conf)
+deploy_manager._add_subparser(subparsers, name='workspace', conf=deploy_manager._get_argparse_methods(deploy_manager_conf), help='A workspace is an instance of spack')
 
 args = parser.parse_args()
 args.func(args)
