@@ -25,7 +25,8 @@ class log_setup:
         #logging.basicConfig(format=BASEFORMAT, level=logging.ERROR)
         logging.basicConfig(level=logging.ERROR)
 
-        logging.getLogger(__name__).setLevel(self.get_level(parser.parse_known_args()[0].debug))
+        for curr_logger in [logging.getLogger(__name__), logging.getLogger('cascade_yaml_config')]:
+            curr_logger.setLevel(self.get_level(parser.parse_known_args()[0].debug))
         #logging.basicConfig(format=BASEFORMAT, level=self.get_level(parser.parse_known_args()[0].debug))
         logging.getLogger(__name__).debug("#########init")
         #logging.getLogger('external1.hiyapyco').setLevel(logging.INFO)
