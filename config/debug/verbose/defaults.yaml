@@ -1,9 +1,6 @@
-
 logging_configs:
   loggers:
     root:
-      level: ERROR
-    external.hiyapyco:
+      level: DEBUG
+    cascade_yaml_config:
       level: INFO
-    __main__:
-      level: ERROR
