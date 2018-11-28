@@ -1,0 +1,9 @@
+
+logging_configs:
+  loggers:
+    root:
+      level: ERROR
+    external.hiyapyco:
+      level: INFO
+    __main__:
+      level: ERROR
