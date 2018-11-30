@@ -63,13 +63,6 @@ def argparse_add_arguments(parser,argument_dict):
         parser.add_argument('--' + a, **arguments)
 
 
-def get_sub_config(conf,nested_keys):
-    curr_conf=conf
-    for key in nested_keys:
-        curr_conf = curr_conf.get(key,dict())
-    return curr_conf
-
-
 def merge_config(merge_conf, base_conf=dict(), nested_keys=[]):
     out=copy.deepcopy(base_conf)
     curr=out
