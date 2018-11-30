@@ -10,10 +10,10 @@ if not lib_path in sys.path:
 import utils
 import cascade_yaml_config
 
-rootLogger = logging.getLogger()
+#rootLogger = logging.getLogger()
 # rootLogger.setLevel(logging.INFO)
-consoleHandler = logging.StreamHandler()
-rootLogger.addHandler(consoleHandler)
+#consoleHandler = logging.StreamHandler()
+#rootLogger.addHandler(consoleHandler)
 
 mylogger = logging.getLogger(__name__)
 
@@ -24,9 +24,9 @@ logging.info("__file__:" + os.path.realpath(__file__))
 
 class WorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
-    def __init__(self, path, dry_run=True):
+    def __init__(self, base_deploy_path, dry_run=True):
         super(WorkspaceManager, self).__init__()
-        self.base_path = path
+        self.base_path = base_deploy_path
         self.dry_run=dry_run
 
     def create(self):
@@ -50,6 +50,7 @@ class WorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             print('error: failed to remove the directory ' + path)
 
     def git_deploy(self,
+                   dest='spack',
                    do_update=False,
                    integration=False,
                    branches=['clean/master'],
@@ -61,12 +62,13 @@ class WorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
 
         # print("@@@@@@@@@@@@@@@@@@@@",self.dry_run)
-        dest=os.path.join(self.base_path, 'dummy_spack_folder')
+        if dest[0] != '/':
+            dest=os.path.join(self.base_path, dest)
 
         dev_git = utils.git_repo(dest, logger=mylogger, dry_run=self.dry_run)
 
         if not os.path.exists(dest):
-            mylogger.info("MISSING destintion_dir-->" + dest + "<-- ")
+            mylogger.info("MISSING destination_dir-->" + dest + "<-- ")
             os.makedirs(dest)
 
             origin_branches = utils.get_branches(origin, branch_selection=branches)
