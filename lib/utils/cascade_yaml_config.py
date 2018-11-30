@@ -208,21 +208,25 @@ class ArgparseSubcommandManager(object):
 
 
     def _add_subparser(self, subparsers, name=None, conf=None, help=''):
-        if name:
-            self.subparser_name = name
-        else:
-            self.subparser_name = self.__class__.__name__
+        # print("############",type(subparsers))
         if conf:
             self.conf=conf
         else:
             self.conf = self._get_argparse_methods()
-        self.subparser = subparsers.add_parser(self.subparser_name , help=help, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-        #self.subparsers = self.subparser.add_subparsers(dest='sub_' + self.subparser_name)
         subparsers_help = ''
         for method in self.conf:
             subparsers_help += method + ','
         subparsers_help = "{ " + subparsers_help + " }"
-        self.subparsers = self.subparser.add_subparsers(dest='sub_' + self.subparser_name, metavar=subparsers_help)
+        if name:
+            self.subparser_name = name
+            self.subparser = subparsers.add_parser(self.subparser_name , help=help, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+            self.subparsers = self.subparser.add_subparsers(dest='sub_' + self.subparser_name, metavar=subparsers_help)
+        else:
+            self.subparsers=subparsers
+#            self.subparser_name = self.__class__.__name__
+        #self.subparser = subparsers.add_parser(self.subparser_name , help=help, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        #self.subparsers = self.subparser.add_subparsers(dest='sub_' + self.subparser_name)
+#        self.subparsers = self.subparser.add_subparsers(dest='sub_' + self.subparser_name, metavar=subparsers_help)
         self.subparsers.required = True
 
         self.methods_subparsers = dict()
@@ -249,9 +253,11 @@ class ArgparseSubcommandManager(object):
 
 class CascadeYamlConfig:
     """
-    singleton ( pattern from https://python-3-patterns-idioms-test.readthedocs.io/en/latest/Singleton.html )
-    config class that parse cascading yaml files with hiyapyco
-    constructor take a list of files that are parsed hierachically by parse method
+    derived from singleton idea ( pattern from https://python-3-patterns-idioms-test.readthedocs.io/en/latest/Singleton.html )
+    Currently it implement a hash strategy to keep a single instance for init calls with the same input paramenters
+    The object is a config class that parse cascading yaml files with hiyapyco
+    constructor take a list of path, default paths env_var variable for config and a glob suffix pattern
+    Files in these folders are parsed hierachically by parse method
     """
 
     instances = dict()
