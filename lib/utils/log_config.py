@@ -34,9 +34,11 @@ class log_setup:
     def get_level(self,arg_level):
         return self.LEVELS.get(arg_level, logging.INFO)
 
-    def set_args(self,):
-        conf = cascade_yaml_config.CascadeYamlConfig(default_paths=['config'], glob_suffix='defaults.yaml' ).conf
-        log_configs=conf.get('logging_configs',{})
+    def set_args(self,log_configs=None):
+        if not log_configs:
+              log_configs = cascade_yaml_config.CascadeYamlConfig(default_paths=['config'], glob_suffix='defaults.yaml' )['logging_configs']
+        # conf = cascade_yaml_config.CascadeYamlConfig(default_paths=['config'], glob_suffix='defaults.yaml' ).conf
+        # log_configs=conf.get('logging_configs',{})
         if not log_configs.get('version',None) : log_configs['version']=1
         for d in log_configs :
             logging.getLogger(__name__).debug("logging_conf : " + d + " - " + type(log_configs[d]).__name__ + "<-->" + str(log_configs[d]))
