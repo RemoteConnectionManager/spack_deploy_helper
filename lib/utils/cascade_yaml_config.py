@@ -7,6 +7,7 @@ import glob
 from collections import OrderedDict
 import argparse
 import inspect
+import importlib
 
 lib_path = os.path.dirname((os.path.dirname(os.path.abspath(__file__))))
 if lib_path not in sys.path:
@@ -15,6 +16,33 @@ import utils
 
 root_path = os.path.dirname(lib_path)
 logger = logging.getLogger(__name__)
+
+
+def retrieve_plugins(plugin_folders):
+    out_plugins = dict()
+    for plugin_folder in plugin_folders:
+        if '/' != plugin_folder[0]:
+            plugin_folder = os.path.join(lib_path, plugin_folder)
+        logger.debug("@@@@@@ list_plugins @@@@@"+plugin_folder)
+        modules = dict()
+        if os.path.isdir(plugin_folder):
+            if plugin_folder not in sys.path:
+                logger.info("adding " + plugin_folder + " to sys path")
+                sys.path.append(plugin_folder)
+            for plugfile in glob.glob(os.path.join(plugin_folder, '*.py')) :
+                logger.info("importing plugfile: " + plugfile + " : " + os.path.basename(plugfile))
+                #print("##################importing plugfile",plugfile,os.path.basename(plugfile))
+                modules[plugfile] = importlib.import_module(os.path.splitext(os.path.basename(plugfile))[0])
+                for name,cls in inspect.getmembers( modules[plugfile], inspect.isclass):
+                    if issubclass(cls,ArgparseSubcommandManager):
+                        logger.info("Found ArgparseSubcommandManager: " + name)
+                        logger.debug("@@@@@@@@ " + str(out_plugins))
+                        out_plugins[plugin_folder] = out_plugins.get(plugin_folder,[]) + [cls]
+                        logger.debug("@@@--@@@ " + str(out_plugins))
+    return out_plugins
+
+
+
 
 
 
@@ -243,6 +271,41 @@ class ArgparseSubcommandManager(object):
             self.methods_subparsers[method].set_defaults(func=self._get_callback(method))
 
 
+def find_config_file_list(list_paths=None,
+                          default_paths = ['etc', os.path.join('etc', 'defaults')],
+                          env_var_config_path = 'RCM_CONFIG_PATH',
+                          glob_suffix = "*.yaml"):
+
+    out_list_paths = []
+    for def_path in default_paths:
+        out_list_paths.extend(glob.glob(os.path.join(root_path, def_path, glob_suffix)))
+    if list_paths:
+        input_list_paths = list_paths
+    else:
+        input_list_paths = []
+    if env_var_config_path:
+        env_config_path = os.environ.get(env_var_config_path, None)
+        if env_config_path:
+            input_list_paths.append(env_config_path)
+    if list_paths:
+        logger.debug("find_config_file_list: list_paths: " + str(list_paths))
+        for path in list_paths:
+            if os.path.isfile(path) and os.path.exists(path):
+                out_list_paths.append(os.path.abspath(path))
+            else:
+                if os.path.isdir(path) and os.path.exists(path):
+                    out_list_paths.extend(glob.glob(os.path.join(os.path.abspath(path), glob_suffix)))
+                else:
+                    for def_path in default_paths:
+                        out_list_paths.extend(glob.glob(os.path.join(root_path, def_path, path, glob_suffix)))
+
+
+
+    logger.debug("@@@@ BEFORE ordered_set list_paths: " + str(list_paths))
+    out_list_paths = ordered_set(out_list_paths)
+    logger.debug("@@@@@ AFTER ordered_set list_paths: " + str(list_paths))
+    return out_list_paths
+
 
 class CascadeYamlConfig:
     """
@@ -257,40 +320,9 @@ class CascadeYamlConfig:
 
 
     class __CascadeYamlConfig:
-        def __init__(self, list_paths,
-                     default_paths,
-                     env_var_config_path,
-                     glob_suffix):
-            #print("#############   here ############  ", str(list_paths), str(default_paths), glob_suffix)
+        def __init__(self, yaml_files):
             self._conf = OrderedDict()
-            self.list_paths = []
-            if list_paths:
-                input_list_paths = list_paths
-            else:
-                input_list_paths = []
-            if env_var_config_path:
-                env_config_path = os.environ.get(env_var_config_path, None)
-                if env_config_path:
-                    input_list_paths.append(env_config_path)
-            if list_paths:
-                logger.info("CascadeYamlConfig: list_paths: " + str(list_paths))
-                for path in list_paths:
-                    if os.path.isfile(path) and os.path.exists(path):
-                        self.list_paths.append(path)
-                    else:
-                        if os.path.isdir(path) and os.path.exists(path):
-                            self.list_paths.extend(glob.glob(os.path.join(path, glob_suffix)))
-                        else:
-                            for def_path in default_paths:
-                                self.list_paths.extend(glob.glob(os.path.join(root_path, def_path, path, glob_suffix)))
-
-            
-            for def_path in default_paths:
-                self.list_paths.extend(glob.glob(os.path.join(root_path, def_path, glob_suffix)))
-
-            self.list_paths = ordered_set(self.list_paths)
-            #self.list_paths.reverse()
-            #print("list paths: ", self.list_paths)
+            self.list_paths = yaml_files
 
         def parse(self):
             logger.info("CascadeYamlConfig: parsing: " + str(self.list_paths))
@@ -309,10 +341,12 @@ class CascadeYamlConfig:
 
         def __getitem__(self, nested_key_list=None):
             """
-            this funchion access parsed config as loaded from hiyapyco
+            this function access parsed config as loaded from hiyapyco
             :param nested_key_list: list of the nested keys to retrieve
             :return: deep copy of OrderedDict
+            usage: top_config[['logging_configs']]
             """
+            logger.debug("nested_key_list: " + str(nested_key_list))
             val = self._conf
             if nested_key_list:
                 for key in nested_key_list:
@@ -322,17 +356,15 @@ class CascadeYamlConfig:
 
     def __init__(self, **kwargs):
 
-        default_values = {
-            'list_paths': None,
-            'default_paths' : ['etc', os.path.join('etc', 'defaults')],
-            'env_var_config_path' : 'RCM_CONFIG_PATH',
-            'glob_suffix' :  "*.yaml"}
+        logger.info("### init kwargs:" + str(kwargs) )
+
+        default_values = {'yaml_files': None}
 
         for k in default_values:
             default_values[k]=kwargs.get(k,default_values[k])
 
-        if not default_values['list_paths']:
-            default_values['list_paths']=argparse_get_config_paths()
+#        if not default_values['list_paths']:
+#            default_values['list_paths']=argparse_get_config_paths()
         par_hash=hash(str(default_values))
         logger.debug("CascadeYamlConfig.instances: " + str(CascadeYamlConfig.instances))
 

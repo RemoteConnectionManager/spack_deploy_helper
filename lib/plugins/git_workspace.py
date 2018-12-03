@@ -22,7 +22,7 @@ logging.info("__file__:" + os.path.realpath(__file__))
 #ls.set_args()
 
 
-class WorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
+class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
     def __init__(self, base_deploy_path, dry_run=True):
         super(WorkspaceManager, self).__init__()

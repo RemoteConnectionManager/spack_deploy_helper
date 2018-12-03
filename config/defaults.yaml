@@ -3,6 +3,7 @@
 
 defaults:
   debug : 'info'
+  plugin_base_dir : 'plugins'
   cache : '../cache'
   linkcache : '../../cache'
   install : '../install'
@@ -13,6 +14,7 @@ defaults:
   clearconfig : 'False'
   platformconfig : 'False'
   runconfig : 'False'
+  git_dest_dir : 'src'
   origin :
     url : 'https://github.com/RemoteConnectionManager/spack.git'
     master : 'develop'
@@ -37,10 +39,19 @@ argparse:
       help: 'do not perform any action'
       default: "{{ defaults.dry_run }}"
 
+    plugin_folder:
+      action: 'store'
+      default: "{{ defaults.plugin_base_dir }}"
+      help: 'plugin base folder'
+
   subparser:
 
     workspace:
       git_deploy:
+        dest:
+          action: 'store'
+          default: "{{ defaults.git_dest_dir }}"
+          help: 'Destination (sub) folder, if not abspath, relative to workspace'
         origin:
           action: 'store'
           default: "{{ defaults.origin.url }}"

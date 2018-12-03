@@ -36,7 +36,10 @@ class log_setup:
 
     def set_args(self,log_configs=None):
         if not log_configs:
-              log_configs = cascade_yaml_config.CascadeYamlConfig(default_paths=['config'], glob_suffix='defaults.yaml' )['logging_configs']
+              log_configs = cascade_yaml_config.CascadeYamlConfig(
+                  yaml_files=cascade_yaml_config.find_config_file_list(
+                                default_paths=['config'],
+                                glob_suffix='defaults.yaml' ))['logging_configs']
         # conf = cascade_yaml_config.CascadeYamlConfig(default_paths=['config'], glob_suffix='defaults.yaml' ).conf
         # log_configs=conf.get('logging_configs',{})
         if not log_configs.get('version',None) : log_configs['version']=1
