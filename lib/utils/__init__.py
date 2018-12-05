@@ -2,7 +2,9 @@ from __future__ import absolute_import
 import os,sys
 
 basepath = os.path.dirname(os.path.realpath(__file__))
-sys.path.insert(0, basepath)
+if basepath not in sys.path:
+    sys.path.append(basepath)
+
 
 from .linkfiles import LinkTree
 from .introspect import baseintrospect, myintrospect
