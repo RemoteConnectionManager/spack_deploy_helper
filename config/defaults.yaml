@@ -39,14 +39,10 @@ argparse:
       help: 'do not perform any action'
       default: "{{ defaults.dry_run }}"
 
-    plugin_folder:
-      action: 'store'
-      default: "{{ defaults.plugin_base_dir }}"
-      help: 'plugin base folder'
 
   subparser:
 
-    workspace:
+    to_remove_workspace:
       git_deploy:
         dest:
           action: 'store'

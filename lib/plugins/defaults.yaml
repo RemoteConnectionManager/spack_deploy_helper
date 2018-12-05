@@ -1,44 +1,51 @@
+defaults:
+  GitWorkspaceManager:
+    help: 'manage a git working copy from an origin and a clone'
+
 argparse:
   subparser:
-    workspace:
-      git_deploy:
-        dest:
-          action: 'store'
-          default: "{{ defaults.git_dest_dir }}"
-          help: 'Destination (sub) folder, if not abspath, relative to workspace'
-        origin:
-          action: 'store'
-          default: "{{ defaults.origin.url }}"
-          help: 'URL of the origin git repo being cloned.'
-        upstream:
-          action: 'store'
-          default: "{{ defaults.upstream.url }}"
-          help: 'URL of the upstream git repo.'
-        origin_master:
-          action: 'store'
-          default: "{{ defaults.origin.master }}"
-          help: 'name of the branch that will be created.'
-        upstream_master :
-          action: 'store'
-          default: "{{ defaults.upstream.master }}"
-          help: 'upstream branch to sync with.'
-        branches :
-          action: 'store'
-          help: 'Regular expressions of origin branches to fetch.  The first one specified will be checked out.'
-          default : '{{ defaults.origin.branches }}'
-        prlist :
-          action: 'store'
-          help: 'Regular expressions of upstream pr to fetch and merge.'
-          default : '{{ defaults.upstream.prs }}'
-        pull_flags :
-          action: 'store'
-          help: 'flags to use when pull.'
-          default : "{{ defaults.origin.pull_flags }}"
-        do_update :
-          action: 'store_true'
-          default : '{{ defaults.do_update }}'
-          help: 'update existing checkout'
-        integration :
-          action: 'store_true'
-          default : "{{ defaults.integration }}"
-          help : 'do upstream integration'
+    GitWorkspaceManager:
+      command: 'gitmanager'
+      help: 'manage a git working copy from an origin and a clone'
+      methods:
+        git_deploy:
+          git_dest:
+            action: 'store'
+            default: "{{ defaults.git_dest_dir }}"
+            help: 'Destination (sub) folder, if not abspath, relative to workspace'
+          origin:
+            action: 'store'
+            default: "{{ defaults.origin.url }}"
+            help: 'URL of the origin git repo being cloned.'
+          upstream:
+            action: 'store'
+            default: "{{ defaults.upstream.url }}"
+            help: 'URL of the upstream git repo.'
+          origin_master:
+            action: 'store'
+            default: "{{ defaults.origin.master }}"
+            help: 'name of the branch that will be created.'
+          upstream_master :
+            action: 'store'
+            default: "{{ defaults.upstream.master }}"
+            help: 'upstream branch to sync with.'
+          branches :
+            action: 'store'
+            help: 'Regular expressions of origin branches to fetch.  The first one specified will be checked out.'
+            default : '{{ defaults.origin.branches }}'
+          prlist :
+            action: 'store'
+            help: 'Regular expressions of upstream pr to fetch and merge.'
+            default : '{{ defaults.upstream.prs }}'
+          pull_flags :
+            action: 'store'
+            help: 'flags to use when pull.'
+            default : "{{ defaults.origin.pull_flags }}"
+          do_update :
+            action: 'store_true'
+            default : '{{ defaults.do_update }}'
+            help: 'update existing checkout'
+          integration :
+            action: 'store_true'
+            default : "{{ defaults.integration }}"
+            help : 'do upstream integration'

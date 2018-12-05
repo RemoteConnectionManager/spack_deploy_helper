@@ -3,9 +3,9 @@ import sys
 import uuid
 import logging
 
-lib_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'lib')
-if not lib_path in sys.path:
-    sys.path.append(lib_path)
+#lib_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'lib')
+#if not lib_path in sys.path:
+#    sys.path.append(lib_path)
 
 import utils
 import cascade_yaml_config
@@ -24,10 +24,14 @@ logging.info("__file__:" + os.path.realpath(__file__))
 
 class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
-    def __init__(self, base_deploy_path, dry_run=True):
-        super(WorkspaceManager, self).__init__()
-        self.base_path = base_deploy_path
-        self.dry_run=dry_run
+    def __init__(self, **kwargs):
+        super(GitWorkspaceManager, self).__init__()
+        for par in kwargs:
+            mylogger.info("init par "+ par+" --> "+str(kwargs[par]))
+
+
+        self.dry_run = kwargs.get('dry_run', False)
+        self.base_path = kwargs.get('dest', os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(sys.modules['__main__'].__file__))), 'deploy'))
 
     def create(self):
         uuid_ = uuid.uuid4()
@@ -50,7 +54,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             print('error: failed to remove the directory ' + path)
 
     def git_deploy(self,
-                   dest='spack',
+                   git_dest='spack',
                    do_update=False,
                    integration=False,
                    branches=['clean/master'],
@@ -62,8 +66,10 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
 
         # print("@@@@@@@@@@@@@@@@@@@@",self.dry_run)
-        if dest[0] != '/':
-            dest=os.path.join(self.base_path, dest)
+        if git_dest[0] != '/':
+            dest = os.path.join(self.base_path, git_dest)
+        else:
+            dest = git_dest
 
         dev_git = utils.git_repo(dest, logger=mylogger, dry_run=self.dry_run)
 

@@ -4,31 +4,30 @@ import os
 import sys
 import argparse
 import logging
-import inspect
-import importlib
-import glob
 
-# Find spack's location and its prefix.
+
+# set prefix.
 current_file = os.path.realpath(os.path.expanduser(__file__))
 current_prefix = os.path.dirname(os.path.dirname(current_file))
 
-# Allow spack libs to be imported in our scripts
+# Add lib folder in current prefix to default  import path
 current_lib_path = os.path.join(current_prefix, "lib")
 sys.path.insert(0, current_lib_path)
 
 import utils
 import cascade_yaml_config
 import log_config
-from workspace import WorkspaceManager
 
 ls=log_config.log_setup()
 logging.debug("__file__:" + os.path.realpath(__file__))
 mylogger = logging.getLogger(__name__)
 
+
 # create the top-level parser
 base_parser = argparse.ArgumentParser(prog='spack-deploy',add_help=False )
 base_parser.add_argument('-c','--config_paths', action='append', help='yaml config folders', default = [os.path.join(current_prefix, 'config')])
 base_parser.add_argument('-p','--plugin_paths', action='append', help='plugins folders', default = [os.path.join(current_lib_path, 'plugins')])
+
 initial_args = base_parser.parse_known_args()[0]
 plugin_folders = vars(initial_args).get('plugin_paths',[])
 config_folders = vars(initial_args).get('config_paths',[])
@@ -37,7 +36,7 @@ yaml_files = cascade_yaml_config.find_config_file_list(
                 default_paths=['config'],
                 glob_suffix='defaults.yaml' )
 
-print("@@@@@@@@@@@ find_config_file_list @@@@@@@@@@", yaml_files)
+# print("@@@@@@@@@@@ find_config_file_list @@@@@@@@@@", yaml_files)
 initial_config = cascade_yaml_config.CascadeYamlConfig(yaml_files=yaml_files)
 ls.set_args(log_configs=initial_config[['logging_configs']])
 
@@ -46,6 +45,7 @@ default_paths=['config']
 for plug_dir in available_plugins:
     default_paths.append(plug_dir)
 
+# load CascadeYamlConfig with plugin dir added as default
 top_config = cascade_yaml_config.CascadeYamlConfig(
     yaml_files=cascade_yaml_config.find_config_file_list(
         list_paths=config_folders,
@@ -64,7 +64,7 @@ common_args=top_config[['argparse', 'common']]
 
 cascade_yaml_config.argparse_add_arguments(common_parser,common_args)
 global_args = common_parser.parse_known_args()[0]
-print("### global args##",global_args)
+# print("### global args##",global_args)
 
 
 
@@ -77,13 +77,30 @@ subparsers = parser.add_subparsers(help='Utility for dealing with many instances
                                    dest='subparser_name')
 subparsers.required=True
 
-deploy_manager = WorkspaceManager("./workspace", dry_run=global_args.dry_run)
-deploy_manager_subcommand = 'workspace'
-deploy_manager_conf =top_config[['argparse', 'subparser', deploy_manager_subcommand]]
-# print(manager.__class__.__name__ + " :: " + str(manager._get_class_methods_defaults()))
-# print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",deploy_manager_conf)
-#deploy_manager._add_subparser(subparsers, name='workspace', conf=deploy_manager._get_argparse_methods(deploy_manager_conf), help='A workspace is an instance of spack')
-deploy_manager._add_subparser(subparsers, conf=deploy_manager._get_argparse_methods(deploy_manager_conf), help='A workspace is an instance of spack')
+print("adding plugins",available_plugins)
+managers = []
+for plug_dir in available_plugins:
+    for cls in  available_plugins[plug_dir]:
+        manager = cls(**vars(global_args))
+        manager_conf =  top_config[['argparse', 'subparser', cls.__name__]]
+        manager_subcommand = manager_conf.get('command', cls.__name__)
+        methods_conf = manager_conf.get('methods', dict())
+        manager_help = manager_conf.get('help', 'Manager ' + manager_subcommand)
+
+        # print("adding class:", cls.__name__)
+        # print("%%%%%%%%%%%%%%%%%%%%", methods_conf)
+
+        manager._add_subparser(subparsers, name=manager_subcommand, conf=manager._get_argparse_methods(methods_conf), help=manager_help)
+        managers.append(manager)
+
+
+# deploy_manager = WorkspaceManager("./workspace", dry_run=global_args.dry_run)
+# deploy_manager_subcommand = 'workspace'
+# deploy_manager_conf =top_config[['argparse', 'subparser', deploy_manager_subcommand]]
+# # print(manager.__class__.__name__ + " :: " + str(manager._get_class_methods_defaults()))
+# # print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",deploy_manager_conf)
+# #deploy_manager._add_subparser(subparsers, name='workspace', conf=deploy_manager._get_argparse_methods(deploy_manager_conf), help='A workspace is an instance of spack')
+# deploy_manager._add_subparser(subparsers, conf=deploy_manager._get_argparse_methods(deploy_manager_conf), help='A workspace is an instance of spack')
 
 args = parser.parse_args()
 args.func(args)
