@@ -23,22 +23,28 @@ logging.debug("__file__:" + os.path.realpath(__file__))
 mylogger = logging.getLogger(__name__)
 
 
+# get config folders
+(base_parser,config_folders, plugin_folders) = cascade_yaml_config.argparse_setup()
+# print("%%%%%%%%%% config folders %%%%%%", config_folders)
+# print("%%%%%%%%%% plugin folders %%%%%%", plugin_folders)
+
 # create the top-level parser
-base_parser = argparse.ArgumentParser(prog='spack-deploy',add_help=False )
-base_parser.add_argument('-c','--config_paths', action='append', help='yaml config folders', default = [os.path.join(current_prefix, 'config')])
-base_parser.add_argument('-p','--plugin_paths', action='append', help='plugins folders', default = [os.path.join(current_lib_path, 'plugins')])
-
-initial_args = base_parser.parse_known_args()[0]
-plugin_folders = vars(initial_args).get('plugin_paths',[])
-config_folders = vars(initial_args).get('config_paths',[])
-yaml_files = cascade_yaml_config.find_config_file_list(
-                list_paths=config_folders,
-                default_paths=['config'],
-                glob_suffix='defaults.yaml' )
-
-# print("@@@@@@@@@@@ find_config_file_list @@@@@@@@@@", yaml_files)
-initial_config = cascade_yaml_config.CascadeYamlConfig(yaml_files=yaml_files)
-ls.set_args(log_configs=initial_config[['logging_configs']])
+# base_parser = argparse.ArgumentParser(prog='spack-deploy',add_help=False )
+# base_parser.add_argument('-c','--config_paths', action='append', help='yaml config folders', default = [os.path.join(current_prefix, 'config')])
+# base_parser.add_argument('-p','--plugin_paths', action='append', help='plugins folders', default = [os.path.join(current_lib_path, 'plugins')])
+# base_parser.add_argument('-w', '--workdir', action='store', help='workspace folder', default=os.getcwd())
+#
+# initial_args = base_parser.parse_known_args()[0]
+# plugin_folders = vars(initial_args).get('plugin_paths',[])
+# config_folders = vars(initial_args).get('config_paths',[])
+# yaml_files = cascade_yaml_config.find_config_file_list(
+#                 list_paths=config_folders,
+#                 default_paths=['config'],
+#                 glob_suffix='defaults.yaml' )
+#
+# # print("@@@@@@@@@@@ find_config_file_list @@@@@@@@@@", yaml_files)
+# initial_config = cascade_yaml_config.CascadeYamlConfig(yaml_files=yaml_files)
+# ls.set_args(log_configs=initial_config[['logging_configs']])
 
 available_plugins = cascade_yaml_config.retrieve_plugins(plugin_folders)
 default_paths=['config']

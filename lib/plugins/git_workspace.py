@@ -31,7 +31,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
 
         self.dry_run = kwargs.get('dry_run', False)
-        self.base_path = kwargs.get('dest', os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(sys.modules['__main__'].__file__))), 'deploy'))
+        self.base_path = kwargs.get('workdir', os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(sys.modules['__main__'].__file__))), 'deploy'))
 
     def create(self):
         uuid_ = uuid.uuid4()
@@ -71,6 +71,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         else:
             dest = git_dest
 
+        print("@@@@@@@@@@@@@@@@@@@@", dest, self.dry_run)
         dev_git = utils.git_repo(dest, logger=mylogger, dry_run=self.dry_run)
 
         if not os.path.exists(dest):

@@ -13,6 +13,7 @@ lib_path = os.path.dirname((os.path.dirname(os.path.abspath(__file__))))
 if lib_path not in sys.path:
     sys.path.append(lib_path)
 import utils
+import log_config
 
 root_path = os.path.dirname(lib_path)
 logger = logging.getLogger(__name__)
@@ -46,27 +47,82 @@ def retrieve_plugins(plugin_folders):
 
 
 
-def argparse_get_config_paths():
+def argparse_setup():
+    ls=log_config.log_setup()
     base_parser = argparse.ArgumentParser(add_help=False)
-    base_parser.add_argument('-c', '--config_paths', action='append', help='yaml config folders',
-                             default=[os.path.join(root_path, 'config')])
-
+    base_parser.add_argument('-w', '--workdir', action='store', help='workspace folder', default=os.getcwd())
     base_args = base_parser.parse_known_args()[0]
-    # for name in vars(base_args):
-    #    print(name + " :: " + str(vars(base_args)[name]))
+    # print("%%%%% workdir %%%%",base_args.workdir)
+    yaml_files = find_config_file_list(
+                list_paths=[base_args.workdir],
+                default_paths=['config'],
+                glob_suffix='defaults.yaml' )
+    # print("yaml files", yaml_files)
 
-    listpaths = []
-    for c in base_args.config_paths:
-        logger.debug("config folder:" + c)
-        if c[0] != '/':
-            for base in [os.getcwd(), root_path]:
-                if os.path.exists(os.path.join(base, c)) :
-                    if os.path.isdir(os.path.join(base, c)) :
-                        c = os.path.abspath(os.path.join(base, c))
-                        break
-        listpaths.append(c)
-    # print("::::: listpaths::::",listpaths)
-    return listpaths
+    base_config = CascadeYamlConfig(yaml_files=yaml_files)
+    ls.set_args(log_configs=base_config[['logging_configs']])
+    config_dict = base_config[['config']]
+    # print("&&&&&&&&&&&&&",config_dict)
+    list_paths = {'config_folders': {'default': [os.path.join(root_path, 'config')],
+                                   'help': 'yaml config folders',
+                                    'folders': [os.path.join(root_path, 'config'), os.path.abspath(base_args.workdir)]},
+                  'plugin_folders': {'default': [os.path.join(lib_path, 'plugins')],
+                                   'help': 'plugins folders',
+                                    'folders': [] },
+                  }
+    for setup_path in list_paths:
+
+        base_parser.add_argument('-' + setup_path[0],
+                                 '--' + setup_path,
+                                 action='append',
+                                 help=list_paths[setup_path]['help'],
+                                 default=config_dict.get(setup_path, list_paths[setup_path]['default']))
+    base_args = base_parser.parse_known_args()[0]
+
+    # print(list_paths)
+    for setup_path in list_paths:
+        parsed_folders = vars(base_args).get(setup_path, [])
+
+        # need do deepcoy, otherwise infinite loop
+        current_folders = copy.deepcopy(list_paths[setup_path]['folders'])
+        for in_path in parsed_folders:
+            # print("@@@@@@@@@@ in_path @@@@",in_path)
+            logger.debug("config folder:" + in_path)
+            if in_path[0] != '/':
+                for base in [os.getcwd()] + list_paths[setup_path]['default']:
+                    if os.path.exists(os.path.join(base, in_path)) :
+                        if os.path.isdir(os.path.join(base, in_path)) :
+                            in_path = os.path.abspath(os.path.join(base, in_path))
+                            break
+            # print("######",current_folders)
+            if in_path not in current_folders:
+                current_folders.append(in_path)
+
+        list_paths[setup_path]['folders'] = current_folders
+
+    # config_paths = config_dict.get('config_folders', [os.path.join(root_path, 'config')])
+    # print("%%%%% config_paths %%%%", config_paths)
+    # plugin_paths = config_dict.get('plugin_paths', [os.path.join(lib_path, 'plugins')])
+    # print("%%%%% plugin_paths %%%%",plugin_paths)
+    # base_parser.add_argument('-c', '--config_paths', action='append', help='yaml config folders', default=config_paths)
+    # base_parser.add_argument('-p','--plugin_paths', action='append', help='plugins folders', default=plugin_paths)
+    # base_args = base_parser.parse_known_args()[0]
+    # # for name in vars(base_args):
+    # #    print(name + " :: " + str(vars(base_args)[name]))
+    #
+    # config_paths
+    # for c in base_args.config_paths:
+    #     logger.debug("config folder:" + c)
+    #     if c[0] != '/':
+    #         for base in [os.getcwd(), root_path]:
+    #             if os.path.exists(os.path.join(base, c)) :
+    #                 if os.path.isdir(os.path.join(base, c)) :
+    #                     c = os.path.abspath(os.path.join(base, c))
+    #                     break
+    #     config_paths.append(c)
+    #
+    # # print("::::: listpaths::::",listpaths)
+    return (base_parser, list_paths['config_folders']['folders'], list_paths['plugin_folders']['folders'])
 
 
 def argparse_add_arguments(parser,argument_dict):

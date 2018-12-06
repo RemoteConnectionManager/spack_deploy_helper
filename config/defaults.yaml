@@ -1,5 +1,8 @@
 # this is
 
+config:
+  config_folders:
+    - 'config'
 
 defaults:
   debug : 'info'
@@ -85,7 +88,6 @@ argparse:
           default : "{{ defaults.integration }}"
           help : 'do upstream integration'
 
-    config:
       cache:
         action: 'store'
         default: "{{ defaults.cache }}"
@@ -167,7 +169,7 @@ logging_configs:
       level: WARNING
       handlers: [console]
       propagate: False
-    workspace:
+    git_workspace:
       level: INFO
       handlers: [console]
       propagate: False
