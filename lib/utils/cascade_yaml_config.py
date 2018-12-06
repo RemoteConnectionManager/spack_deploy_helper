@@ -44,85 +44,99 @@ def retrieve_plugins(plugin_folders):
 
 
 
+def merge_folder_list(in_folders, merge_folders=None, prefixes=None):
+
+    if merge_folders==None:
+        merge_folders = []
+    if prefixes==None:
+        prefixes = [os.getcwd()]
+
+    # need do deepcoy, otherwise infinite loop
+    current_folders = copy.deepcopy(in_folders)
+    for in_path in merge_folders:
+        # print("@@@@@@@@@@ in_path @@@@",in_path)
+        logger.debug("config folder:" + in_path)
+        if in_path[0] != '/':
+            for base in prefixes:
+                if os.path.exists(os.path.join(base, in_path)):
+                    if os.path.isdir(os.path.join(base, in_path)):
+                        in_path = os.path.abspath(os.path.join(base, in_path))
+                        break
+        # print("######",current_folders)
+        if in_path not in current_folders:
+            current_folders.append(str(in_path))
+
+    return current_folders
 
 
+def setup_from_args_and_configs():
+    """
+    This function parse predefined args in hierarchical order, accumulating default parameters and
+    by parsing known config files
+    """
 
-def argparse_setup():
-    ls=log_config.log_setup()
+    log_controller = log_config.log_setup()
+
+    # base parser
     base_parser = argparse.ArgumentParser(add_help=False)
+    # this is the base workspace folder, containing a config file, named defaults.yaml, this file should accumulate the history
+    # of the subcommands configs, so it should
     base_parser.add_argument('-w', '--workdir', action='store', help='workspace folder', default=os.getcwd())
+
+    # partial parsing of known args
     base_args = base_parser.parse_known_args()[0]
     # print("%%%%% workdir %%%%",base_args.workdir)
+
+    #get yaml files involved
     yaml_files = find_config_file_list(
                 list_paths=[base_args.workdir],
                 default_paths=['config'],
                 glob_suffix='defaults.yaml' )
-    # print("yaml files", yaml_files)
+    # print("#######################first yaml files", yaml_files)
 
     base_config = CascadeYamlConfig(yaml_files=yaml_files)
-    ls.set_args(log_configs=base_config[['logging_configs']])
-    config_dict = base_config[['config']]
-    # print("&&&&&&&&&&&&&",config_dict)
-    list_paths = {'config_folders': {'default': [os.path.join(root_path, 'config')],
-                                   'help': 'yaml config folders',
-                                    'folders': [os.path.join(root_path, 'config'), os.path.abspath(base_args.workdir)]},
-                  'plugin_folders': {'default': [os.path.join(lib_path, 'plugins')],
-                                   'help': 'plugins folders',
-                                    'folders': [] },
-                  }
-    for setup_path in list_paths:
 
-        base_parser.add_argument('-' + setup_path[0],
-                                 '--' + setup_path,
-                                 action='append',
-                                 help=list_paths[setup_path]['help'],
-                                 default=config_dict.get(setup_path, list_paths[setup_path]['default']))
+    log_controller.set_args(log_configs=base_config[['logging_configs']])
+
+    config_session = base_config[['config']]
+    key_name = 'config_folders'
+    base_parser.add_argument('-' + key_name[0],
+                             '--' + key_name,
+                             action='append',
+                             help='yaml config folders',
+                             default=config_session.get(key_name,  [os.path.join(root_path, 'config')]))
+
+    # now reparse with this new arguments
     base_args = base_parser.parse_known_args()[0]
 
-    # print(list_paths)
-    for setup_path in list_paths:
-        parsed_folders = vars(base_args).get(setup_path, [])
+    yaml_files = find_config_file_list(
+                list_paths=[base_args.workdir] + base_args.config_folders,
+                default_paths=['config'],
+                glob_suffix='defaults.yaml' )
+    # print("#######################second yaml files", yaml_files)
+    base_config = CascadeYamlConfig(yaml_files=yaml_files)
+    log_controller.set_args(log_configs=base_config[['logging_configs']])
+    config_session = base_config[['config']]
 
-        # need do deepcoy, otherwise infinite loop
-        current_folders = copy.deepcopy(list_paths[setup_path]['folders'])
-        for in_path in parsed_folders:
-            # print("@@@@@@@@@@ in_path @@@@",in_path)
-            logger.debug("config folder:" + in_path)
-            if in_path[0] != '/':
-                for base in [os.getcwd()] + list_paths[setup_path]['default']:
-                    if os.path.exists(os.path.join(base, in_path)) :
-                        if os.path.isdir(os.path.join(base, in_path)) :
-                            in_path = os.path.abspath(os.path.join(base, in_path))
-                            break
-            # print("######",current_folders)
-            if in_path not in current_folders:
-                current_folders.append(in_path)
+    key_name = 'plugin_folders'
+    base_parser.add_argument('-' + key_name[0],
+                             '--' + key_name,
+                             action='append',
+                             help='plugin folders',
+                             default=config_session.get(key_name,  [os.path.join(lib_path, 'plugins')]))
 
-        list_paths[setup_path]['folders'] = current_folders
+    # now reparse with this new arguments
+    base_args = base_parser.parse_known_args()[0]
 
-    # config_paths = config_dict.get('config_folders', [os.path.join(root_path, 'config')])
-    # print("%%%%% config_paths %%%%", config_paths)
-    # plugin_paths = config_dict.get('plugin_paths', [os.path.join(lib_path, 'plugins')])
-    # print("%%%%% plugin_paths %%%%",plugin_paths)
-    # base_parser.add_argument('-c', '--config_paths', action='append', help='yaml config folders', default=config_paths)
-    # base_parser.add_argument('-p','--plugin_paths', action='append', help='plugins folders', default=plugin_paths)
-    # base_args = base_parser.parse_known_args()[0]
-    # # for name in vars(base_args):
-    # #    print(name + " :: " + str(vars(base_args)[name]))
-    #
-    # config_paths
-    # for c in base_args.config_paths:
-    #     logger.debug("config folder:" + c)
-    #     if c[0] != '/':
-    #         for base in [os.getcwd(), root_path]:
-    #             if os.path.exists(os.path.join(base, c)) :
-    #                 if os.path.isdir(os.path.join(base, c)) :
-    #                     c = os.path.abspath(os.path.join(base, c))
-    #                     break
-    #     config_paths.append(c)
-    #
-    # # print("::::: listpaths::::",listpaths)
-    return (base_parser, list_paths['config_folders']['folders'], list_paths['plugin_folders']['folders'])
+    config_folders = merge_folder_list([os.path.join(root_path, 'config'), os.path.abspath(base_args.workdir)],
+                                        merge_folders=base_args.config_folders,
+                                        prefixes=[os.getcwd(),os.path.join(root_path, 'config')])
+    plugin_folders = merge_folder_list([],
+                                        merge_folders=base_args.plugin_folders,
+                                        prefixes=[os.getcwd(),lib_path])
+
+    return (base_parser, config_folders, plugin_folders)
+
 
 
 def argparse_add_arguments(parser,argument_dict):
