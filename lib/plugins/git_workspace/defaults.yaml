@@ -1,6 +1,6 @@
 defaults:
-  GitWorkspaceManager:
-    help: 'manage a git working copy from an origin and a clone'
+  integration : 'False'
+  do_update : 'False'
 
 argparse:
   subparser:

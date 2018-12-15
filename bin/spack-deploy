@@ -3,6 +3,7 @@
 import os
 import sys
 import argparse
+import copy
 import logging
 
 
@@ -52,11 +53,13 @@ for plug_dir in available_plugins:
     default_paths.append(plug_dir)
 
 # load CascadeYamlConfig with plugin dir added as default
+yaml_files=cascade_yaml_config.find_config_file_list(
+    list_paths=config_folders,
+    default_paths=default_paths,
+    glob_suffix='defaults.yaml' )
+
 top_config = cascade_yaml_config.CascadeYamlConfig(
-    yaml_files=cascade_yaml_config.find_config_file_list(
-        list_paths=config_folders,
-        default_paths=default_paths,
-        glob_suffix='defaults.yaml' ))
+    yaml_files=yaml_files)
 
 #ls.set_args(log_configs=top_config[['logging_configs']])
 
@@ -72,7 +75,10 @@ cascade_yaml_config.argparse_add_arguments(common_parser,common_args)
 global_args = common_parser.parse_known_args()[0]
 # print("### global args##",global_args)
 
-
+# force config and plugin folders to be absolute paths
+copy_args = copy.deepcopy(vars(global_args))
+copy_args['config_folders'] = config_folders
+copy_args['plugin_folders'] = plugin_folders
 
 
 
@@ -87,14 +93,17 @@ print("adding plugins",available_plugins)
 managers = []
 for plug_dir in available_plugins:
     for cls in  available_plugins[plug_dir]:
-        manager = cls(**vars(global_args))
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11",copy_args)
+        manager = cls(**copy_args)
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!22",copy_args)
+
         manager_conf =  top_config[['argparse', 'subparser', cls.__name__]]
         manager_subcommand = manager_conf.get('command', cls.__name__)
         methods_conf = manager_conf.get('methods', dict())
         manager_help = manager_conf.get('help', 'Manager ' + manager_subcommand)
 
         # print("adding class:", cls.__name__)
-        # print("%%%%%%%%%%%%%%%%%%%%", methods_conf)
+        # print("%%%%%%%% methods_conf %%%%%%%%%%%%", methods_conf)
 
         manager._add_subparser(subparsers, name=manager_subcommand, conf=manager._get_argparse_methods(methods_conf), help=manager_help)
         managers.append(manager)

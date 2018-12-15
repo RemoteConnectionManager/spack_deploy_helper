@@ -46,9 +46,9 @@ def retrieve_plugins(plugin_folders):
 
 def merge_folder_list(in_folders, merge_folders=None, prefixes=None):
 
-    if merge_folders==None:
+    if merge_folders is None:
         merge_folders = []
-    if prefixes==None:
+    if prefixes is None:
         prefixes = [os.getcwd()]
 
     # need do deepcoy, otherwise infinite loop
@@ -73,6 +73,10 @@ def setup_from_args_and_configs():
     """
     This function parse predefined args in hierarchical order, accumulating default parameters and
     by parsing known config files
+    return a triple consisting of:
+    base_parser:      base command line parser
+    config_folders:   list of config folders used for setup
+    plugin_folders:   list of plugin folders used for setup
     """
 
     log_controller = log_config.log_setup()
@@ -135,7 +139,7 @@ def setup_from_args_and_configs():
                                         merge_folders=base_args.plugin_folders,
                                         prefixes=[os.getcwd(),lib_path])
 
-    return (base_parser, config_folders, plugin_folders)
+    return base_parser, config_folders, plugin_folders
 
 
 
@@ -185,11 +189,37 @@ def ordered_set(in_list):
 
 class ArgparseSubcommandManager(object):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.methods_defaults = self._get_class_methods_defaults()
         self.yaml_config_nested_keys=[]
         logger.debug("@@@@@@@@"+str(self.methods_defaults)+"@@@@@@@@@@")
-        # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+        for par in kwargs:
+            logger.debug("###############initrgparseSubcommandManager  par "+ par+" --> "+str(kwargs[par]))
+
+        self.dry_run = kwargs.get('dry_run', False)
+        self.base_path = kwargs.get('workdir', os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(sys.modules['__main__'].__file__))), 'deploy'))
+        self.save_config_file = kwargs.get('save_config',  'defaults.yaml' )
+        if '/' != self.save_config_file[0]:
+            self.save_config_file = os.path.join(self.base_path, self.save_config_file)
+        self.save_config_file = os.path.abspath(self.save_config_file)
+        if os.path.exists(self.save_config_file) :
+            self.conf_to_save = utils.hiyapyco.load(
+                    [self.save_config_file],
+                    interpolate=True,
+                    method=utils.hiyapyco.METHOD_MERGE,
+                    failonmissingfiles=True
+                )
+        else:
+            self.conf_to_save = OrderedDict()
+
+        conf = copy.deepcopy(self.conf_to_save.get('config',OrderedDict()))
+        for k in ['config_folders', 'plugin_folders']:
+            conf[k] = kwargs.get(k,[])
+        self.conf_to_save['config'] = conf
+
+        print("$$$$$$$$$$$$$$ saving to", self.save_config_file, self.conf_to_save)
+
+
 
     def _set_yaml_config_nested_keys(self,nested_keys):
         self.yaml_config_nested_keys = nested_keys
@@ -249,13 +279,14 @@ class ArgparseSubcommandManager(object):
 
                 if 'default' in param_defaults:
                     d=param_defaults['default']
-                    if d[0]=='['  :
-                        #print("multimpar",a,conf_args[a]['default'])
-                        arguments['nargs']='*'
-                        arguments['default'] = eval(d)
-                    else:
-                        if  arguments['action'] == 'store_true': arguments['default'] = eval(d)
-                        else: arguments['default'] = str(d)
+                    if d :
+                        if d[0]=='['  :
+                            #print("multimpar",a,conf_args[a]['default'])
+                            arguments['nargs']='*'
+                            arguments['default'] = eval(d)
+                        else:
+                            if  arguments['action'] == 'store_true': arguments['default'] = eval(d)
+                            else: arguments['default'] = str(d)
                 else:
                     if self.methods_defaults[method][param] != None:
                         arguments['default'] = self.methods_defaults[method][param]
@@ -291,12 +322,18 @@ class ArgparseSubcommandManager(object):
                     merged_args.append(all_args[par])
 
         logger.debug("@@@@merged_args: " + str(merged_args) + " merged_kw: "+ str(merged_kwargs))
-        config_to_merge = merge_config(merged_kwargs, nested_keys=self.yaml_config_nested_keys)
-        out=utils.hiyapyco.dump(config_to_merge, default_flow_style=False)
-        print("@@@@@", out)
+
         getattr(self.__class__, method)(self,*merged_args,**merged_kwargs)
 
+    def _print_config(self,**kwargs):
+        for par in kwargs:
+            logger.info("############### print_config par "+ par+" --> "+str(kwargs[par]))
+        config_to_merge = merge_config(kwargs, nested_keys=self.yaml_config_nested_keys)
+        out=utils.hiyapyco.dump(config_to_merge, default_flow_style=False)
+        print("@@@@@", out)
 
+    def _merge_config(self, nested_keys, **kwargs):
+        self.conf_to_save = merge_config(kwargs, base_conf=self.conf_to_save, nested_keys=nested_keys)
 
     def _add_subparser(self, subparsers, name=None, conf=None, help=''):
         # print("############",type(subparsers))

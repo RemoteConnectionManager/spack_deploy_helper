@@ -25,13 +25,11 @@ logging.info("__file__:" + os.path.realpath(__file__))
 class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
     def __init__(self, **kwargs):
-        super(GitWorkspaceManager, self).__init__()
+        super(GitWorkspaceManager, self).__init__(**kwargs)
         for par in kwargs:
             mylogger.info("init par "+ par+" --> "+str(kwargs[par]))
 
 
-        self.dry_run = kwargs.get('dry_run', False)
-        self.base_path = kwargs.get('workdir', os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(sys.modules['__main__'].__file__))), 'deploy'))
 
     def create(self):
         uuid_ = uuid.uuid4()
@@ -54,7 +52,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             print('error: failed to remove the directory ' + path)
 
     def git_deploy(self,
-                   git_dest='spack',
+                   git_dest='src',
                    do_update=False,
                    integration=False,
                    branches=['clean/master'],
