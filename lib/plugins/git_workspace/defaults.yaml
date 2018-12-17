@@ -9,6 +9,7 @@ argparse:
       help: 'manage a git working copy from an origin and a clone'
       methods:
         git_deploy:
+          help: 'deploy from origin cloned from upstream, add origin branches and upstream pull requests, tested on github'
           git_dest:
             action: 'store'
             default: "{{ defaults.git_dest_dir }}"
