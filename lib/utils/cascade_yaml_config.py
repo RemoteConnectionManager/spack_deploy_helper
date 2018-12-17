@@ -166,11 +166,13 @@ def argparse_add_arguments(parser,argument_dict):
 
 
 def merge_config(merge_conf, base_conf=dict(), nested_keys=[]):
-    out=copy.deepcopy(base_conf)
-    curr=out
     if len(nested_keys) > 0:
+        out = copy.deepcopy(base_conf)
+        curr = out
         for key in nested_keys[:-1]:
-            curr = curr.get(key,OrderedDict())
+            next = curr.get(key,OrderedDict())
+            curr[key] =next
+            curr = next
         curr[nested_keys[-1]] = copy.deepcopy(merge_conf)
         return out
     else:
@@ -217,12 +219,19 @@ class ArgparseSubcommandManager(object):
             conf[k] = kwargs.get(k,[])
         self.conf_to_save['config'] = conf
 
-        print("$$$$$$$$$$$$$$ saving to", self.save_config_file, self.conf_to_save)
+        self.config_nested_keys = kwargs.get('nested_keys', ['argparse', 'subparser'] + [self.__class__.__name__])
+        top_config = kwargs.get('top_config', None)
+        if top_config:
+             manager_conf =  top_config[self.config_nested_keys]
+        else:
+            manager_conf = OrderedDict()
+        self.manager_subcommand = manager_conf.get('command',self.__class__.__name__)
+        self.manager_help = manager_conf.get('help', 'Manager ' + self.manager_subcommand)
+        self.methods_conf = manager_conf.get('methods', dict())
+
+        print("$$$$$$$$$$$$$$ saving to", self.save_config_file, self.config_nested_keys, self.conf_to_save)
 
 
-
-    def _set_yaml_config_nested_keys(self,nested_keys):
-        self.yaml_config_nested_keys = nested_keys
 
     def _get_class_methods_defaults(self):
         # print("class name",self.__class__.__name__)
@@ -325,6 +334,12 @@ class ArgparseSubcommandManager(object):
 
         getattr(self.__class__, method)(self,*merged_args,**merged_kwargs)
 
+        self._merge_config(self.config_nested_keys + ['methods', method], **merged_kwargs)
+        out=utils.hiyapyco.dump(self.conf_to_save, default_flow_style=False)
+        print("@@@@@", out)
+
+        #self._print_config(**merged_kwargs)
+
     def _print_config(self,**kwargs):
         for par in kwargs:
             logger.info("############### print_config par "+ par+" --> "+str(kwargs[par]))
@@ -333,22 +348,29 @@ class ArgparseSubcommandManager(object):
         print("@@@@@", out)
 
     def _merge_config(self, nested_keys, **kwargs):
+        print("UUUUUUU merging ", nested_keys, kwargs)
+        print("AAAAAAA conf_to_save ", self.conf_to_save)
         self.conf_to_save = merge_config(kwargs, base_conf=self.conf_to_save, nested_keys=nested_keys)
+        print("BBBBBBB conf_to_save ", self.conf_to_save)
 
     def _add_subparser(self, subparsers, name=None, conf=None, help=''):
         # print("############",type(subparsers))
         if conf:
             self.conf=conf
         else:
-            self.conf = self._get_argparse_methods()
+            self.conf = self._get_argparse_methods(self.methods_conf)
+        if name:
+            self.manager_subcommand = name
+
+        if help:
+            self.manager_help = help
         subparsers_help = ''
         for method in self.conf:
             subparsers_help += method + ','
         subparsers_help = "{ " + subparsers_help + " }"
-        if name:
-            self.subparser_name = name
-            self.subparser = subparsers.add_parser(self.subparser_name , help=help, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-            self.subparsers = self.subparser.add_subparsers(dest='sub_' + self.subparser_name, metavar=subparsers_help)
+        if self.manager_subcommand:
+            self.subparser = subparsers.add_parser(self.manager_subcommand , help= self.manager_help, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+            self.subparsers = self.subparser.add_subparsers(dest='sub_' + self.manager_subcommand, metavar=subparsers_help)
         else:
             self.subparsers=subparsers
 #            self.subparser_name = self.__class__.__name__
