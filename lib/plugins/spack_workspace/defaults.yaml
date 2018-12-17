@@ -7,7 +7,6 @@ defaults:
   linkinstall : '../../install'
   git_dest_dir : 'spack'
   origin :
-    url : 'https://github.com/RemoteConnectionManager/spack.git'
     master : 'develop'
     branches :
       - 'clean/develop'
