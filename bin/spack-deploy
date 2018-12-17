@@ -79,6 +79,7 @@ global_args = common_parser.parse_known_args()[0]
 copy_args = copy.deepcopy(vars(global_args))
 copy_args['config_folders'] = config_folders
 copy_args['plugin_folders'] = plugin_folders
+copy_args['top_config'] = top_config
 
 
 
@@ -95,18 +96,19 @@ for plug_dir in available_plugins:
     for cls in  available_plugins[plug_dir]:
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11",copy_args)
         manager = cls(**copy_args)
+        manager._add_subparser(subparsers)
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!22",copy_args)
 
-        manager_conf =  top_config[['argparse', 'subparser', cls.__name__]]
-        manager_subcommand = manager_conf.get('command', cls.__name__)
-        methods_conf = manager_conf.get('methods', dict())
-        manager_help = manager_conf.get('help', 'Manager ' + manager_subcommand)
-
-        # print("adding class:", cls.__name__)
-        # print("%%%%%%%% methods_conf %%%%%%%%%%%%", methods_conf)
-
-        manager._add_subparser(subparsers, name=manager_subcommand, conf=manager._get_argparse_methods(methods_conf), help=manager_help)
-        managers.append(manager)
+        # manager_conf =  top_config[['argparse', 'subparser', cls.__name__]]
+        # manager_subcommand = manager_conf.get('command', cls.__name__)
+        # methods_conf = manager_conf.get('methods', dict())
+        # manager_help = manager_conf.get('help', 'Manager ' + manager_subcommand)
+        #
+        # # print("adding class:", cls.__name__)
+        # # print("%%%%%%%% methods_conf %%%%%%%%%%%%", methods_conf)
+        #
+        # manager._add_subparser(subparsers, name=manager_subcommand, conf=manager._get_argparse_methods(methods_conf), help=manager_help)
+        # managers.append(manager)
 
 
 # deploy_manager = WorkspaceManager("./workspace", dry_run=global_args.dry_run)
