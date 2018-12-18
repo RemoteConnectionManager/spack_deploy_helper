@@ -41,7 +41,7 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         print('Searching workspaces into:', base_path)
         for root, dirs, files in os.walk(base_path, topdown=True):
             if is_spack_root(root):
-                print(" found spack folder ", root)
+                print(" OOOOOOOOOOOOO list OOOOO found spack folder ", root)
                 del dirs
 
     def remove(self, uuid_):

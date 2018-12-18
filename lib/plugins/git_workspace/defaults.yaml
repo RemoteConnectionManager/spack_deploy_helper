@@ -1,6 +1,8 @@
 defaults:
   integration : 'False'
-  do_update : 'False'
+  origin_update : 'False'
+  upstream_update : 'False'
+  rebase_update : 'False'
 
 argparse:
   subparser:
@@ -42,10 +44,18 @@ argparse:
             action: 'store'
             help: 'flags to use when pull.'
             default : "{{ defaults.origin.pull_flags }}"
-          do_update :
+          origin_update :
             action: 'store_true'
-            default : '{{ defaults.do_update }}'
-            help: 'update existing checkout'
+            default : '{{ defaults.origin_update }}'
+            help: 'update existing checkout from origin'
+          upstream_update :
+            action: 'store_true'
+            default : '{{ defaults.upstream_update }}'
+            help: 'update existing checkout from upstream'
+          rebase_update :
+            action: 'store_true'
+            default : '{{ defaults.rebase_update }}'
+            help: 'rebase from upstream'
           integration :
             action: 'store_true'
             default : "{{ defaults.integration }}"

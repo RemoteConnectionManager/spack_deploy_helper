@@ -53,8 +53,10 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
     def git_deploy(self,
                    git_dest='src',
-                   do_update=False,
                    integration=False,
+                   origin_update=False,
+                   upstream_update=False,
+                   rebase_update=False,
                    branches=['clean/master'],
                    prlist=[],
                    origin='',
@@ -72,11 +74,22 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         print("@@@@@@@@@@@@@@@@@@@@", dest, self.dry_run)
         dev_git = utils.git_repo(dest, logger=mylogger, dry_run=self.dry_run)
 
+        origin_branches = utils.get_branches(origin, branch_selection=branches)
+        upstream_branches = utils.get_branches(
+            upstream,
+            branch_pattern='.*?\s+refs/pull/([0-9]*?)/head\s+',
+            # branch_exclude_pattern='.*?\s+refs/pull/({branch})/merge\s+',
+            branch_format_string='pull/{branch}/head',
+            branch_selection=prlist)
+
+        local_pr = utils.trasf_match(upstream_branches, in_match='.*/([0-9]*)/(.*)', out_format='pull/{name}/clean')
+
+        mylogger.info("upstream_branches->" + str(upstream_branches) + "<--")
+
         if not os.path.exists(dest):
             mylogger.info("MISSING destination_dir-->" + dest + "<-- ")
             os.makedirs(dest)
 
-            origin_branches = utils.get_branches(origin, branch_selection=branches)
 
             dev_git.init()
 
@@ -84,16 +97,6 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             dev_git.add_remote(origin, name='origin', fetch_branches=origin_branches)
             dev_git.add_remote(upstream, name='upstream')
 
-            upstream_branches = utils.get_branches(
-                upstream,
-                branch_pattern='.*?\s+refs/pull/([0-9]*?)/head\s+',
-                # branch_exclude_pattern='.*?\s+refs/pull/({branch})/merge\s+',
-                branch_format_string='pull/{branch}/head',
-                branch_selection=prlist)
-
-            local_pr = utils.trasf_match(upstream_branches, in_match='.*/([0-9]*)/(.*)', out_format='pull/{name}/clean')
-
-            mylogger.info("upstream_branches->" + str(upstream_branches) + "<--")
 
             dev_git.fetch(name='origin', branches=origin_branches)
 
@@ -102,14 +105,21 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                     upstream_clean = origin_branches[0]
                     # print("--------------------------------------" + upstream_clean + "-----------------------")
                     dev_git.checkout(upstream_clean)
-                    dev_git.sync_upstream()
+                    if upstream_update:
+                        dev_git.sync_upstream()
                     dev_git.checkout(upstream_clean, newbranch=origin_master)
 
-                    dev_git.sync_upstream()
+                    if upstream_update:
+                        dev_git.sync_upstream()
 
                     for b in origin_branches[1:]:
-                        dev_git.checkout(b)
-                        dev_git.sync_upstream(options=['--rebase'])
+                        if upstream_update:
+                            dev_git.checkout(b)
+                            merge_options = []
+                            if rebase_update:
+                                merge_options.append('--rebase')
+                        #dev_git.sync_upstream(options=['--rebase'])
+                            dev_git.sync_upstream(options=merge_options)
 
                     dev_git.fetch(name='upstream', branches=local_pr)
 
@@ -128,11 +138,21 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 dev_git.checkout(origin_master)
 
         else:
-            mylogger.warning("Folder ->" + dest + "<- already existing, skipping git stuff")
-            if do_update:
+            mylogger.warning("Folder ->" + dest + "<- already existing")
+            if origin_update:
                 mylogger.info("Updating Folder ->" + dest + "<-")
                 pull_options = []
                 for flag in pull_flags: pull_options.append('--' + flag)
-                for b in dev_git.get_local_branches():
-                    dev_git.checkout(b)
-                    dev_git.sync_upstream(upstream='origin', master=b, options=pull_options)
+                local_branches = dev_git.get_local_branches()
+                for branch in origin_branches[1:]:
+                    if branch in local_branches:
+                        dev_git.checkout(branch)
+                        dev_git.sync_upstream(upstream='origin', master=branch, options=pull_options)
+                    else:
+                        dev_git.fetch(name='origin', branches=[branch])
+                        dev_git.checkout(branch)
+                    if upstream_update:
+                        merge_options = []
+                        if rebase_update:
+                            merge_options.append('--rebase')
+                        dev_git.sync_upstream(options=merge_options)
