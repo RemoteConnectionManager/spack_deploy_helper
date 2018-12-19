@@ -34,7 +34,7 @@ argparse:
             help: 'upstream branch to sync with.'
           branches :
             action: 'store'
-            help: 'Regular expressions of origin branches to fetch.  The first one specified will be checked out.'
+            help: 'Regular expressions of origin branches to fetch.  The first one specified will be the upstream clean copy.'
             default : '{{ defaults.origin.branches }}'
           prlist :
             action: 'store'
@@ -51,11 +51,11 @@ argparse:
           upstream_update :
             action: 'store_true'
             default : '{{ defaults.upstream_update }}'
-            help: 'update existing checkout from upstream'
+            help: 'update first branch (upstream/master/clean) from upstream and check that all branches can be merged but do not actually merge them'
           rebase_update :
             action: 'store_true'
             default : '{{ defaults.rebase_update }}'
-            help: 'rebase from upstream'
+            help: 'all the origin branches fetched will be rebased from the clean upstream'
           integration :
             action: 'store_true'
             default : "{{ defaults.integration }}"
