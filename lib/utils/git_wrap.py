@@ -101,6 +101,12 @@ class git_repo:
         (ret,output) = self.run(cmd)
         if ret : self.logger.error("rebase " + branch + "failed")
 
+    def delete(self, branch):
+        self.logger.info("removing-->" + branch + '<<-')
+        cmd = [ 'git', 'branch', '--delete', branch]
+        (ret,output) = self.run(cmd)
+        if ret : self.logger.error("delete " + branch + "failed")
+
     def get_local_branches(self):
         cmd = [ 'git', 'branch']
         (ret,output) = self.run(cmd)

@@ -114,16 +114,22 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
                     for b in origin_branches[1:]:
                         if upstream_update:
-                            dev_git.checkout(b)
                             merge_branch = b + '_merge'
                             dev_git.checkout(b, newbranch=merge_branch)
                             dev_git.merge(upstream_clean)
 
                             if rebase_update:
-                                rebase_branch = b + '_rebase'
-                                dev_git.checkout(merge_branch, newbranch=rebase_branch)
+                                dev_git.checkout(b)
+                                dev_git.merge(upstream_clean)
                                 dev_git.rebase(branch=upstream_clean, options=['-Xtheirs'])
                                 dev_git.merge(merge_branch, options=['-Xtheirs'])
+                                #rebase_branch = b + '_rebase'
+                                #dev_git.checkout(merge_branch, newbranch=rebase_branch)
+                                #dev_git.rebase(branch=upstream_clean, options=['-Xtheirs'])
+                                #dev_git.merge(merge_branch, options=['-Xtheirs'])
+                            dev_git.delete(merge_branch)
+                        dev_git.checkout(b)
+
 
 
 
