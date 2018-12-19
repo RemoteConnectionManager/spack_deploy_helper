@@ -88,12 +88,18 @@ class git_repo:
         (ret,output) = self.run(cmd)
         if ret : self.logger.error("sync_upstream failed")
 
-    def merge(self, branch, comment='merged branch '):
+    def merge(self, branch, comment='', options=[]):
         if not comment : comment = 'merged branch ' + branch
         self.logger.info("merging-->" + branch + '<<-')
-        cmd = [ 'git', 'merge', '-m', '"' + comment  + '"', branch]
+        cmd = [ 'git', 'merge', '-m', '"' + comment  + '"'] + options + [branch]
         (ret,output) = self.run(cmd)
         if ret : self.logger.error("merge " + branch + "failed")
+
+    def rebase(self, branch='upstream/develop', options=[]):
+        self.logger.info("rebasing-->" + branch + '<<-')
+        cmd = ['git', 'rebase'] + options + [branch]
+        (ret,output) = self.run(cmd)
+        if ret : self.logger.error("rebase " + branch + "failed")
 
     def get_local_branches(self):
         cmd = [ 'git', 'branch']
