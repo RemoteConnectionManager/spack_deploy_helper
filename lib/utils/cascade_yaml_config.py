@@ -192,6 +192,7 @@ def ordered_set(in_list):
 class ArgparseSubcommandManager(object):
 
     def __init__(self, **kwargs):
+        self.root_path = root_path
         self.methods_defaults = self._get_class_methods_defaults()
         self.yaml_config_nested_keys=[]
         logger.debug("@@@@@@@@"+str(self.methods_defaults)+"@@@@@@@@@@")
@@ -217,12 +218,12 @@ class ArgparseSubcommandManager(object):
         conf = copy.deepcopy(self.conf_to_save.get('config',OrderedDict()))
         for k in ['config_folders', 'plugin_folders']:
             conf[k] = kwargs.get(k,[])
+            setattr(self, k,conf[k] )
         self.conf_to_save['config'] = conf
-
         self.config_nested_keys = kwargs.get('nested_keys', ['argparse', 'subparser'] + [self.__class__.__name__])
-        top_config = kwargs.get('top_config', None)
-        if top_config:
-             manager_conf =  top_config[self.config_nested_keys]
+        self.top_config = kwargs.get('top_config', None)
+        if self.top_config:
+             manager_conf =  self.top_config[self.config_nested_keys]
         else:
             manager_conf = OrderedDict()
         self.manager_subcommand = manager_conf.get('command',self.__class__.__name__)
@@ -353,19 +354,17 @@ class ArgparseSubcommandManager(object):
         self.conf_to_save = merge_config(kwargs, base_conf=self.conf_to_save, nested_keys=nested_keys)
         print("BBBBBBB conf_to_save ", self.conf_to_save)
 
-    def _add_subparser(self, subparsers, name=None, conf=None, help=''):
+    def _add_subparser(self, subparsers, name=None, parser_conf=None, help=''):
         # print("############",type(subparsers))
-        if conf:
-            self.conf=conf
-        else:
-            self.conf = self._get_argparse_methods(self.methods_conf)
+        if parser_conf == None:
+            conf = self._get_argparse_methods(self.methods_conf)
         if name:
             self.manager_subcommand = name
 
         if help:
             self.manager_help = help
         subparsers_help = ''
-        for method in self.conf:
+        for method in parser_conf:
             subparsers_help += method + ','
         subparsers_help = "{ " + subparsers_help + " }"
         if self.manager_subcommand:
@@ -380,9 +379,9 @@ class ArgparseSubcommandManager(object):
         self.subparsers.required = True
 
         self.methods_subparsers = dict()
-        for method in self.conf:
+        for method in parser_conf:
             # print("---handling method",method)
-            method_conf = self.conf[method]
+            method_conf = parser_conf[method]
             methods_conf_args=method_conf.get('args',dict())
             self.methods_subparsers[method] = self.subparsers.add_parser(method,
                                                                     help=method_conf.get('help',''),
