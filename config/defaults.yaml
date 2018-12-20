@@ -1,40 +1,16 @@
-# this is
+# this is main defaults config file
+
+
 
 config:
   config_folders:
     - 'config'
+  hosts_dir: 'recipes/hosts'
 
 defaults:
   debug : 'info'
 
-to_remove_defaults:
-  debug : 'info'
-  plugin_base_dir : 'plugins'
-  cache : '../cache'
-  linkcache : '../../cache'
-  install : '../install'
-  linkinstall : '../../install'
-  dry_run : 'False'
-  integration : 'False'
-  do_update : 'False'
-  clearconfig : 'False'
-  platformconfig : 'False'
-  runconfig : 'False'
-  git_dest_dir : 'src'
-  origin :
-    url : 'https://github.com/RemoteConnectionManager/spack.git'
-    master : 'develop'
-    branches :
-      - 'clean/develop'
-    pull_flags :
-      - 'ff-only'
-  upstream :
-    url : 'https://github.com/LLNL/spack.git'
-    master : 'develop'
-    prs : []
-
 argparse:
-
   common:
     debug:
       action: 'store'
@@ -44,6 +20,8 @@ argparse:
       action: 'store_true'
       help: 'do not perform any action'
       default: "{{ defaults.dry_run }}"
+
+
 
 
 
@@ -115,3 +93,30 @@ logging_configs:
       handlers: [console]
       level: INFO
       propagate: False
+
+
+to_remove_defaults:
+  debug : 'info'
+  plugin_base_dir : 'plugins'
+  cache : '../cache'
+  linkcache : '../../cache'
+  install : '../install'
+  linkinstall : '../../install'
+  dry_run : 'False'
+  integration : 'False'
+  do_update : 'False'
+  clearconfig : 'False'
+  platformconfig : 'False'
+  runconfig : 'False'
+  git_dest_dir : 'src'
+  origin :
+    url : 'https://github.com/RemoteConnectionManager/spack.git'
+    master : 'develop'
+    branches :
+      - 'clean/develop'
+    pull_flags :
+      - 'ff-only'
+  upstream :
+    url : 'https://github.com/LLNL/spack.git'
+    master : 'develop'
+    prs : []

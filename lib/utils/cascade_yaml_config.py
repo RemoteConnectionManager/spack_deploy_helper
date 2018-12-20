@@ -77,6 +77,7 @@ def setup_from_args_and_configs():
     base_parser:      base command line parser
     config_folders:   list of config folders used for setup
     plugin_folders:   list of plugin folders used for setup
+    platform_folders: list of platform folders used for setup
     """
 
     log_controller = log_config.log_setup()
@@ -103,6 +104,10 @@ def setup_from_args_and_configs():
     log_controller.set_args(log_configs=base_config[['logging_configs']])
 
     config_session = base_config[['config']]
+
+    # print("///////////////", config_session)
+
+    # adding config_folders arg
     key_name = 'config_folders'
     base_parser.add_argument('-' + key_name[0],
                              '--' + key_name,
@@ -110,17 +115,49 @@ def setup_from_args_and_configs():
                              help='yaml config folders',
                              default=config_session.get(key_name,  [os.path.join(root_path, 'config')]))
 
+    key_name = 'hosts_dir'
+
+    base_parser.add_argument('--' + key_name,
+                             action='store',
+                             help='hosts config base dir',
+                             default=config_session.get(key_name,  'config/hosts'))
+
     # now reparse with this new arguments
     base_args = base_parser.parse_known_args()[0]
+    # print("@@@@@@@@@ args.hosts_dir ::::::", str(base_args.hosts_dir).split('/'))
+    if base_args.hosts_dir[0] == '/':
+        hosts_dir = base_args.hosts_dir
+    else:
+        hosts_dir = os.path.join(root_path, str(base_args.hosts_dir))
+    # print("@@@@@@@@@ hosts_dir ::::::", hosts_dir)
+    default_paths = ['config']
+    if os.path.exists(hosts_dir):
+        default_paths.append(hosts_dir)
+
+
+
 
     yaml_files = find_config_file_list(
                 list_paths=[base_args.workdir] + base_args.config_folders,
-                default_paths=['config'],
+                default_paths=default_paths,
                 glob_suffix='defaults.yaml' )
+
     # print("#######################second yaml files", yaml_files)
     base_config = CascadeYamlConfig(yaml_files=yaml_files)
     log_controller.set_args(log_configs=base_config[['logging_configs']])
+
     config_session = base_config[['config']]
+
+
+    platform_match = utils.myintrospect(tags=config_session.get('host_tags', dict())).platform_tag()
+    platform_folders=[]
+    if platform_match:
+        logger.info(" platform -->" + str(platform_match) + "<--")
+        platform_folders = merge_folder_list([],
+                                            merge_folders=[os.path.join(platform_match, config_session.get('config_dir', 'config'))],
+                                            prefixes=[os.getcwd(), hosts_dir])
+        logger.info(" platform folders -->" + str(platform_folders) + "<--")
+
 
     key_name = 'plugin_folders'
     base_parser.add_argument('-' + key_name[0],
@@ -132,14 +169,32 @@ def setup_from_args_and_configs():
     # now reparse with this new arguments
     base_args = base_parser.parse_known_args()[0]
 
-    config_folders = merge_folder_list([os.path.join(root_path, 'config'), os.path.abspath(base_args.workdir)],
+    # platform_folders=[]
+    # if base_args.platform_dir[0] == '/':
+    #     platform_dir = base_args.platform_dir
+    # else:
+    #     platform_dir = os.path.join(root_path, base_args.platform_dir)
+    # if os.path.exists(platform_dir):
+    #     platform_folders.append(platform_dir)
+    #     platform_match = utils.myintrospect(tags=config_session.get('host_tags', dict())).platform_tag()
+    #     logger.info(" platform -->" + str(platform_match) + "<--")
+    #     if platform_match:
+    #         platform_config_folder = os.path.abspath(os.path.join(platform_dir, platform_match, config_session.get('config_dir', 'config')))
+    #         if os.path.exists(platform_config_folder):
+    #             platform_folders.append(platform_config_folder)
+    #         else:
+    #             logger.warning(" NON EXISTING PLATFORM FOLDER :" + str(platform_config_folder))
+
+
+    config_folders = merge_folder_list([os.path.join(root_path, 'config')] + platform_folders + [os.path.abspath(base_args.workdir)],
                                         merge_folders=base_args.config_folders,
                                         prefixes=[os.getcwd(),os.path.join(root_path, 'config')])
     plugin_folders = merge_folder_list([],
                                         merge_folders=base_args.plugin_folders,
                                         prefixes=[os.getcwd(),lib_path])
 
-    return base_parser, config_folders, plugin_folders
+    return base_parser, config_folders, plugin_folders, platform_folders
+
 
 
 
@@ -357,7 +412,7 @@ class ArgparseSubcommandManager(object):
     def _add_subparser(self, subparsers, name=None, parser_conf=None, help=''):
         # print("############",type(subparsers))
         if parser_conf == None:
-            conf = self._get_argparse_methods(self.methods_conf)
+            parser_conf = self._get_argparse_methods(self.methods_conf)
         if name:
             self.manager_subcommand = name
 
