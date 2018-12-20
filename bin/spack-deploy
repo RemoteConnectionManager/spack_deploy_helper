@@ -94,10 +94,10 @@ print("adding plugins",available_plugins)
 managers = []
 for plug_dir in available_plugins:
     for cls in  available_plugins[plug_dir]:
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11",copy_args)
+        # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11",copy_args)
         manager = cls(**copy_args)
         manager._add_subparser(subparsers)
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!22",copy_args)
+        # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!22",copy_args)
 
         # manager_conf =  top_config[['argparse', 'subparser', cls.__name__]]
         # manager_subcommand = manager_conf.get('command', cls.__name__)
