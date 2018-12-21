@@ -1,6 +1,5 @@
 import os
-import sys
-import uuid
+import glob
 import logging
 
 #lib_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'lib')
@@ -27,9 +26,6 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             mylogger.info("init par "+ par+" --> "+str(kwargs[par]))
 
 
-        self.dry_run = kwargs.get('dry_run', False)
-        self.base_path = kwargs.get('workdir', os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(sys.modules['__main__'].__file__))), 'deploy'))
-
 
     def list(self, base_path=''):
         if not base_path:
@@ -51,96 +47,169 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         except OSError:
             print('error: failed to remove the directory ' + path)
 
-    def folder_setup(self,
-                    spack_root='spack',
-                    cache='cache',
-                    bincache='bincache',
-                    install='install'):
-        print("setting up folders for spack deploy in: ", os.path.join(self.base_path,spack_root))
-
 
     def config_setup(self,
-                   spack_root='spack',
-                   do_update=False,
-                   integration=False,
-                   branches=['clean/master'],
-                   prlist=[],
-                   origin='',
-                   origin_master='',
-                   pull_flags=['ff-only'],
-                   upstream=''):
+                     spack_root='spack',
+                     cache='cache',
+                     bincache='bincache',
+                     install='install',
+                     clearconfig=True,
+                     runconfig=False):
+
 
 
         # print("@@@@@@@@@@@@@@@@@@@@",self.dry_run)
-        if git_dest[0] != '/':
-            dest = os.path.join(self.base_path, git_dest)
+        if spack_root [0] != '/':
+            dest = os.path.join(self.base_path, spack_root)
         else:
-            dest = git_dest
+            dest = spack_root
 
-        print("@@@@@@@@@@@@@@@@@@@@", dest, self.dry_run)
-        dev_git = utils.git_repo(dest, logger=mylogger, dry_run=self.dry_run)
 
-        if not os.path.exists(dest):
-            mylogger.info("MISSING destination_dir-->" + dest + "<-- ")
-            os.makedirs(dest)
-
-            origin_branches = utils.get_branches(origin, branch_selection=branches)
-
-            dev_git.init()
-
-            dev_git.get_remotes()
-            dev_git.add_remote(origin, name='origin', fetch_branches=origin_branches)
-            dev_git.add_remote(upstream, name='upstream')
-
-            upstream_branches = utils.get_branches(
-                upstream,
-                branch_pattern='.*?\s+refs/pull/([0-9]*?)/head\s+',
-                # branch_exclude_pattern='.*?\s+refs/pull/({branch})/merge\s+',
-                branch_format_string='pull/{branch}/head',
-                branch_selection=prlist)
-
-            local_pr = utils.trasf_match(upstream_branches, in_match='.*/([0-9]*)/(.*)', out_format='pull/{name}/clean')
-
-            mylogger.info("upstream_branches->" + str(upstream_branches) + "<--")
-
-            dev_git.fetch(name='origin', branches=origin_branches)
-
-            if integration:
-                if len(origin_branches) > 0:
-                    upstream_clean = origin_branches[0]
-                    # print("--------------------------------------" + upstream_clean + "-----------------------")
-                    dev_git.checkout(upstream_clean)
-                    dev_git.sync_upstream()
-                    dev_git.checkout(upstream_clean, newbranch=origin_master)
-
-                    dev_git.sync_upstream()
-
-                    for b in origin_branches[1:]:
-                        dev_git.checkout(b)
-                        dev_git.sync_upstream(options=['--rebase'])
-
-                    dev_git.fetch(name='upstream', branches=local_pr)
-
-                    for n, branch in local_pr.items():
-                        mylogger.info("local_pr " + n + " " + branch)
-                        dev_git.checkout(branch, newbranch=branch + '_update')
-                        dev_git.merge(upstream_clean, comment='sync with upstream develop ')
-                        dev_git.checkout(origin_master)
-                        dev_git.merge(branch + '_update', comment='merged ' + branch)
-
-                    for branch in origin_branches[1:]:
-                        dev_git.checkout(origin_master)
-                        dev_git.merge(branch, comment='merged ' + branch)
-            else:
-                dev_git.fetch(name='origin', branches=[origin_master])
-                dev_git.checkout(origin_master)
-
+        ########## cache handling ##############
+        cachedir=cache
+        mylogger.info("input cache_dir-->"+cachedir+"<--")
+        if not os.path.exists(cachedir):
+            cachedir=os.path.abspath(os.path.join(self.base_path,cachedir))
         else:
-            mylogger.warning("Folder ->" + dest + "<- already existing, skipping git stuff")
-            if do_update:
-                mylogger.info("Updating Folder ->" + dest + "<-")
-                pull_options = []
-                for flag in pull_flags: pull_options.append('--' + flag)
-                for b in dev_git.get_local_branches():
-                    dev_git.checkout(b)
-                    dev_git.sync_upstream(upstream='origin', master=b, options=pull_options)
+            cachedir=os.path.abspath(cachedir)
+        mylogger.info("actual cache_dir-->"+cachedir+"<--")
+        try:
+            os.makedirs(cachedir)
+        except OSError:
+            if not os.path.isdir(cachedir):
+                raise
+        #if not os.path.exists(cachedir):
+        #    os.makedirs(cachedir)
+        if os.path.exists(os.path.join(dest, 'var', 'spack')):
+            deploy_cache=os.path.join(dest, 'var', 'spack','cache')
+            mylogger.info("deploy cache_dir-->"+deploy_cache+"<--")
+            if not os.path.exists(deploy_cache):
+                os.symlink(cachedir,deploy_cache)
+                mylogger.info("symlinked -->"+cachedir+"<-->"+deploy_cache)
+
+        ########## install folder handling ##############
+        if  install:
+            mylogger.info("find install in args-->"+install+"<--")
+            install_dir = install
+            if not os.path.exists(install_dir):
+                install_dir = os.path.join(dest,install)
+        else:
+            install_dir = os.path.join(dest,'opt','spack')
+        install_dir=os.path.abspath(install_dir)
+        if not os.path.exists(install_dir):
+            mylogger.info("creting install_dir-->"+install_dir+"<--")
+            os.makedirs(install_dir)
+        mylogger.info("install_dir-->"+install_dir+"<--")
+
+
+
+
+        ######## config path handling #################
+        # config_path_list=
+        # for configdir in self.args.config_paths :
+        #     mylogger.info(" check input config dir -->"+configdir+"<--")
+        #     for test in [ os.path.abspath(configdir), os.path.abspath(os.path.join(root_dir,configdir)), ] :
+        #         if os.path.exists(test):
+        #             config_path_list=[test]+config_path_list
+        #             mylogger.info(" found config dir -->" + test + "<-- ADDED")
+        #             break
+        #
+        subst=dict()
+        subst["RCM_DEPLOY_ROOTPATH"] = self.root_path
+        subst["RCM_DEPLOY_INSTALLPATH"] = install_dir
+        subst["RCM_DEPLOY_SPACKPATH"] = dest
+        #
+        # if platformconfig :
+        #     platform_match=utils.myintrospect(tags=conf['configurations']['host_tags']).platform_tag()
+        #     mylogger.info(" platform -->" + str(platform_match) +"<--")
+        #     if platform_match :
+        #         test=os.path.abspath(os.path.join(root_dir,
+        #                                           configurations.get('base_folder',''),
+        #                                           configurations.get('host_folder',''),
+        #                                           platform_match,
+        #                                           configurations.get('config_dir','')))
+        if len(self.platform_folders) > 0 :
+            subst["RCM_DEPLOY_HOSTPATH"] = self.platform_folders[0]
+            if self.platform_folders[0] not in self.config_folders:
+                mylogger.warning("missing " + str(self.platform_folders[0]) )
+            #config_path_list=config_path_list + [test]
+            #config_path_list=[test] + config_path_list
+
+        config_path_list = self.config_folders
+        mylogger.info(" config_path_list -->" + str(config_path_list) )
+
+
+        ########## merge, interpolate and write spack config files#########
+
+
+        spack_config_dir=os.path.abspath(os.path.join(dest,'etc','spack'))
+        if os.path.exists(spack_config_dir) :
+            if clearconfig:
+                mylogger.info("Clear config Folder ->"+spack_config_dir+"<-")
+                for f in glob.glob(spack_config_dir+ "/*.yaml"):
+                    os.remove(f)
+
+            for f in self.manager_conf.get('config', dict()).get('spack_yaml_files',[]) :
+                merge_files=[]
+                for p in config_path_list:
+                    test=os.path.abspath(os.path.join(p,f))
+                    if os.path.exists(test): merge_files = merge_files +[test]
+
+                if merge_files :
+                    mylogger.info("configuring "+ f + " with files: "+str(merge_files))
+                    merged_f = utils.hiyapyco.load(
+                        *merge_files,
+                        interpolate=True,
+                        method=utils.hiyapyco.METHOD_MERGE,
+                        failonmissingfiles=True
+                    )
+
+                    mylogger.info("merged "+f+" yaml-->"+str(merged_f)+"<--")
+
+                    outfile = os.path.basename(f)
+                    target = os.path.join(spack_config_dir, outfile)
+                    mylogger.info(" output config_file " + outfile + "<-- ")
+                    if not os.path.exists(target):
+                        out=utils.hiyapyco.dump(merged_f, default_flow_style=False)
+                        out = utils.stringtemplate(out).safe_substitute(subst)
+                        mylogger.info("WRITING config_file " + outfile + " -->" + target + "<-- ")
+                        open(target, "w").write(out)
+                else :
+                    mylogger.info("no template file for "+ f + " : skipping ")
+
+
+
+        utils.source(os.path.join(dest,'share','spack','setup-env.sh'))
+        if runconfig :
+            for p in config_path_list:
+                initfile=os.path.abspath(os.path.join(p,'config.sh'))
+                if os.path.exists(initfile):
+                    mylogger.info("executing init file-->" + initfile + "<-- ")
+
+        #            mylogger.info("parsing init file-->" + initfile + "<-- ")
+        ##            (ret,out,err)=utils.run(['/bin/bash', initfile], logger=mylogger)
+        ##            mylogger.info("  " + out )
+                    f=open(initfile,'r')
+                    for line in f:
+                        line=line.lstrip()
+                        if len(line)>0:
+                            if not line[0] == '#':
+                                templ= utils.stringtemplate(line)
+                                cmd=templ.safe_substitute(subst)
+        #                        (ret,out,err)=utils.run(cmd.split(),logger=mylogger)
+                                (ret,out,err)=utils.run(['/bin/bash', '-c', cmd], logger=mylogger)
+                                mylogger.info("  " + out )
+
+            for p in config_path_list:
+                initfile=os.path.join(p,'install.sh')
+                if os.path.exists(initfile):
+                    mylogger.info("parsing init file-->" + initfile + "<-- ")
+                    f=open(initfile,'r')
+                    for line in f:
+                        line=line.lstrip()
+                        if len(line)>0:
+                            if not line[0] == '#':
+                                templ= utils.stringtemplate(line)
+                                cmd=templ.safe_substitute(subst)
+                                (ret,out,err)=utils.run(cmd.split(),logger=mylogger)
+                                mylogger.info("  " + out )
