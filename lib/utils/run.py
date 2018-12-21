@@ -9,9 +9,9 @@ def run(cmd,logger=None,stop_on_error=True,dry_run=False,folder='.'):
     if not cmd :
         logger.warning("skipping empty command")
         return (0, '','')
-    logger.info("running-->"+' '.join(cmd)+"<-")
+    logger.info("running-->"+' '.join(cmd)+"<-\n"+os.environ['PATH'])
     if not dry_run :
-        myprocess = subprocess.Popen(cmd, cwd=folder,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        myprocess = subprocess.Popen(cmd, cwd=folder,stdout=subprocess.PIPE,stderr=subprocess.PIPE, env=os.environ)
         stdout,stderr = myprocess.communicate()
         myprocess.wait()
         ret = myprocess.returncode
