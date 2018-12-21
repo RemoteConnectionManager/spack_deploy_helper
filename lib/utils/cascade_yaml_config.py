@@ -278,14 +278,14 @@ class ArgparseSubcommandManager(object):
         self.config_nested_keys = kwargs.get('nested_keys', ['argparse', 'subparser'] + [self.__class__.__name__])
         self.top_config = kwargs.get('top_config', None)
         if self.top_config:
-             manager_conf =  self.top_config[self.config_nested_keys]
+             self.manager_conf =  self.top_config[self.config_nested_keys]
         else:
-            manager_conf = OrderedDict()
+            self.manager_conf = OrderedDict()
 
-        self.manager_subcommand = manager_conf.get('command',self.__class__.__name__)
+        self.manager_subcommand = self.manager_conf.get('command',self.__class__.__name__)
 
-        self.manager_help = manager_conf.get('help', 'Manager ' + self.manager_subcommand)
-        self.methods_conf = manager_conf.get('methods', dict())
+        self.manager_help = self.manager_conf.get('help', 'Manager ' + self.manager_subcommand)
+        self.methods_conf = self.manager_conf.get('methods', dict())
 
         print("$$$$$$$$$$$$$$ saving to", self.save_config_file, self.config_nested_keys, self.conf_to_save)
 
