@@ -271,7 +271,7 @@ class ArgparseSubcommandManager(object):
             self.conf_to_save = OrderedDict()
 
         conf = copy.deepcopy(self.conf_to_save.get('config',OrderedDict()))
-        for k in ['config_folders', 'plugin_folders']:
+        for k in ['config_folders', 'plugin_folders', 'platform_folders']:
             conf[k] = kwargs.get(k,[])
             setattr(self, k,conf[k] )
         self.conf_to_save['config'] = conf
@@ -281,7 +281,9 @@ class ArgparseSubcommandManager(object):
              manager_conf =  self.top_config[self.config_nested_keys]
         else:
             manager_conf = OrderedDict()
+
         self.manager_subcommand = manager_conf.get('command',self.__class__.__name__)
+
         self.manager_help = manager_conf.get('help', 'Manager ' + self.manager_subcommand)
         self.methods_conf = manager_conf.get('methods', dict())
 

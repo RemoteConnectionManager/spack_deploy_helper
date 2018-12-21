@@ -83,6 +83,7 @@ global_args = common_parser.parse_known_args()[0]
 copy_args = copy.deepcopy(vars(global_args))
 copy_args['config_folders'] = config_folders
 copy_args['plugin_folders'] = plugin_folders
+copy_args['platform_folders'] = platform_folders
 copy_args['top_config'] = top_config
 
 
