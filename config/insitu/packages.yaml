@@ -33,6 +33,9 @@ packages:
     version:
     - 2.6.1
 
-
+# pinning matplotlib not to require python3
+  py-matplotlib:
+    version:
+    - 2.2.3
 
 

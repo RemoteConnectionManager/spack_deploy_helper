@@ -5,6 +5,11 @@ packages:
     version:
     - 2.24.32
     variants: +X
+# pinning atk to not use meson, that in turn requires python3...
+# for fixing, either move to python3 stack or use meson as external package
+  atk:
+    version:
+    - 2.20.0
   cairo:
     variants: +X
   vte:
