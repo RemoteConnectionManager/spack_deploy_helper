@@ -21,6 +21,8 @@ mylogger = logging.getLogger(__name__)
 logging.info("__file__:" + os.path.realpath(__file__))
 #ls.set_args()
 
+def is_git_clone(path):
+    return os.path.exists(os.path.join(path, '.git'))
 
 class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
@@ -39,10 +41,11 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         return uuid
 
     def list(self):
-        print('The current workspaces are:')
-        for root, dirs, files in os.walk(self.base_path, topdown=False):
-            for name in dirs:
-                print(" * " + name)
+        print('The current workspaces found in ' + self.base_path + ' are:')
+        for root, dirs, files in os.walk(self.base_path, topdown=True):
+            if is_git_clone(root):
+                print(" found git clone folder ", root)
+                del dirs
 
     def remove(self, uuid_):
         path = os.path.join(self.base_path, str(uuid_))
@@ -127,6 +130,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                                 #dev_git.checkout(merge_branch, newbranch=rebase_branch)
                                 #dev_git.rebase(branch=upstream_clean, options=['-Xtheirs'])
                                 #dev_git.merge(merge_branch, options=['-Xtheirs'])
+                            dev_git.checkout(b)
                             dev_git.delete(merge_branch)
                         dev_git.checkout(b)
 
