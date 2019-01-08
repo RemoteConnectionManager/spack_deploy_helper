@@ -1,8 +1,12 @@
 defaults:
-  integration : 'False'
-  origin_update : 'False'
-  upstream_update : 'False'
-  rebase_update : 'False'
+  origin:
+#    url: ''
+  upstream:
+#    url: ''
+  integration : 'True'
+  origin_update : 'True'
+#  upstream_update : 'False'
+#  rebase_update : 'False'
 
 argparse:
   subparser:
