@@ -205,7 +205,7 @@ def argparse_add_arguments(parser,argument_dict):
         arguments['help'] = conf_args['help']
         arguments['action'] = conf_args['action']
         d = conf_args['default']
-        # print("param:", a, " :::", d, type(d).__name__)
+        # print("OOOOOOOOOOOOOOOOOOOOOOparam:", a, " :::", d, type(d).__name__)
         if d:
             if d[0] == '[':
                 # print("multimpar",a,conf_args[a]['default'])
@@ -255,7 +255,16 @@ class ArgparseSubcommandManager(object):
             logger.debug("###############initrgparseSubcommandManager  par "+ par+" --> "+str(kwargs[par]))
 
         self.dry_run = kwargs.get('dry_run', False)
-        self.base_path = kwargs.get('workdir', os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(sys.modules['__main__'].__file__))), 'deploy'))
+        rel_path = kwargs.get('workdir', '')
+        deploy_dir = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(sys.modules['__main__'].__file__))), 'deploy')
+        for path in [os.path.join(os.curdir,rel_path),
+                     os.path.join(deploy_dir,rel_path),
+                     deploy_dir,
+                     os.curdir] :
+            if os.path.exists(path):
+                self.base_path = os.path.abspath(path)
+                break
+        #self.base_path = kwargs.get('workdir', os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(sys.modules['__main__'].__file__))), 'deploy'))
         self.save_config_file = kwargs.get('save_config',  'defaults.yaml' )
         if '/' != self.save_config_file[0]:
             self.save_config_file = os.path.join(self.base_path, self.save_config_file)
@@ -338,31 +347,52 @@ class ArgparseSubcommandManager(object):
                                         'args' : dict() }
             for param in self.methods_defaults[method]:
                 param_defaults = conf_params_defaults.get(param,dict())
+                # print("PPPPPPPPPPPPPPPPPP",method,param,param_defaults)
                 arguments = dict()
                 if 'help' in param_defaults:
                     arguments['help'] = param_defaults['help']
-                if 'action' in param_defaults:
-                    arguments['action'] = param_defaults['action']
 
-                if 'default' in param_defaults:
-                    d=param_defaults['default']
-                    if d :
-                        if d[0]=='['  :
-                            #print("multimpar",a,conf_args[a]['default'])
-                            arguments['nargs']='*'
-                            arguments['default'] = eval(d)
+                arguments['action'] = param_defaults.get('action', 'store')
+
+
+                if self.methods_defaults[method][param] != None:
+                    arguments['default'] = str(self.methods_defaults[method][param])
+
+                    d = param_defaults.get('default', '')
+                    if len(d) > 0 :
+                        arguments['default'] = str(d)
+
+
+                    if len(arguments['default']) > 0 :
+                        if str(arguments['default'])[0] == '[':
+                             arguments['nargs'] = '*'
+                             arguments['default'] = eval(arguments['default'])
                         else:
-                            if  arguments['action'] == 'store_true': arguments['default'] = eval(d)
-                            else: arguments['default'] = str(d)
+                            if  arguments['action'] == 'store_true':
+                                arguments['default'] = eval(arguments['default'])
                 else:
-                    if self.methods_defaults[method][param] != None:
-                        arguments['default'] = self.methods_defaults[method][param]
-                        if len(str(arguments['default'])) > 0:
-                            if str(arguments['default'])[0]=='[':
-                                arguments['nargs'] = '*'
-                    else:
-                        logger.info("method: " + method + " has positional param " + param + " defaults:>" + str(self.methods_defaults[method][param]) + "<:")
-                    arguments['action'] = 'store'
+                    logger.info("!!!!!!!!!!!!!method: " + method + " has positional param " + param + " defaults:>" + str(self.methods_defaults[method][param]) + "<:")
+
+                #     if d[0]=='['  :
+                #         #print("multimpar",a,conf_args[a]['default'])
+                #         arguments['nargs']='*'
+                #         arguments['default'] = eval(d)
+                #     else:
+                #         if  arguments['action'] == 'store_true': arguments['default'] = eval(d)
+                #         else: arguments['default'] = str(d)
+                # else:
+                #     arguments['action'] = 'store'
+                #
+                #
+                # else:
+                #     if self.methods_defaults[method][param] != None:
+                #         arguments['default'] = self.methods_defaults[method][param]
+                #         if len(str(arguments['default'])) > 0:
+                #             if str(arguments['default'])[0]=='[':
+                #                 arguments['nargs'] = '*'
+                #     else:
+                #         logger.info("method: " + method + " has positional param " + param + " defaults:>" + str(self.methods_defaults[method][param]) + "<:")
+                #     arguments['action'] = 'store'
                 argparse_methods[method]['args'][param] = arguments
 
         return argparse_methods
