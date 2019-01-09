@@ -7,3 +7,7 @@ logging_configs:
       level: INFO
     __main__:
       level: ERROR
+    utils:
+      level: WARNING
+    plugin:
+      level: WARNING

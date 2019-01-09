@@ -247,6 +247,7 @@ def ordered_set(in_list):
 class ArgparseSubcommandManager(object):
 
     def __init__(self, **kwargs):
+        self.logger = logging.getLogger('plugin.' + self.__class__.__name__)
         self.root_path = root_path
         self.methods_defaults = self._get_class_methods_defaults()
         self.yaml_config_nested_keys=[]
@@ -296,7 +297,7 @@ class ArgparseSubcommandManager(object):
         self.manager_help = self.manager_conf.get('help', 'Manager ' + self.manager_subcommand)
         self.methods_conf = self.manager_conf.get('methods', dict())
 
-        print("$$$$$$$$$$$$$$ saving to", self.save_config_file, self.config_nested_keys, self.conf_to_save)
+        # print("$$$$$$$$$$$$$$ saving to", self.save_config_file, self.config_nested_keys, self.conf_to_save)
 
 
 

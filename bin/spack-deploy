@@ -67,7 +67,7 @@ top_config = cascade_yaml_config.CascadeYamlConfig(
 
 #ls.set_args(log_configs=top_config[['logging_configs']])
 
-common_parser = argparse.ArgumentParser(prog='spack-deploy',
+common_parser = argparse.ArgumentParser(prog=__name__,
                                         parents=[base_parser],
                                         add_help=False,
                                         formatter_class=argparse.ArgumentDefaultsHelpFormatter  )
@@ -88,14 +88,14 @@ copy_args['top_config'] = top_config
 
 
 
-parser = argparse.ArgumentParser(prog='spack-deploy',
+parser = argparse.ArgumentParser(prog=__name__,
                                  parents=[common_parser],
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-subparsers = parser.add_subparsers(help='Utility for dealing with many instances of spacks',
+subparsers = parser.add_subparsers(help='Utility for hierarchical configuration deployment',
                                    dest='subparser_name')
 subparsers.required=True
 
-print("adding plugins",available_plugins)
+# print("adding plugins",available_plugins)
 managers = []
 for plug_dir in available_plugins:
     for cls in  available_plugins[plug_dir]:

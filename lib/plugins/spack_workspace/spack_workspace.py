@@ -9,9 +9,8 @@ import logging
 import utils
 import cascade_yaml_config
 
-mylogger = logging.getLogger(__name__)
 
-logging.info("imported __file__:" + os.path.realpath(__file__))
+logging.debug("imported __file__:" + os.path.realpath(__file__))
 
 
 def is_spack_root(path):
@@ -23,7 +22,7 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
     def __init__(self, **kwargs):
         super(SpackWorkspaceManager, self).__init__(**kwargs)
         for par in kwargs:
-            mylogger.info("init par "+ par+" --> "+str(kwargs[par]))
+            self.logger.info("init par "+ par+" --> "+str(kwargs[par]))
 
 
 
@@ -67,12 +66,12 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
         ########## cache handling ##############
         cachedir=cache
-        mylogger.info("input cache_dir-->"+cachedir+"<--")
+        self.logger.info("input cache_dir-->"+cachedir+"<--")
         if not os.path.exists(cachedir):
             cachedir=os.path.abspath(os.path.join(self.base_path,cachedir))
         else:
             cachedir=os.path.abspath(cachedir)
-        mylogger.info("actual cache_dir-->"+cachedir+"<--")
+        self.logger.info("actual cache_dir-->"+cachedir+"<--")
         try:
             os.makedirs(cachedir)
         except OSError:
@@ -82,14 +81,14 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         #    os.makedirs(cachedir)
         if os.path.exists(os.path.join(dest, 'var', 'spack')):
             deploy_cache=os.path.join(dest, 'var', 'spack','cache')
-            mylogger.info("deploy cache_dir-->"+deploy_cache+"<--")
+            self.logger.info("deploy cache_dir-->"+deploy_cache+"<--")
             if not os.path.exists(deploy_cache):
                 os.symlink(cachedir,deploy_cache)
-                mylogger.info("symlinked -->"+cachedir+"<-->"+deploy_cache)
+                self.logger.info("symlinked -->"+cachedir+"<-->"+deploy_cache)
 
         ########## install folder handling ##############
         if  install:
-            mylogger.info("find install in args-->"+install+"<--")
+            self.logger.info("find install in args-->"+install+"<--")
             install_dir = install
             if not os.path.exists(install_dir):
                 install_dir = os.path.join(dest,install)
@@ -97,9 +96,9 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             install_dir = os.path.join(dest,'opt','spack')
         install_dir=os.path.abspath(install_dir)
         if not os.path.exists(install_dir):
-            mylogger.info("creting install_dir-->"+install_dir+"<--")
+            self.logger.info("creting install_dir-->"+install_dir+"<--")
             os.makedirs(install_dir)
-        mylogger.info("install_dir-->"+install_dir+"<--")
+        self.logger.info("install_dir-->"+install_dir+"<--")
 
 
 
@@ -107,11 +106,11 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         ######## config path handling #################
         # config_path_list=
         # for configdir in self.args.config_paths :
-        #     mylogger.info(" check input config dir -->"+configdir+"<--")
+        #     self.logger.info(" check input config dir -->"+configdir+"<--")
         #     for test in [ os.path.abspath(configdir), os.path.abspath(os.path.join(root_dir,configdir)), ] :
         #         if os.path.exists(test):
         #             config_path_list=[test]+config_path_list
-        #             mylogger.info(" found config dir -->" + test + "<-- ADDED")
+        #             self.logger.info(" found config dir -->" + test + "<-- ADDED")
         #             break
         #
         subst=dict()
@@ -121,7 +120,7 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         #
         # if platformconfig :
         #     platform_match=utils.myintrospect(tags=conf['configurations']['host_tags']).platform_tag()
-        #     mylogger.info(" platform -->" + str(platform_match) +"<--")
+        #     self.logger.info(" platform -->" + str(platform_match) +"<--")
         #     if platform_match :
         #         test=os.path.abspath(os.path.join(root_dir,
         #                                           configurations.get('base_folder',''),
@@ -131,12 +130,12 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         if len(self.platform_folders) > 0 :
             subst["RCM_DEPLOY_HOSTPATH"] = self.platform_folders[0]
             if self.platform_folders[0] not in self.config_folders:
-                mylogger.warning("missing " + str(self.platform_folders[0]) )
+                self.logger.warning("missing " + str(self.platform_folders[0]) )
             #config_path_list=config_path_list + [test]
             #config_path_list=[test] + config_path_list
 
         config_path_list = self.config_folders
-        mylogger.info(" config_path_list -->" + str(config_path_list) )
+        self.logger.info(" config_path_list -->" + str(config_path_list) )
 
 
         ########## merge, interpolate and write spack config files#########
@@ -145,7 +144,7 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         spack_config_dir=os.path.abspath(os.path.join(dest,'etc','spack'))
         if os.path.exists(spack_config_dir) :
             if clearconfig:
-                mylogger.info("Clear config Folder ->"+spack_config_dir+"<-")
+                self.logger.info("Clear config Folder ->"+spack_config_dir+"<-")
                 for f in glob.glob(spack_config_dir+ "/*.yaml"):
                     os.remove(f)
 
@@ -156,7 +155,7 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                     if os.path.exists(test): merge_files = merge_files +[test]
 
                 if merge_files :
-                    mylogger.info("configuring "+ f + " with files: "+str(merge_files))
+                    self.logger.info("configuring "+ f + " with files: "+str(merge_files))
                     merged_f = utils.hiyapyco.load(
                         *merge_files,
                         interpolate=True,
@@ -164,18 +163,18 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                         failonmissingfiles=True
                     )
 
-                    mylogger.info("merged "+f+" yaml-->"+str(merged_f)+"<--")
+                    self.logger.info("merged "+f+" yaml-->"+str(merged_f)+"<--")
 
                     outfile = os.path.basename(f)
                     target = os.path.join(spack_config_dir, outfile)
-                    mylogger.info(" output config_file " + outfile + "<-- ")
+                    self.logger.info(" output config_file " + outfile + "<-- ")
                     if not os.path.exists(target):
                         out=utils.hiyapyco.dump(merged_f, default_flow_style=False)
                         out = utils.stringtemplate(out).safe_substitute(subst)
-                        mylogger.info("WRITING config_file " + outfile + " -->" + target + "<-- ")
+                        self.logger.info("WRITING config_file " + outfile + " -->" + target + "<-- ")
                         open(target, "w").write(out)
                 else :
-                    mylogger.info("no template file for "+ f + " : skipping ")
+                    self.logger.info("no template file for "+ f + " : skipping ")
 
 
 
@@ -184,11 +183,11 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             for p in config_path_list:
                 initfile=os.path.abspath(os.path.join(p,'config.sh'))
                 if os.path.exists(initfile):
-                    mylogger.info("executing init file-->" + initfile + "<-- ")
+                    self.logger.info("executing init file-->" + initfile + "<-- ")
 
-        #            mylogger.info("parsing init file-->" + initfile + "<-- ")
-        ##            (ret,out,err)=utils.run(['/bin/bash', initfile], logger=mylogger)
-        ##            mylogger.info("  " + out )
+        #            self.logger.info("parsing init file-->" + initfile + "<-- ")
+        ##            (ret,out,err)=utils.run(['/bin/bash', initfile], logger=self.logger)
+        ##            self.logger.info("  " + out )
                     f=open(initfile,'r')
                     for line in f:
                         line=line.lstrip()
@@ -196,14 +195,14 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                             if not line[0] == '#':
                                 templ= utils.stringtemplate(line)
                                 cmd=templ.safe_substitute(subst)
-        #                        (ret,out,err)=utils.run(cmd.split(),logger=mylogger)
-                                (ret,out,err)=utils.run(['/bin/bash', '-c', cmd], logger=mylogger)
-                                mylogger.info("  " + out )
+        #                        (ret,out,err)=utils.run(cmd.split(),logger=self.logger)
+                                (ret,out,err)=utils.run(['/bin/bash', '-c', cmd], logger=self.logger)
+                                self.logger.info("  " + out )
 
             for p in config_path_list:
                 initfile=os.path.join(p,'install.sh')
                 if os.path.exists(initfile):
-                    mylogger.info("parsing init file-->" + initfile + "<-- ")
+                    self.logger.info("parsing init file-->" + initfile + "<-- ")
                     f=open(initfile,'r')
                     for line in f:
                         line=line.lstrip()
@@ -211,5 +210,5 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                             if not line[0] == '#':
                                 templ= utils.stringtemplate(line)
                                 cmd=templ.safe_substitute(subst)
-                                (ret,out,err)=utils.run(cmd.split(),logger=mylogger)
-                                mylogger.info("  " + out )
+                                (ret,out,err)=utils.run(cmd.split(),logger=self.logger)
+                                self.logger.info("  " + out )

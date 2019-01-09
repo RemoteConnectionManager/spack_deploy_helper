@@ -15,10 +15,10 @@ import cascade_yaml_config
 #consoleHandler = logging.StreamHandler()
 #rootLogger.addHandler(consoleHandler)
 
-mylogger = logging.getLogger(__name__)
+# mylogger = logging.getLogger(__name__)
 
 #ls=utils.log_setup()
-logging.info("__file__:" + os.path.realpath(__file__))
+logging.debug("__file__:" + os.path.realpath(__file__))
 #ls.set_args()
 
 def is_git_clone(path):
@@ -29,7 +29,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
     def __init__(self, **kwargs):
         super(GitWorkspaceManager, self).__init__(**kwargs)
         for par in kwargs:
-            mylogger.info("init par "+ par+" --> "+str(kwargs[par]))
+            self.logger.info("init par "+ par+" --> "+str(kwargs[par]))
 
 
 
@@ -75,7 +75,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             dest = git_dest
 
         print("@@@@@@@@@@@@@@@@@@@@", dest, self.dry_run)
-        dev_git = utils.git_repo(dest, logger=mylogger, dry_run=self.dry_run)
+        dev_git = utils.git_repo(dest, logger=self.logger, dry_run=self.dry_run)
 
         origin_branches = utils.get_branches(origin, branch_selection=branches)
         upstream_branches = utils.get_branches(
@@ -87,10 +87,10 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
         local_pr = utils.trasf_match(upstream_branches, in_match='.*/([0-9]*)/(.*)', out_format='pull/{name}/clean')
 
-        mylogger.info("upstream_branches->" + str(upstream_branches) + "<--")
+        self.logger.info("upstream_branches->" + str(upstream_branches) + "<--")
 
         if not os.path.exists(dest):
-            mylogger.info("MISSING destination_dir-->" + dest + "<-- ")
+            self.logger.info("MISSING destination_dir-->" + dest + "<-- ")
             os.makedirs(dest)
 
 
@@ -140,7 +140,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                     dev_git.fetch(name='upstream', branches=local_pr)
 
                     for n, branch in local_pr.items():
-                        mylogger.info("local_pr " + n + " " + branch)
+                        self.logger.info("local_pr " + n + " " + branch)
                         dev_git.checkout(branch, newbranch=branch + '_update')
                         dev_git.merge(upstream_clean, comment='sync with upstream develop ')
                         dev_git.checkout(origin_master)
@@ -154,9 +154,9 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 dev_git.checkout(origin_master)
 
         else:
-            mylogger.warning("Folder ->" + dest + "<- already existing")
+            self.logger.warning("Folder ->" + dest + "<- already existing")
             if origin_update:
-                mylogger.info("Updating Folder ->" + dest + "<-")
+                self.logger.info("Updating Folder ->" + dest + "<-")
                 pull_options = []
                 for flag in pull_flags: pull_options.append('--' + flag)
                 local_branches = dev_git.get_local_branches()
