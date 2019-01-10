@@ -1,5 +1,5 @@
 import os
-import sys
+import shutil
 import uuid
 import logging
 
@@ -42,19 +42,38 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
     def list(self):
         print('The current workspaces found in ' + self.base_path + ' are:')
+        count = 0
         for root, dirs, files in os.walk(self.base_path, topdown=True):
             if is_git_clone(root):
-                print(" found git clone folder ", root)
+                print("  " + str(count) + " : " + root)
+                count += 1
                 del dirs
 
-    def remove(self, uuid_):
-        path = os.path.join(self.base_path, str(uuid_))
+    def remove(self, uuid):
+        if str(uuid[0]) == '/':
+            path = str(uuid)
+        else:
+            path = os.path.join(self.base_path, str(uuid))
+        if not os.path.exists(path):
+            count = 0
+            for root, dirs, files in os.walk(self.base_path, topdown=True):
+
+                if is_git_clone(root):
+                    if str(count) == str(uuid):
+                        path = root
+
+                        break
+                    count += 1
+                    del dirs
+        print("removing: " + path)
+
         try:
-            os.rmdir(path)
+            # os.rmdir(path)
+            shutil.rmtree(path, ignore_errors=True)
         except OSError:
             print('error: failed to remove the directory ' + path)
 
-    def git_deploy(self,
+    def deploy(self,
                    git_dest='src',
                    integration=False,
                    origin_update=False,
@@ -122,16 +141,31 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                             dev_git.merge(upstream_clean)
 
                             if rebase_update:
-                                dev_git.checkout(b)
+                                rebase_branch = b + '_rebase'
+                                dev_git.checkout(b, newbranch=rebase_branch)
                                 dev_git.merge(upstream_clean)
                                 dev_git.rebase(branch=upstream_clean, options=['-Xtheirs'])
                                 dev_git.merge(merge_branch, options=['-Xtheirs'])
-                                #rebase_branch = b + '_rebase'
-                                #dev_git.checkout(merge_branch, newbranch=rebase_branch)
-                                #dev_git.rebase(branch=upstream_clean, options=['-Xtheirs'])
+                                dev_git.checkout(b)
+
+                                #dev_git.merge(upstream_clean)
+                                dev_git.rebase(branch=upstream_clean, options=['-Xtheirs'])
+
+                                out_diff = dev_git.compare_branches(b, rebase_branch)
+                                if out_diff == '':
+                                    dev_git.delete(rebase_branch)
+                                else:
+                                    self.logger.warning("DIFF " + b + " " + rebase_branch + "\n" + out_diff)
+
                                 #dev_git.merge(merge_branch, options=['-Xtheirs'])
+                                out_diff = dev_git.compare_branches(b, merge_branch)
+                                if out_diff == '':
+                                    dev_git.delete(merge_branch)
+                                else:
+                                    self.logger.warning("DIFF " + b + " " + merge_branch + "\n" + out_diff)
                             dev_git.checkout(b)
-                            dev_git.delete(merge_branch)
+
+                            # dev_git.delete(merge_branch)
                         dev_git.checkout(b)
 
 

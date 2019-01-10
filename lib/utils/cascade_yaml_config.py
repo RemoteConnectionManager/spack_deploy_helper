@@ -425,7 +425,7 @@ class ArgparseSubcommandManager(object):
 
         self._merge_config(self.config_nested_keys + ['methods', method], **merged_kwargs)
         out=utils.hiyapyco.dump(self.conf_to_save, default_flow_style=False)
-        print("@@@@@", out)
+        # print("@@@@@", out)
 
         #self._print_config(**merged_kwargs)
 
@@ -434,13 +434,13 @@ class ArgparseSubcommandManager(object):
             logger.info("############### print_config par "+ par+" --> "+str(kwargs[par]))
         config_to_merge = merge_config(kwargs, nested_keys=self.yaml_config_nested_keys)
         out=utils.hiyapyco.dump(config_to_merge, default_flow_style=False)
-        print("@@@@@", out)
+        # print("@@@@@", out)
 
     def _merge_config(self, nested_keys, **kwargs):
-        print("UUUUUUU merging ", nested_keys, kwargs)
-        print("AAAAAAA conf_to_save ", self.conf_to_save)
+        # print("UUUUUUU merging ", nested_keys, kwargs)
+        # print("AAAAAAA conf_to_save ", self.conf_to_save)
         self.conf_to_save = merge_config(kwargs, base_conf=self.conf_to_save, nested_keys=nested_keys)
-        print("BBBBBBB conf_to_save ", self.conf_to_save)
+        # print("BBBBBBB conf_to_save ", self.conf_to_save)
 
     def _add_subparser(self, subparsers, name=None, parser_conf=None, help=''):
         # print("############",type(subparsers))
