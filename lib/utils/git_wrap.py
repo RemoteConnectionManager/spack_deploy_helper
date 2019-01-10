@@ -10,6 +10,9 @@ from .run import run
 #print("###TOP######## "+__name__)
 logging.getLogger(__name__).debug('in module:'+ __name__ + " info")
 
+def handle_diff(diff_out):
+    print(diff_out)
+
 class git_repo:
     def __init__(self, folder, logger=None,stop_on_error=True,dry_run=False):
         self.folder = os.path.abspath(folder)
@@ -103,9 +106,19 @@ class git_repo:
 
     def delete(self, branch):
         self.logger.info("removing-->" + branch + '<<-')
-        cmd = [ 'git', 'branch', '--delete', branch]
+        cmd = [ 'git', 'branch', '-D', branch]
         (ret,output) = self.run(cmd)
         if ret : self.logger.error("delete " + branch + "failed")
+
+    def compare_branches(self, b1, b2, diff_handler=handle_diff):
+        self.logger.info("comparing-->" + b1 + "<-->" + b2 + '<<-')
+        cmd = [ 'git', 'diff', b1, b2]
+        (ret,output) = self.run(cmd)
+        if output :
+            self.logger.warning("DIFFER")
+            diff_handler(output)
+        return output
+
 
     def get_local_branches(self):
         cmd = [ 'git', 'branch']
