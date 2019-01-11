@@ -9,7 +9,7 @@ defaults:
     branches :
       - 'packages/qt5-dbus'
       - 'packages/qt5-virtualgl'
-      - 'packages/of-paraview-catalyst'
+# merged      - 'packages/of-paraview-catalyst'
 #  upstream :
 #    prs :
 #      - '8070'
