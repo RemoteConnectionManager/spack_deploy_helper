@@ -1,0 +1,6 @@
+upstreams:
+  test-a:
+    install_tree: /g/g17/scheibel/repos/test-upstream-spack/spack/opt/spack
+    modules:
+      tcl: /g/g17/scheibel/repos/test-upstream-spack/share/spack/modules
+
