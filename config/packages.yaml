@@ -1,8 +1,0 @@
-packages:
-  openssl:
-    version: [1.0.2o]
-  cmake:
-    version:
-    - 3.11.3
-
-
