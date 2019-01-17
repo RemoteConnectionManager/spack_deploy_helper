@@ -29,7 +29,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
     def __init__(self, **kwargs):
         super(GitWorkspaceManager, self).__init__(**kwargs)
         for par in kwargs:
-            self.logger.info("init par "+ par+" --> "+str(kwargs[par]))
+            self.logger.debug("init par "+ par+" --> "+str(kwargs[par]))
 
 
 
@@ -87,13 +87,12 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                    upstream=''):
 
 
-        # print("@@@@@@@@@@@@@@@@@@@@",self.dry_run)
         if git_dest[0] != '/':
             dest = os.path.join(self.base_path, git_dest)
         else:
             dest = git_dest
 
-        print("@@@@@@@@@@@@@@@@@@@@", dest, self.dry_run)
+        # print("@@@@@@@@@@@@@@@@@@@@", dest, self.dry_run)
         dev_git = utils.git_repo(dest, logger=self.logger, dry_run=self.dry_run)
 
         origin_branches = utils.get_branches(origin, branch_selection=branches)
