@@ -23,12 +23,11 @@ ls=log_config.log_setup()
 logging.debug("__file__:" + os.path.realpath(__file__))
 mylogger = logging.getLogger(__name__)
 
-
 # get config folders
-base_parser,config_folders, plugin_folders, platform_folders = cascade_yaml_config.setup_from_args_and_configs()
-print("%%%%%%%%%% config folders %%%%%%", config_folders)
-print("%%%%%%%%%% plugin folders %%%%%%", plugin_folders)
-print("%%%%%%%%%% platform folders %%%%%%", platform_folders)
+base_parser,config_folders, plugin_folders, platform_folders = cascade_yaml_config.setup_from_args_and_configs(log_controller=ls)
+mylogger.info("%%%%%%%%%% config folders %%%%%% " + str(config_folders))
+mylogger.info("%%%%%%%%%% plugin folders %%%%%% " + str(plugin_folders))
+mylogger.info("%%%%%%%%%% platform folders %%%%%% " + str(platform_folders))
 
 # create the top-level parser
 # base_parser = argparse.ArgumentParser(prog='spack-deploy',add_help=False )
@@ -65,7 +64,7 @@ yaml_files=cascade_yaml_config.find_config_file_list(
 top_config = cascade_yaml_config.CascadeYamlConfig(
     yaml_files=yaml_files)
 
-#ls.set_args(log_configs=top_config[['logging_configs']])
+ls.set_args(log_configs=top_config[['logging_configs']])
 
 common_parser = argparse.ArgumentParser(prog=__name__,
                                         parents=[base_parser],
@@ -88,7 +87,7 @@ copy_args['top_config'] = top_config
 
 
 
-parser = argparse.ArgumentParser(prog=__name__,
+parser = argparse.ArgumentParser(prog=os.path.basename(__file__),
                                  parents=[common_parser],
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 subparsers = parser.add_subparsers(help='Utility for hierarchical configuration deployment',
@@ -101,7 +100,7 @@ for plug_dir in available_plugins:
     for cls in  available_plugins[plug_dir]:
         # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11",copy_args)
         manager = cls(**copy_args)
-        manager._add_subparser(subparsers)
+        manager._add_subparser(subparsers, parents=[common_parser])
         # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!22",copy_args)
 
         # manager_conf =  top_config[['argparse', 'subparser', cls.__name__]]
