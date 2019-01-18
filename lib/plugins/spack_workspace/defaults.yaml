@@ -56,3 +56,22 @@ argparse:
             help: 'run config.sh files present in config folders'
 
 
+logging_configs:
+  loggers:
+    plugin.SpackWorkspaceManager:
+      level: INFO
+      handlers: [console_bare]
+      propagate: False
+
+    plugin.SpackWorkspaceManager.run.input:
+      level: INFO
+      handlers: [console_colored_in]
+      propagate: False
+    plugin.SpackWorkspaceManager.run.output:
+      level: INFO
+      handlers: [console_colored_out]
+      propagate: False
+    plugin.SpackWorkspaceManager.run.error:
+      level: INFO
+      handlers: [console_colored_err]
+      propagate: False

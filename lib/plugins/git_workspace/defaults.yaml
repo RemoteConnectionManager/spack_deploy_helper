@@ -64,3 +64,24 @@ argparse:
             action: 'store_true'
             default : "{{ defaults.integration }}"
             help : 'do upstream integration'
+
+
+logging_configs:
+  loggers:
+    plugin.GitWorkspaceManager:
+      level: INFO
+      handlers: [console_bare]
+      propagate: False
+
+    plugin.GitWorkspaceManager.run.input:
+      level: INFO
+      handlers: [console_colored_in]
+      propagate: False
+    plugin.GitWorkspaceManager.run.output:
+      level: INFO
+      handlers: [console_colored_out]
+      propagate: False
+    plugin.GitWorkspaceManager.run.error:
+      level: INFO
+      handlers: [console_colored_err]
+      propagate: False
