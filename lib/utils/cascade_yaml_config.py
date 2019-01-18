@@ -69,7 +69,7 @@ def merge_folder_list(in_folders, merge_folders=None, prefixes=None):
     return current_folders
 
 
-def setup_from_args_and_configs():
+def setup_from_args_and_configs(log_controller=None):
     """
     This function parse predefined args in hierarchical order, accumulating default parameters and
     by parsing known config files
@@ -80,7 +80,8 @@ def setup_from_args_and_configs():
     platform_folders: list of platform folders used for setup
     """
 
-    log_controller = log_config.log_setup()
+    if log_controller == None:
+        log_controller = log_config.log_setup()
 
     # base parser
     base_parser = argparse.ArgumentParser(add_help=False)
@@ -442,7 +443,7 @@ class ArgparseSubcommandManager(object):
         self.conf_to_save = merge_config(kwargs, base_conf=self.conf_to_save, nested_keys=nested_keys)
         # print("BBBBBBB conf_to_save ", self.conf_to_save)
 
-    def _add_subparser(self, subparsers, name=None, parser_conf=None, help=''):
+    def _add_subparser(self, subparsers, parents=[], name=None, parser_conf=None, help=''):
         # print("############",type(subparsers))
         if parser_conf == None:
             parser_conf = self._get_argparse_methods(self.methods_conf)
@@ -456,7 +457,10 @@ class ArgparseSubcommandManager(object):
             subparsers_help += method + ','
         subparsers_help = "{ " + subparsers_help + " }"
         if self.manager_subcommand:
-            self.subparser = subparsers.add_parser(self.manager_subcommand , help= self.manager_help, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+            self.subparser = subparsers.add_parser(self.manager_subcommand,
+                                                   help= self.manager_help,
+                                                   parents = parents,
+                                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
             self.subparsers = self.subparser.add_subparsers(dest='sub_' + self.manager_subcommand, metavar=subparsers_help)
         else:
             self.subparsers=subparsers
@@ -473,6 +477,7 @@ class ArgparseSubcommandManager(object):
             methods_conf_args=method_conf.get('args',dict())
             self.methods_subparsers[method] = self.subparsers.add_parser(method,
                                                                     help=method_conf.get('help',''),
+                                                                    parents=parents,
                                                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
             for par in  methods_conf_args:
                 arguments = methods_conf_args[par]
