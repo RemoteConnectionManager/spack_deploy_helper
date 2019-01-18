@@ -1,0 +1,6 @@
+upstreams:
+  base:
+    install_tree: /cineca/prod/spack/v002/RCM_spack_deploy/deploy/base_spack_devel/install
+    modules:
+      tcl:  /cineca/prod/spack/v002/RCM_spack_deploy/deploy/base_spack_devel/spack/share/spack/modules
+

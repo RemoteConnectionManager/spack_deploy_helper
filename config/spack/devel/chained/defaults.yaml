@@ -1,0 +1,8 @@
+
+
+argparse:
+  subparser:
+    SpackWorkspaceManager:
+      config:
+        spack_yaml_files :
+          - 'upstreams.yaml'
