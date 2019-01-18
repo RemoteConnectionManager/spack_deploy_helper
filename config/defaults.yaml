@@ -31,17 +31,18 @@ configurations:
   base_folder : 'recipes'
   host_folder : 'hosts'
   config_dir : 'config'
-  spack_yaml_files :
-    - 'packages.yaml'
-    - 'modules.yaml'
-    - 'compilers.yaml'
-    - 'config.yaml'
+#to_delete  spack_yaml_files :
+#to_delete    - 'packages.yaml'
+#to_delete    - 'modules.yaml'
+#to_delete    - 'compilers.yaml'
+#to_delete    - 'config.yaml'
   host_tags :
     galileo : 'galileo'
     eni : 'eni'
     calori : 'ws_mint'
     marconi : 'marconi'
     davide : 'davide'
+    carmen : 'arm'
 
 build:
   build_folder : build
@@ -52,17 +53,59 @@ logging_configs:
   disable_existing_loggers: False
 
   formatters:
+  # colors strings
+  # from https://stackoverflow.com/questions/39473297/how-do-i-print-colored-output-with-python-3
+    colored_in:
+      format: "\x1b[33m%(message)s \x1b[0m"
+    colored_out:
+      format: "\x1b[90m%(message)s \x1b[0m"
+    colored_err:
+      format: "\x1b[91m%(message)s \x1b[0m"
+    empty:
+      format: "%(message)s"
+    bare:
+      format: "%(levelname)-5s:%(message)s"
     short:
-      format: "#ooo%(levelname)-5s %(name)s[#%(message)s"
+      format: "#%(levelname)-5s %(name)s[#%(message)s"
     base:
       format: "[%(levelname)-5s %(name)s # %(pathname)s:%(lineno)s] %(message)s"
     long:
       format: "[%(filename)s:%(lineno)s - %(funcName)20s() %(asctime)s] %(message)s"
   handlers:
+    console_colored_in:
+      class: logging.StreamHandler
+      level: DEBUG
+      formatter: colored_in
+      stream: ext://sys.stdout
+    console_colored_out:
+      class: logging.StreamHandler
+      level: DEBUG
+      formatter: colored_out
+      stream: ext://sys.stdout
+    console_colored_err:
+      class: logging.StreamHandler
+      level: DEBUG
+      formatter: colored_err
+      stream: ext://sys.stdout
     console:
       class: logging.StreamHandler
       level: DEBUG
       formatter: base
+      stream: ext://sys.stdout
+    console_short:
+      class: logging.StreamHandler
+      level: DEBUG
+      formatter: short
+      stream: ext://sys.stdout
+    console_bare:
+      class: logging.StreamHandler
+      level: INFO
+      formatter: bare
+      stream: ext://sys.stdout
+    console_empty:
+      class: logging.StreamHandler
+      level: INFO
+      formatter: empty
       stream: ext://sys.stdout
   loggers:
     '':
@@ -77,10 +120,6 @@ logging_configs:
       level: WARNING
       handlers: [console]
       propagate: False
-    git_workspace:
-      level: INFO
-      handlers: [console]
-      propagate: False
     utils.external.hiyapyco:
       handlers: [console]
       level: INFO
@@ -90,33 +129,27 @@ logging_configs:
       level: INFO
       propagate: False
     __main__:
+      handlers: [console_empty]
+      level: WARNING
+      propagate: False
+    utils:
+      handlers: [console]
+      propagate: False
+      level: INFO
+    plugin:
       handlers: [console]
       level: INFO
       propagate: False
+    utils.run:
+      level: WARNING
+      handlers: [console]
+      propagate: False
+    utils.run.input:
+      level: INFO
+      handlers: [console]
+      propagate: False
 
 
-to_remove_defaults:
-  debug : 'info'
-  plugin_base_dir : 'plugins'
-  cache : '../cache'
-  linkcache : '../../cache'
-  install : '../install'
-  linkinstall : '../../install'
-  dry_run : 'False'
-  integration : 'False'
-  do_update : 'False'
-  clearconfig : 'False'
-  platformconfig : 'False'
-  runconfig : 'False'
-  git_dest_dir : 'src'
-  origin :
-    url : 'https://github.com/RemoteConnectionManager/spack.git'
-    master : 'develop'
-    branches :
-      - 'clean/develop'
-    pull_flags :
-      - 'ff-only'
-  upstream :
-    url : 'https://github.com/LLNL/spack.git'
-    master : 'develop'
-    prs : []
+
+
+
