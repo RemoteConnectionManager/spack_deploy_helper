@@ -4,59 +4,69 @@ import subprocess
 import logging
 import json
 import fcntl
+import time
 
+module_logger = logging.getLogger(__name__)
 def run(cmd,logger=None,
         stop_on_error=True,
         dry_run=False,
         folder='.',
         pipe_output=False):
-    logger = logger or logging.getLogger(__name__)
+    logger = logger or module_logger
+    logger_in  = logging.getLogger(logger.name + '.' + __name__.split('.')[-1:][0] + '.input')
+    logger_out = logging.getLogger(logger.name + '.' + __name__.split('.')[-1:][0] + '.output')
+    logger_err = logging.getLogger(logger.name + '.' + __name__.split('.')[-1:][0] + '.error')
     if not cmd :
         logger.warning("skipping empty command")
         return (0, '','')
-    logger.info("running: "+' '.join(cmd))
+    logger_in.info("> "+' '.join(cmd))
     # logger.debug("PATH: " + os.environ['PATH'])
     # print("running-->"+' '.join(cmd))
     if not dry_run :
         myprocess = subprocess.Popen(cmd, cwd=folder,stdout=subprocess.PIPE,stderr=subprocess.PIPE, env=os.environ)
         if pipe_output:
-            #for f in [myprocess.stdout, myprocess.stderr]:
-            #    fd = f.fileno()
-            #    fl = fcntl.fcntl(fd, fcntl.F_GETFL)
-            #    fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+            # for f in [myprocess.stdout, myprocess.stderr]:
+            #     fd = f.fileno()
+            #     fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+            #     fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
             out_buf=''
             err_buf=''
-            loop_var = True
-            ret=0
-            while loop_var:
+            while myprocess.poll() is None:
                 #print("in while")
-                try:
-                    next_out_line = myprocess.stdout.readline()
+                while True:
+                    try:
+                        next_out_line = myprocess.stdout.readline()
+                    except:
+                        module_logger.warning("##################missing out")
+                        # sys.sleep(1)
+                        next_out_line = ''
+                        time.sleep(1)
                     if next_out_line != '':
                         out_buf += next_out_line
-                        logger.info(next_out_line.rstrip())
-                except:
-                    print("missing out")
-                    #sys.sleep(1)
-                    next_out_line=''
-                try:
-                    next_err_line = myprocess.stderr.readline()
+                        # ligth gray color:
+                        logger_out.info(next_out_line.rstrip())
+                    else:
+                        break
+                while True:
+                    try:
+                        next_err_line = myprocess.stderr.readline()
+                    except:
+                        module_logger.warning("##################missing err")
+                        next_err_line = ''
+                        time.sleep(1)
                     if next_err_line != '':
                         err_buf += next_err_line
-                        logger.warning(next_err_line.rstrip())
-                    loop_var=True
-                except:
-                    print("missing err")
-                    next_err_line=''
+                        logger_err.warning(next_err_line.rstrip())
+                    else:
+                        break
 
-                #ret = myprocess.returncode
-                loop_var = next_err_line != '' or next_out_line != '' or myprocess.poll() is None
-            print("exited while")
+
+            # print("exited while")
 
         else:
             out_buf,err_buf = myprocess.communicate()
-            myprocess.wait()
-            ret = myprocess.returncode
+        myprocess.wait()
+        ret = myprocess.returncode
         if ret:
             #print("ERROR:",ret,"Exiting")
             logger.error("ERROR CODE : " + str(ret) + '\n'+stderr+'\nExit...\n')
@@ -74,7 +84,7 @@ def source(sourcefile,logger=None):
     logger = logger or logging.getLogger(__name__)
     if os.path.exists(sourcefile) :
         source = 'source '+ sourcefile
-        logger.info("spurcing-->"+ source+ "<-")
+        logger.info("sourcing-->"+ source+ "<-")
         dump = sys.executable + ' -c "import os, json; print(json.dumps(dict(os.environ)))"'
         pipe = subprocess.Popen(['/bin/bash', '-c', '%s && %s' %(source,dump)], stdout=subprocess.PIPE)
         env = json.loads(pipe.stdout.read().decode('utf-8'))
