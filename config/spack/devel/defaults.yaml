@@ -7,6 +7,9 @@ config:
 defaults:
   origin :
     url : 'https://github.com/RemoteConnectionManager/spack.git'
+    branches :
+      - 'clean/develop'
+      - 'pr/fix/flake8_configparser_backport'
   upstream :
     prs : 
      - '8772' # spack chain
