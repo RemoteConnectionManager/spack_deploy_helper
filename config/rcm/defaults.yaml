@@ -10,9 +10,9 @@ defaults:
     master : 'integrate/rcm'
     branches :
       - 'pr/turbovnc'
-      - 'pr/pyinstaller'
+#      - 'pr/pyinstaller'
 #fixed with merged 7493#      - 'pr/fix/glib_dtrace_pythonhome'
-      - 'packages/qt5-dbus'
+#      - 'packages/qt5-dbus'
 #merged      - 'pr/fix/bdftopcf'
 #merged      - 'pr/fix/xinput'
 
