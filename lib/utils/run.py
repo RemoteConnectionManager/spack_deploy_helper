@@ -69,7 +69,7 @@ def run(cmd,logger=None,
         ret = myprocess.returncode
         if ret:
             #print("ERROR:",ret,"Exiting")
-            logger.error("ERROR CODE : " + str(ret) + '\n'+stderr+'\nExit...\n')
+            logger.error("ERROR CODE : " + str(ret) + '\n' + err_buf +'\nExit...\n')
             if stop_on_error :
                 sys.exit()
         # print("############################",stdout)
