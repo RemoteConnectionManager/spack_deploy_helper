@@ -7,8 +7,9 @@ import collections
 
 from .run import run
 
+module_logger=logging.getLogger(__name__)
 #print("###TOP######## "+__name__)
-logging.getLogger(__name__).debug('in module:'+ __name__ + " info")
+module_logger.debug('in module:'+ __name__ + " info")
 
 def handle_diff(diff_out):
     print(diff_out)
@@ -16,13 +17,21 @@ def handle_diff(diff_out):
 class git_repo:
     def __init__(self, folder, logger=None,stop_on_error=True,dry_run=False):
         self.folder = os.path.abspath(folder)
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger or module_logger
         self.stop_on_error=stop_on_error
         self.dry_run=dry_run
         #print("debug level-->",self.debug)
 
-    def run(self,cmd):
-        (ret,out,err)=run(cmd,logger=self.logger,dry_run=self.dry_run,stop_on_error=self.stop_on_error,folder=self.folder)
+    def run(self, cmd, pipe_output=True):
+        (ret,out,err)=run(cmd,
+                          logger=self.logger,
+                          pipe_output=pipe_output,
+                          dry_run=self.dry_run,
+                          stop_on_error=self.stop_on_error,
+                          folder=self.folder)
+        if not pipe_output:
+            module_logger.debug("@@@ERROR@@@" + err)
+            module_logger.debug("@@@OUTPUT@@@" + out)
         return (ret,out)
 
     def init(self):
@@ -33,11 +42,11 @@ class git_repo:
         git_root = os.path.abspath(output.strip())
 
         #print("in path ",self.folder," git rev_parse ret: ",ret, ' git top:', git_root)
-        self.logger.info("in path " + self.folder + " git rev_parse ret: " + str(int(ret)) + ' git top:'+ git_root.decode('utf-8'))
+        self.logger.debug("in path " + self.folder + " git rev_parse ret: " + str(int(ret)) + ' git top:'+ git_root.decode('utf-8'))
         if 0 != ret or git_root != self.folder:
             cmd = ['git', 'init']
             (ret,output) = self.run(cmd)
-            self.logger.info("git init in >>" + self.folder + "<< >>" + git_root.decode('utf-8') + "<< ret= "+ str(int(ret)))
+            self.logger.debug("git init in >>" + self.folder + "<< >>" + git_root.decode('utf-8') + "<< ret= "+ str(ret))
             #print("git init in ",">>" + self.folder + "<<",">>" + git_root + "<< ret= ",ret)
 
     def get_remotes(self):
@@ -88,30 +97,30 @@ class git_repo:
 
     def sync_upstream(self, upstream='upstream', master='develop', options=['--ff-only']):
         cmd = [ 'git', 'pull'] + options  + [upstream, master]
-        (ret,output) = self.run(cmd)
+        (ret,output) = self.run(cmd, pipe_output=False)
         if ret : self.logger.error("sync_upstream failed")
 
     def merge(self, branch, comment='', options=[]):
         if not comment : comment = 'merged branch ' + branch
-        self.logger.info("merging-->" + branch + '<<-')
+        self.logger.debug("merging-->" + branch + '<<-')
         cmd = [ 'git', 'merge', '-m', '"' + comment  + '"'] + options + [branch]
-        (ret,output) = self.run(cmd)
+        (ret,output) = self.run(cmd, pipe_output=False)
         if ret : self.logger.error("merge " + branch + "failed")
 
     def rebase(self, branch='upstream/develop', options=[]):
-        self.logger.info("rebasing-->" + branch + '<<-')
+        self.logger.debug("rebasing-->" + branch + '<<-')
         cmd = ['git', 'rebase'] + options + [branch]
         (ret,output) = self.run(cmd)
         if ret : self.logger.error("rebase " + branch + "failed")
 
     def delete(self, branch):
-        self.logger.info("removing-->" + branch + '<<-')
+        self.logger.debug("removing-->" + branch + '<<-')
         cmd = [ 'git', 'branch', '-D', branch]
         (ret,output) = self.run(cmd)
         if ret : self.logger.error("delete " + branch + "failed")
 
     def compare_branches(self, b1, b2, diff_handler=handle_diff):
-        self.logger.info("comparing-->" + b1 + "<-->" + b2 + '<<-')
+        self.logger.debug("comparing-->" + b1 + "<-->" + b2 + '<<-')
         cmd = [ 'git', 'diff', b1, b2]
         (ret,output) = self.run(cmd)
         if output :
@@ -140,7 +149,7 @@ class git_repo:
 def get_branches(url, branch_pattern='.*?\s+refs/heads/(.*?)\s+', branch_format_string='{branch}', branch_selection=[]):
 
     cmd = ['git', 'ls-remote', url]
-    logging.getLogger(__name__).info("execute-->"+str(cmd)+"<<-")
+    module_logger.debug("execute-->"+str(cmd)+"<<-")
     output = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
 
     headRE = re.compile(branch_pattern)
@@ -195,7 +204,7 @@ def get_branches(url, branch_pattern='.*?\s+refs/heads/(.*?)\s+', branch_format_
 
     #  print("checkout-->",checkout_branch)
     for b in fetch_branches:
-        logging.getLogger(__name__).info('{0} fetch-->{1}'.format(url, b))
+        module_logger.debug('{0} fetch-->{1}'.format(url, b))
 
     return fetch_branches
 
