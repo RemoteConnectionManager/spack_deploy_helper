@@ -22,7 +22,7 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
     def __init__(self, **kwargs):
         super(SpackWorkspaceManager, self).__init__(**kwargs)
         for par in kwargs:
-            self.logger.info("init par "+ par+" --> "+str(kwargs[par]))
+            self.logger.debug("init par "+ par+" --> "+str(kwargs[par]))
 
 
 
@@ -66,12 +66,12 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
         ########## cache handling ##############
         cachedir=cache
-        self.logger.info("input cache_dir-->"+cachedir+"<--")
+        self.logger.debug("input cache_dir-->"+cachedir+"<--")
         if not os.path.exists(cachedir):
             cachedir=os.path.abspath(os.path.join(self.base_path,cachedir))
         else:
             cachedir=os.path.abspath(cachedir)
-        self.logger.info("actual cache_dir-->"+cachedir+"<--")
+        self.logger.debug("actual cache_dir-->"+cachedir+"<--")
         try:
             os.makedirs(cachedir)
         except OSError:
@@ -81,14 +81,14 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         #    os.makedirs(cachedir)
         if os.path.exists(os.path.join(dest, 'var', 'spack')):
             deploy_cache=os.path.join(dest, 'var', 'spack','cache')
-            self.logger.info("deploy cache_dir-->"+deploy_cache+"<--")
+            self.logger.debug("deploy cache_dir-->"+deploy_cache+"<--")
             if not os.path.exists(deploy_cache):
                 os.symlink(cachedir,deploy_cache)
                 self.logger.info("symlinked -->"+cachedir+"<-->"+deploy_cache)
 
         ########## install folder handling ##############
         if  install:
-            self.logger.info("find install in args-->"+install+"<--")
+            self.logger.debug("find install in args-->"+install+"<--")
             install_dir = install
             if not os.path.exists(install_dir):
                 install_dir = os.path.join(dest,install)
@@ -96,9 +96,9 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             install_dir = os.path.join(dest,'opt','spack')
         install_dir=os.path.abspath(install_dir)
         if not os.path.exists(install_dir):
-            self.logger.info("creting install_dir-->"+install_dir+"<--")
+            self.logger.info("creating install_dir-->"+install_dir+"<--")
             os.makedirs(install_dir)
-        self.logger.info("install_dir-->"+install_dir+"<--")
+        self.logger.debug("install_dir-->"+install_dir+"<--")
 
 
 
@@ -134,8 +134,8 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             #config_path_list=config_path_list + [test]
             #config_path_list=[test] + config_path_list
 
-        config_path_list = self.config_folders
-        self.logger.info(" config_path_list -->" + str(config_path_list) )
+        config_path_list = self.plugin_folders + self.config_folders
+        self.logger.debug(" config_path_list -->" + str(config_path_list) )
 
 
         ########## merge, interpolate and write spack config files#########
@@ -155,7 +155,7 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                     if os.path.exists(test): merge_files = merge_files +[test]
 
                 if merge_files :
-                    self.logger.info("configuring "+ f + " with files: "+str(merge_files))
+                    self.logger.debug("configuring "+ f + " with files: "+str(merge_files))
                     merged_f = utils.hiyapyco.load(
                         *merge_files,
                         interpolate=True,
@@ -163,11 +163,11 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                         failonmissingfiles=True
                     )
 
-                    self.logger.info("merged "+f+" yaml-->"+str(merged_f)+"<--")
+                    self.logger.debug("merged "+f+" yaml-->"+str(merged_f)+"<--")
 
                     outfile = os.path.basename(f)
                     target = os.path.join(spack_config_dir, outfile)
-                    self.logger.info(" output config_file " + outfile + "<-- ")
+                    self.logger.debug(" output config_file " + outfile + "<-- ")
                     if not os.path.exists(target):
                         out=utils.hiyapyco.dump(merged_f, default_flow_style=False)
                         out = utils.stringtemplate(out).safe_substitute(subst)
@@ -196,8 +196,11 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                                 templ= utils.stringtemplate(line)
                                 cmd=templ.safe_substitute(subst)
         #                        (ret,out,err)=utils.run(cmd.split(),logger=self.logger)
-                                (ret,out,err)=utils.run(['/bin/bash', '-c', cmd], logger=self.logger)
-                                self.logger.info("  " + out )
+                                (ret,out,err)=utils.run(['/bin/bash', '-c', cmd],
+                                                        logger=self.logger,
+                                                        pipe_output=True
+                                                        )
+                                self.logger.debug("  " + out )
 
             for p in config_path_list:
                 initfile=os.path.join(p,'install.sh')
