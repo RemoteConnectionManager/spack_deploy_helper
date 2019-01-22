@@ -10,6 +10,10 @@ packages:
   atk:
     version:
     - 2.20.0
+  gdk-pixbuf:
+    version:
+    - 2.31.2
+
   cairo:
     variants: +X
   vte:
