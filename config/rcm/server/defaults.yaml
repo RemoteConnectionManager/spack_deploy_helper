@@ -3,6 +3,7 @@ defaults:
   origin :
     branches :
 #merged      - 'packages/fluxbox'
+      - 'packages/fix/gdk-pixbuf_old_release'
       - 'packages/lxde-lxterminal'
       - 'packages/mesa_update'
       - 'packages/mesa-glu'
