@@ -1,5 +1,8 @@
 modules:
   tcl:
+    hash_length: 2
+
+
     whitelist:
     - catalyst
     - paraview
