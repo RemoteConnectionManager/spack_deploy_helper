@@ -19,6 +19,8 @@ import utils
 import cascade_yaml_config
 import log_config
 
+cascade_yaml_config.yaml_environment_import(['USER'])
+
 ls=log_config.log_setup()
 logging.debug("__file__:" + os.path.realpath(__file__))
 mylogger = logging.getLogger(__name__)
