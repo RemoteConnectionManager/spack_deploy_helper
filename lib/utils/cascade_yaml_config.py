@@ -18,6 +18,13 @@ import log_config
 root_path = os.path.dirname(lib_path)
 logger = logging.getLogger(__name__)
 
+def yaml_environment_import(varlist=[]):
+    import  utils.external.jinja2
+    env=dict()
+    for v in varlist:
+        if v in os.environ:
+            env[v] = os.environ[v]
+    utils.hiyapyco.jinja2env.globals =  {'env' : env}
 
 def retrieve_plugins(plugin_folders):
     out_plugins = dict()
@@ -573,6 +580,14 @@ class CascadeYamlConfig:
                 for key in nested_key_list:
                     val = val.get(key, OrderedDict())
             return copy.deepcopy(val)
+
+        def __setitem__(self, nested_key_list,value):
+            logger.debug("nested_key_list: " + str(nested_key_list))
+            val = self._conf
+            if len(nested_key_list) > 1:
+                for key in nested_key_list[:-1]:
+                    val = val.get(key, OrderedDict())
+            val[nested_key_list[-1:][0]]=value
 
 
     def __init__(self, **kwargs):
