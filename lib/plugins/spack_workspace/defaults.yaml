@@ -3,7 +3,7 @@
 defaults:
   cache : '../cache'
   linkcache : '../../cache'
-  install : '../install'
+  install : 'install'
   linkinstall : '../../install'
   git_dest_dir : 'spack'
   origin :
@@ -37,11 +37,15 @@ argparse:
           cache:
             action: 'store'
             default: "{{ defaults.cache }}"
-            help: 'folder where cache is'
+            help: 'folder where cache is, if start with / considered absolute, otherwise considered relative to workdir'
           install:
             action: 'store'
             default: "{{ defaults.install }}"
-            help: 'folder where install packages, if start with / considered absolute, otherwise considered relative to dest'
+            help: 'folder where install packages, if start with / considered absolute, otherwise considered relative to workdir'
+          spack_root:
+            action: 'store'
+            default: "{{ defaults.git_dest_dir }}"
+            help: 'folder where is spack instance (cloned) if start with / considered absolute, otherwise considered relative to workdir'
           clearconfig :
             action: 'store_true'
             default : "{{ defaults.clearconfig }}"

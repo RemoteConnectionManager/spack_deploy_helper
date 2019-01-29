@@ -89,9 +89,10 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         ########## install folder handling ##############
         if  install:
             self.logger.debug("find install in args-->"+install+"<--")
-            install_dir = install
-            if not os.path.exists(install_dir):
-                install_dir = os.path.join(dest,install)
+            if install[0] != '/':
+                install_dir = os.path.join(self.base_path, install)
+            else:
+                install_dir = install
         else:
             install_dir = os.path.join(dest,'opt','spack')
         install_dir=os.path.abspath(install_dir)
