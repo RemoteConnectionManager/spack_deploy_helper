@@ -2,10 +2,6 @@
 
 
 
-config:
-  config_folders:
-    - 'config'
-  hosts_dir: 'recipes/hosts'
 
 defaults:
   debug : 'info'
@@ -22,20 +18,10 @@ argparse:
       default: "{{ defaults.dry_run }}"
 
 
-
-
-
-
-
-configurations:
-  base_folder : 'recipes'
-  host_folder : 'hosts'
-  config_dir : 'config'
-#to_delete  spack_yaml_files :
-#to_delete    - 'packages.yaml'
-#to_delete    - 'modules.yaml'
-#to_delete    - 'compilers.yaml'
-#to_delete    - 'config.yaml'
+config:
+  config_folders:
+    - 'config'
+  hosts_dir: 'recipes/hosts'
   host_tags :
     galileo : 'galileo'
     eni : 'eni'
@@ -44,8 +30,6 @@ configurations:
     davide : 'davide'
     carmen : 'arm'
 
-build:
-  build_folder : build
 
 
 logging_configs:
