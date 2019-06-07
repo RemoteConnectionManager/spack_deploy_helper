@@ -14,8 +14,8 @@ defaults:
 
   upstream :
     prs : 
-     - '8772' # spack chain
-     - '8612' # Spack can be extended with external commands
+     - '11646' # avoid fixed depnency of cmake from gnutls
+#merged     - '8612' # Spack can be extended with external commands
 #     - '7759' # enable using spack-installed packages as externals
   runconfig: 'True'
   integration: 'True'

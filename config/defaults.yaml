@@ -25,6 +25,7 @@ config:
   host_tags :
     galileo : 'galileo'
     eni : 'eni'
+    athena : 'athena'
     calori : 'ws_mint'
     marconi : 'marconi'
     davide : 'davide'
@@ -114,7 +115,7 @@ logging_configs:
       propagate: False
     __main__:
       handlers: [console_empty]
-      level: WARNING
+      level: INFO
       propagate: False
     utils:
       handlers: [console]
