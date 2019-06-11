@@ -12,9 +12,9 @@ defaults:
 #closed      - 'pr/fix/flake8_configparser_backport'
 #https://github.com/spack/spack/commit/f878c0cb5be8bc247ab85cffdacdcd6a9e1342f1
 
-  upstream :
-    prs : 
-     - '11646' # avoid fixed depnency of cmake from gnutls
+#  upstream :
+#    prs : 
+#merged     - '11646' # avoid fixed depnency of cmake from gnutls
 #merged     - '8612' # Spack can be extended with external commands
 #     - '7759' # enable using spack-installed packages as externals
   runconfig: 'True'
