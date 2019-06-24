@@ -7,7 +7,7 @@ defaults:
       - 'packages/lxde-lxterminal'
 #not needed any more?      - 'packages/mesa_update'
 #not needed any more?      - 'packages/mesa-glu'
-      - 'packages/virtualgl'
+#not needed any more?      - 'packages/virtualgl'
 #needed on redhat for build glib, see #6968 #6965
 #fixed with merged 7493#      - 'pr/fix/glib_dtrace_pythonhome'
 
