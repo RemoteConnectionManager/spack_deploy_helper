@@ -4,6 +4,7 @@ defaults:
   cache : '../cache'
   linkcache : '../../cache'
   install : 'install'
+  modules : 'modules'
   linkinstall : '../../install'
   git_dest_dir : 'spack'
   origin :
@@ -42,6 +43,11 @@ argparse:
             action: 'store'
             default: "{{ defaults.install }}"
             help: 'folder where install packages, if start with / considered absolute, otherwise considered relative to workdir'
+          modules:
+            action: 'store'
+            default: "{{ defaults.modules }}"
+            help: 'folder where put tcl modules, if start with / considered absolute, otherwise considered relative to dest'
+
           spack_root:
             action: 'store'
             default: "{{ defaults.git_dest_dir }}"

@@ -52,6 +52,7 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                      cache='cache',
                      bincache='bincache',
                      install='install',
+                     modules='modules',
                      clearconfig=True,
                      runconfig=False):
 
@@ -102,6 +103,19 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         self.logger.debug("install_dir-->"+install_dir+"<--")
 
 
+        ########## modules folder handling ##############
+        if  modules:
+            self.logger.debug("find modules in args-->" + modules + "<--")
+            if modules[0] != '/':
+                modules_dir = os.path.join(self.base_path, modules)
+            else:
+                modules_dir = modules
+            modules_dir=os.path.abspath(modules_dir)
+            if not os.path.exists(modules_dir):
+                self.logger.info("creating modules_dir-->"+modules_dir+"<--")
+                os.makedirs(modules_dir)
+            self.logger.debug("modules_dir-->"+modules_dir+"<--")
+
 
 
         ######## config path handling #################
@@ -117,6 +131,7 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         subst=dict()
         subst["RCM_DEPLOY_ROOTPATH"] = self.root_path
         subst["RCM_DEPLOY_INSTALLPATH"] = install_dir
+        subst["RCM_DEPLOY_MODULESPATH"] = modules_dir
         subst["RCM_DEPLOY_SPACKPATH"] = dest
         #
         # if platformconfig :
