@@ -1,0 +1,4 @@
+packages:
+  qt:
+    variants: +examples+opengl+dbus
+

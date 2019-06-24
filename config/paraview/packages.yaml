@@ -1,0 +1,24 @@
+packages:
+  paraview:
+    version:
+     - 5.5.1
+    variants:
+     -  +opengl2
+     -  +mpi
+     -  +python
+     -  +qt
+     -  +hdf5
+     -  +examples
+     -  +netcdf
+     -  +expat
+# to check... paraview with gcc7.3 needs 2.6.1, pined also to satisfy openfoam
+  flex:
+    version:
+    - 2.6.1
+
+# pinning matplotlib not to require python3
+  py-matplotlib:
+    version:
+    - 2.2.3
+
+
