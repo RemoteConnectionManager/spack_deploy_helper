@@ -14,3 +14,4 @@ modules:
     - lxde-lxterminal
     - lxde-libfm
     - lxde-menu-cache
+    - py-six

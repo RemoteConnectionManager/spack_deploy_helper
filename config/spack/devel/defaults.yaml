@@ -12,13 +12,13 @@ defaults:
 #closed      - 'pr/fix/flake8_configparser_backport'
 #https://github.com/spack/spack/commit/f878c0cb5be8bc247ab85cffdacdcd6a9e1342f1
 
-  upstream :
-    prs : 
+#  upstream :
+#    prs : 
 #merged     - '11646' # avoid fixed depnency of cmake from gnutls
 #merged     - '8612' # Spack can be extended with external commands
 #     - '7759' # enable using spack-installed packages as externals
-     - '11871' #share spack source possibly among  users
-     - '11989' #Load compiler from modules
+#     - '11871' #share spack source possibly among  users
+#introduce error on ccompiler find on marconi     - '11989' #Load compiler from modules
   runconfig: 'True'
   integration: 'True'
   upstream_update: 'True'
@@ -29,4 +29,3 @@ logging_configs:
   loggers:
     cascade_yaml_config:
       level: WARNING
-
