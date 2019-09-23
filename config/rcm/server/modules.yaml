@@ -19,4 +19,5 @@ modules:
     - lxde-openbox
     - lxde-leafpad
     - lxde-gpicview
+    - lxde-icon-theme
     - py-six
