@@ -49,6 +49,7 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
     def config_setup(self,
                      spack_root='spack',
+                     out_config_dir = os.path.join('etc','spack'),
                      cache='cache',
                      bincache='bincache',
                      install='install',
@@ -156,8 +157,21 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
         ########## merge, interpolate and write spack config files#########
 
+        if modules:
+            self.logger.debug("find modules in args-->" + modules + "<--")
+            if modules[0] != '/':
+                modules_dir = os.path.join(self.base_path, modules)
+            else:
+                modules_dir = modules
+            modules_dir = os.path.abspath(modules_dir)
 
-        spack_config_dir=os.path.abspath(os.path.join(dest,'etc','spack'))
+        if out_config_dir:
+            if out_config_dir[0] != '/':
+                spack_config_dir = os.path.abspath(os.path.join(dest, out_config_dir))
+            else:
+                os.makedirs(out_config_dir)
+                spack_config_dir = out_config_dir
+
         if os.path.exists(spack_config_dir) :
             if clearconfig:
                 self.logger.info("Clear config Folder ->"+spack_config_dir+"<-")
