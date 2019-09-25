@@ -14,10 +14,10 @@ modules:
     - lxde-lxterminal
     - lxde-libfm
     - lxde-menu-cache
-    - lxde-pcmanfm
-    - lxde-tint2
-    - lxde-openbox
-    - lxde-leafpad
-    - lxde-gpicview
+    - pcmanfm
+    - tint2
+    - openbox
+    - leafpad
+    - gpicview
     - lxde-icon-theme
     - py-six
