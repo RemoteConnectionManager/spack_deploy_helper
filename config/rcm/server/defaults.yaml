@@ -10,8 +10,6 @@ defaults:
       - 'packages/lxde-openbox'
       - 'packages/lxde-pcmanfm'
       - 'packages/lxde-tint2'
-      - 'packages/virtualgl_build_on_compute_nodes'
-      - 'packages/add_glew_x11_dep'
 #not needed any more?      - 'packages/mesa_update'
 #not needed any more?      - 'packages/mesa-glu'
 #not needed any more?      - 'packages/virtualgl'
