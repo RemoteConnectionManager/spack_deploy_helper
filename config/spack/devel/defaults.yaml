@@ -17,9 +17,10 @@ defaults:
 #merged     - '11646' # avoid fixed depnency of cmake from gnutls
 #merged     - '8612' # Spack can be extended with external commands
 #     - '7759' # enable using spack-installed packages as externals
-     - '11871' #share spack source possibly among  users
+#mybe break spack find     - '11871' #share spack source possibly among  users
+     - '11598' #Try to put spack source on local disk, so nothing on install point there
 #introduce error on ccompiler find on marconi     - '11989' #Load compiler from modules
-     - '11372' #concretize environments together 
+#merged     - '11372' #concretize environments together 
   runconfig: 'True'
   integration: 'True'
   upstream_update: 'True'
