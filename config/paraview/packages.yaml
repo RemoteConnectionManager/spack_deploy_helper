@@ -21,4 +21,17 @@ packages:
     version:
     - 2.2.3
 
+# pinning py-numpy not to require python3
+  py-numpy:
+    version:
+    - 1.16.5
+
+  hdf5:
+    variants:
+    - +hl
+  vtk:
+    variants:
+    - +python
+    - +qt
+
 
