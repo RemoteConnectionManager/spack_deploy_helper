@@ -10,14 +10,6 @@ packages:
       glu:
         - openglu
         - mesa-glu
-  opengl:
-    paths:
-      opengl@4.5.0: /usr
-    buildable: False
-  openglu:
-    paths:
-      openglu@1.3: /usr
-    buildable: False
   rcm:
     variants:
       - +virtualgl
