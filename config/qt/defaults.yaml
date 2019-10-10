@@ -1,0 +1,7 @@
+defaults:
+  origin :
+    branches :
+    - packages/fix_py5t5_env_module_generation
+#merged      - 'packages/fluxbox'
+#      - 'packages/fix/gdk-pixbuf_old_release'
+#
