@@ -16,3 +16,4 @@ modules:
     - py-appdirs
     - py-packaging
     - py-subprocess32
+    - vtk
