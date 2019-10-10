@@ -33,5 +33,9 @@ packages:
     variants:
     - +python
     - +qt
+  visit:
+    variants:
+    - ~hdf5
+
 
 
