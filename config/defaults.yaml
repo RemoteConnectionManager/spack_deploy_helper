@@ -21,7 +21,7 @@ argparse:
 config:
   config_folders:
     - 'config'
-  hosts_dir: 'recipes/hosts'
+  hosts_dir: '../hosts'
   host_tags :
     galileo : 'galileo'
     eni : 'eni'
