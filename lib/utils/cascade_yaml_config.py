@@ -109,19 +109,31 @@ def setup_from_args_and_configs(log_controller=None):
 
     base_config = CascadeYamlConfig(yaml_files=yaml_files)
 
+    #env spack yaml files involved
+    env_spack_yaml_files = find_config_file_list(
+                           list_paths=[base_args.workdir],
+                           default_paths=['config'],
+                           glob_suffix='spack.yaml' )
+    # print("#######################first yaml files", yaml_files)
+
+    env_spack_config = CascadeYamlConfig(yaml_files=env_spack_yaml_files)
+    env_spack_session = env_spack_config[['spack']]
     log_controller.set_args(log_configs=base_config[['logging_configs']])
 
     config_session = base_config[['config']]
 
-    # print("///////////////", config_session)
-
     # adding config_folders arg
     key_name = 'config_folders'
+
+    #print("######"+str(env_spack_session))
+    #print("######"+str(env_spack_session.get('include', [os.path.join(root_path, 'config')])))
+    # print("///////////////", config_session)
+
     base_parser.add_argument('-' + key_name[0],
                              '--' + key_name,
                              action='append',
                              help='yaml config folders',
-                             default=config_session.get(key_name,  [os.path.join(root_path, 'config')]))
+                             default = env_spack_session.get('include', config_session.get(key_name, [os.path.join(root_path, 'config')])))
 
     key_name = 'hosts_dir'
 
