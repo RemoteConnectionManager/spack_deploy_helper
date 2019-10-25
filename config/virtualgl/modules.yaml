@@ -1,6 +1,7 @@
 modules:
   tcl:
-    whitelist: ['virtualgl']
+    whitelist:
+    - virtualgl
     virtualgl:
       environment:
         set:

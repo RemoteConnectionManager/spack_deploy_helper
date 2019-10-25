@@ -5,6 +5,5 @@ modules:
     - kdiff3
     - gnuplot
     - py-pyqt5
-#    - dislin
-    - cmake+qt
+    - cmake
   
