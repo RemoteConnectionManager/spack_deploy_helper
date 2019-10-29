@@ -22,14 +22,18 @@ config:
   config_folders:
     - 'config'
   hosts_dir: '../hosts'
-  host_tags :
-    galileo : 'galileo'
-    eni : 'eni'
-    athena : 'athena'
-    calori : 'ws_mint'
-    marconi : 'marconi'
-    davide : 'davide'
-    carmen : 'arm'
+  plugin_folders:
+    - 'plugins/git_workspace'
+    - 'plugins/spack_workspace'
+
+#  host_tags :
+#    galileo : 'galileo'
+#    eni : 'eni'
+#    athena : 'athena'
+#    calori : 'ws_mint'
+#    marconi : 'marconi'
+#    davide : 'davide'
+#    carmen : 'arm'
 
 
 
