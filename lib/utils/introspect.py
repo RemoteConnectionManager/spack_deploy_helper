@@ -47,7 +47,7 @@ class myintrospect(commandintrospect):
 
         commandintrospect.__init__(self,['git --version'])
 
-        self.test('git config --get remote.origin.url',key='giturl')
+        #self.test('git config --get remote.origin.url',key='giturl')
         self.tags=tags
 
     def platform_tag(self):
