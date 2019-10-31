@@ -6,17 +6,6 @@ defaults:
   install : 'install'
   modules : 'modules'
   linkinstall : '../../install'
-  git_dest_dir : 'spack'
-  origin :
-    master : 'develop'
-    branches :
-      - 'clean/develop'
-    pull_flags :
-      - 'ff-only'
-  upstream :
-    url : 'https://github.com/LLNL/spack.git'
-    master : 'develop'
-    prs : []
 
 
 
