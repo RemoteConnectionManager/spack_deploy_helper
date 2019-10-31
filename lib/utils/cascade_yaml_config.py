@@ -1,6 +1,7 @@
 # stdlib
 import sys
 import os
+import pwd
 import logging
 import copy
 import glob
@@ -16,6 +17,7 @@ import utils
 import log_config
 
 root_path = os.path.dirname(lib_path)
+current_username = pwd.getpwuid( os.getuid() )[ 0 ]
 logger = logging.getLogger(__name__)
 
 def yaml_environment_import(varlist=[]):
@@ -25,6 +27,20 @@ def yaml_environment_import(varlist=[]):
         if v in os.environ:
             env[v] = os.environ[v]
     utils.hiyapyco.jinja2env.globals =  {'env' : env}
+
+def abs_deploy_path(path, 
+                    prefixes=[],
+                    subst={'DEPLOY_USERNAME': current_username,
+                           'DEPLOY_ROOTPATH': root_path,
+                           'DEPLOY_LIBPATH': lib_path}):
+    subst_path = utils.stringtemplate(path).safe_substitute(subst)
+    out_path = subst_path
+    if '/' != subst_path[0]:
+        for prefix in prefixes:
+            out_path = os.path.join(prefix, subst_path)
+            if os.path.exists(subst_path):
+                break
+    return os.path.abspath(out_path)
 
 def retrieve_plugins(plugin_folders):
     out_plugins = dict()
@@ -184,7 +200,8 @@ def setup_from_args_and_configs(log_controller=None):
                              '--' + key_name,
                              action='append',
                              help='plugin folders',
-                             default=config_session.get(key_name,  [os.path.join(lib_path, 'plugins')]))
+                             default = [abs_deploy_path(path, prefixes=[lib_path])
+                                        for path in config_session.get(key_name,  [os.path.join(lib_path, 'plugins')])])
 
     # now reparse with this new arguments
     base_args = base_parser.parse_known_args()[0]
@@ -424,7 +441,7 @@ class ArgparseSubcommandManager(object):
         return lambda_method
 
     def _parse_args(self, method, args):
-        # print("parse_args for ", method)
+        # print("parse_args for " + method)
         # getattr(self.__class__, method)(self, *args, **kw)
         all_args=vars(args)
         logger.debug("^^^^^all_args:" + str(all_args))
@@ -567,6 +584,11 @@ class CascadeYamlConfig:
         def parse(self):
             logger.info("CascadeYamlConfig: parsing: " + str(self.list_paths))
             if self.list_paths:
+                # add global variable substitution to jinja env, so 
+                # used with {{DEPLOY_USERNAME'}}
+                utils.hiyapyco.jinja2env.globals['DEPLOY_USERNAME'] = current_username
+                utils.hiyapyco.jinja2env.globals['DEPLOY_ROOTPATH'] = root_path
+                
                 self._conf = utils.hiyapyco.load(
                     *self.list_paths,
                     interpolate=True,
