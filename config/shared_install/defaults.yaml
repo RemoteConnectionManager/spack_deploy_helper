@@ -8,7 +8,6 @@ defaults:
   clearconfig : 'True'
   origin :
     branches :
-      - 'clean/develop'
       - 'pr/fix/flake8_configparser_backport'
 #merged      - 'pr/fix/perl-dependent-modules'
 
