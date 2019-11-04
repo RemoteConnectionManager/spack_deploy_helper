@@ -4,9 +4,6 @@
 defaults:
   origin :
     url : 'https://github.com/RemoteConnectionManager/spack.git'
-  integration : 'True'
-  clearconfig : 'True'
-  origin :
     master : 'integrate/rcm'
     branches :
       - 'pr/turbovnc'
