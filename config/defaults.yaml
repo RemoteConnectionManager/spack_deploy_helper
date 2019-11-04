@@ -19,8 +19,8 @@ argparse:
 
 
 config:
-  config_folders:
-    - 'config'
+#  config_folders:
+#    - 'config'
   hosts_dir: '../hosts'
   plugin_folders:
     - 'plugins/git_workspace'
