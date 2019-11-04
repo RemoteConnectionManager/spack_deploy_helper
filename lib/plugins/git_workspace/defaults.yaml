@@ -1,8 +1,14 @@
 defaults:
   origin:
-#    url: ''
+    url: ''
+    branches :
+      - 'clean/develop'
+    pull_flags :
+      - 'ff-only'
   upstream:
-#    url: ''
+    url: ''
+    prs : []
+
   integration : 'True'
   origin_update : 'True'
 #  upstream_update : 'False'

@@ -6,6 +6,26 @@ defaults:
   install : 'install'
   modules : 'modules'
   linkinstall : '../../install'
+  git_dest_dir : 'spack'
+  origin :
+    master : 'develop'
+    branches :
+      - 'clean/develop'
+    pull_flags :
+      - 'ff-only'
+  upstream :
+    url : 'https://github.com/LLNL/spack.git'
+    master : 'develop'
+    prs :
+#merged     - '11646' # avoid fixed depnency of cmake from gnutls
+##merged     - '8612' # Spack can be extended with external commands
+##     - '7759' # enable using spack-installed packages as externals
+##mybe break spack find     - '11871' #share spack source possibly among  users
+     - '11598' #Try to put spack source on local disk, so nothing on install point there
+#     #introduce error on ccompiler find on marconi     - '11989' #Load compiler from modules
+#     #merged     - '11372' #concretize environments together 
+#
+
 
 
 
