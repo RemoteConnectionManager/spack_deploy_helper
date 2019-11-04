@@ -1,8 +1,6 @@
 defaults:
   origin:
     url: ''
-    branches :
-      - 'clean/develop'
     pull_flags :
       - 'ff-only'
   upstream:
