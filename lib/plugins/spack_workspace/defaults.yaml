@@ -1,8 +1,9 @@
 
 
 defaults:
-  cache : '../cache'
-  linkcache : '../../cache'
+  output_config_dir : "{{defaults.git_dest_dir}}/etc"
+  cache : "{{DEPLOY_ROOTPATH}}/cache"
+  linkcache : "{{DEPLOY_PARENT_ROOTPATH}}/cache"
   install : 'install'
   modules : 'modules'
   linkinstall : '../../install'
@@ -74,6 +75,11 @@ argparse:
             action: 'store_true'
             default : "{{ defaults.runconfig }}"
             help: 'run config.sh files present in config folders'
+          out_config_dir :
+            action: 'store'
+            default: "{{ defaults.output_config_dir }}"
+            help: 'folder where generated config files are written, if start with / considered absolute, otherwise considered relative to workdir'
+
 
 
 logging_configs:
