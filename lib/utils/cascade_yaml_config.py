@@ -17,7 +17,12 @@ import utils
 import log_config
 
 root_path = os.path.dirname(lib_path)
+parent_root_path = os.path.dirname(root_path)
 current_username = pwd.getpwuid( os.getuid() )[ 0 ]
+global_key_subst = {'DEPLOY_USERNAME': current_username,
+                    'DEPLOY_ROOTPATH': root_path,
+                    'DEPLOY_PARENT_ROOTPATH': parent_root_path,
+                    'DEPLOY_LIBPATH': lib_path}
 logger = logging.getLogger(__name__)
 
 def yaml_environment_import(varlist=[]):
@@ -30,9 +35,7 @@ def yaml_environment_import(varlist=[]):
 
 def abs_deploy_path(path, 
                     prefixes=[],
-                    subst={'DEPLOY_USERNAME': current_username,
-                           'DEPLOY_ROOTPATH': root_path,
-                           'DEPLOY_LIBPATH': lib_path}):
+                    subst=global_key_subst):
     subst_path = utils.stringtemplate(path).safe_substitute(subst)
     out_path = subst_path
     if '/' != subst_path[0]:
@@ -193,7 +196,7 @@ def setup_from_args_and_configs(log_controller=None):
                                             merge_folders=[os.path.join(platform_match, config_session.get('config_dir', 'config'))],
                                             prefixes=[os.getcwd(), hosts_dir])
         logger.info(" platform folders -->" + str(platform_folders) + "<--")
-
+        global_key_subst['DEPLOY_HOST_CONFIGPATH'] = platform_folders[0]
 
     key_name = 'plugin_folders'
     base_parser.add_argument('-' + key_name[0],
@@ -586,8 +589,8 @@ class CascadeYamlConfig:
             if self.list_paths:
                 # add global variable substitution to jinja env, so 
                 # used with {{DEPLOY_USERNAME'}}
-                utils.hiyapyco.jinja2env.globals['DEPLOY_USERNAME'] = current_username
-                utils.hiyapyco.jinja2env.globals['DEPLOY_ROOTPATH'] = root_path
+                for subst_key in global_key_subst:
+                    utils.hiyapyco.jinja2env.globals[subst_key] = global_key_subst[subst_key]
                 
                 self._conf = utils.hiyapyco.load(
                     *self.list_paths,
