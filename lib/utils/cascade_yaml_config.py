@@ -117,23 +117,34 @@ def setup_from_args_and_configs(log_controller=None):
 
     # partial parsing of known args
     base_args = base_parser.parse_known_args()[0]
-    # print("%%%%% workdir %%%%",base_args.workdir)
+
+
+    if base_args.workdir[0] == '/':
+        work_dir = base_args.workdir
+        env_dir = work_dir
+    else:
+        work_dir = os.path.join(parent_root_path, 'deploy', base_args.workdir)
+        env_dir = os.path.join(parent_root_path, 'environments', base_args.workdir)
+
+    global_key_subst['DEPLOY_WORKDIR'] = work_dir
+
+# print("%%%%% workdir %%%%",base_args.workdir)
 
     #get yaml files involved
     yaml_files = find_config_file_list(
-                list_paths=[base_args.workdir],
+                list_paths=[work_dir, env_dir],
                 default_paths=['config'],
                 glob_suffix='defaults.yaml' )
-    # print("#######################first yaml files", yaml_files)
+    # print("#######################defaults yaml files", yaml_files)
 
     base_config = CascadeYamlConfig(yaml_files=yaml_files)
 
     #env spack yaml files involved
     env_spack_yaml_files = find_config_file_list(
-                           list_paths=[base_args.workdir],
-                           default_paths=['config'],
+                           list_paths=[work_dir, env_dir],
+                           default_paths=[],
                            glob_suffix='spack.yaml' )
-    # print("#######################first yaml files", yaml_files)
+    # print("#######################spack yaml files", env_spack_yaml_files)
 
     env_spack_config = CascadeYamlConfig(yaml_files=env_spack_yaml_files)
     env_spack_session = env_spack_config[['spack']]
@@ -159,7 +170,8 @@ def setup_from_args_and_configs(log_controller=None):
     base_parser.add_argument('--' + key_name,
                              action='store',
                              help='hosts config base dir',
-                             default=config_session.get(key_name,  'config/hosts'))
+                             default=abs_deploy_path(config_session.get(key_name,  'config/hosts'),
+                                                     prefixes=[root_path]))
 
     # now reparse with this new arguments
     base_args = base_parser.parse_known_args()[0]
@@ -177,7 +189,7 @@ def setup_from_args_and_configs(log_controller=None):
 
 
     yaml_files = find_config_file_list(
-                list_paths=[base_args.workdir] + base_args.config_folders,
+                list_paths=[env_dir, work_dir] + base_args.config_folders,
                 default_paths=default_paths,
                 glob_suffix='defaults.yaml' )
 
@@ -226,7 +238,9 @@ def setup_from_args_and_configs(log_controller=None):
     #             logger.warning(" NON EXISTING PLATFORM FOLDER :" + str(platform_config_folder))
 
 
-    config_folders = merge_folder_list([os.path.join(root_path, 'config')] + platform_folders + [os.path.abspath(base_args.workdir)],
+    config_folders = merge_folder_list([os.path.join(root_path, 'config')] +
+                                       platform_folders +
+                                       [env_dir, work_dir],
                                         merge_folders=base_args.config_folders,
                                         prefixes=[os.getcwd(),os.path.join(root_path, 'config')])
     plugin_folders = merge_folder_list([],
