@@ -45,7 +45,7 @@ class commandintrospect(baseintrospect):
 class myintrospect(commandintrospect):
     def __init__(self,tags={}):
 
-        commandintrospect.__init__(self,['git --version'])
+        commandintrospect.__init__(self,[])
 
         #self.test('git config --get remote.origin.url',key='giturl')
         self.tags=tags
