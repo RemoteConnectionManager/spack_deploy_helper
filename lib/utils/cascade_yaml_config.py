@@ -118,13 +118,17 @@ def setup_from_args_and_configs(log_controller=None):
     # partial parsing of known args
     base_args = base_parser.parse_known_args()[0]
 
+    #log_controller.set_args()
 
     if base_args.workdir[0] == '/':
         work_dir = base_args.workdir
         env_dir = work_dir
     else:
+        logger.warning(" workdir path is not absolute-->" + base_args.workdir + "<--")
         work_dir = os.path.join(parent_root_path, 'deploy', base_args.workdir)
+        logger.warning(" setting output work folder to -->" + work_dir + "<--")
         env_dir = os.path.join(parent_root_path, 'environments', base_args.workdir)
+        logger.warning(" setting input environment folder to -->" + env_dir + "<--")
 
     global_key_subst['DEPLOY_WORKDIR'] = work_dir
 
@@ -149,7 +153,6 @@ def setup_from_args_and_configs(log_controller=None):
     env_spack_config = CascadeYamlConfig(yaml_files=env_spack_yaml_files)
     env_spack_session = env_spack_config[['spack']]
     log_controller.set_args(log_configs=base_config[['logging_configs']])
-
     config_session = base_config[['config']]
 
     # adding config_folders arg

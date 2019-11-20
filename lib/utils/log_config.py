@@ -21,7 +21,7 @@ class log_setup:
 
         BASEFORMAT = "#aaa[%(levelname)-5s %(name)s # %(pathname)s:%(lineno)s] %(message)s"
         parser = argparse.ArgumentParser(add_help=False)
-        parser.add_argument('-d','--debug', default = 'error')
+        parser.add_argument('-d','--debug', default = 'warning')
         #logging.basicConfig(format=BASEFORMAT, level=logging.ERROR)
         logging.basicConfig(level=logging.ERROR)
 
