@@ -34,6 +34,13 @@ class git_repo:
             module_logger.debug("@@@OUTPUT@@@" + out)
         return (ret,out)
 
+    def release_tag(self):
+        cmd = ['git', 'describe', '--tags', '--long']
+        (ret,output,err) = run(cmd,logger=self.logger,folder=self.folder,stop_on_error=False)
+        tag = output.decode().splitlines()[0].strip()
+        release_tag = tag.split("/")[-1:][0]
+        return release_tag
+
     def init(self):
         if not os.path.exists(self.folder):
             os.makedirs(self.folder)
