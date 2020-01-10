@@ -313,12 +313,20 @@ class ArgparseSubcommandManager(object):
             logger.debug("###############initrgparseSubcommandManager  par "+ par+" --> "+str(kwargs[par]))
 
         self.dry_run = kwargs.get('dry_run', False)
-        rel_path = kwargs.get('workdir', '')
-        deploy_dir = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(sys.modules['__main__'].__file__))), 'deploy')
-        for path in [os.path.join(os.curdir,rel_path),
-                     os.path.join(deploy_dir,rel_path),
-                     deploy_dir,
-                     os.curdir] :
+        base_path_search_list = [os.curdir]
+        deploy_dir = global_key_subst.get('DEPLOY_WORKDIR',
+                     os.path.join(os.path.abspath(os.path.dirname(
+                         os.path.dirname(sys.modules['__main__'].__file__))
+                                                 ), 'deploy'))
+        base_path_search_list = [deploy_dir] + base_path_search_list
+        work_dir = kwargs.get('workdir', global_key_subst.get('DEPLOY_WORKDIR', ''))
+        if work_dir :
+            if work_dir[0] == '/' :
+                base_path_search_list = [work_dir] + base_path_search_list
+            else:
+                base_path_search_list = [os.path.join(os.curdir,work_dir),
+                     os.path.join(deploy_dir,work_dir)] + base_path_search_list
+        for path in base_path_search_list:
             if os.path.exists(path):
                 self.base_path = os.path.abspath(path)
                 break

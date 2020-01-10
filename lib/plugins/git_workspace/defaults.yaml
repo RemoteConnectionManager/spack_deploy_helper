@@ -1,10 +1,10 @@
 defaults:
   origin:
-    url: ''
+    url: '{{ defaults.upstream.url }}'
     pull_flags :
       - 'ff-only'
   upstream:
-    url: ''
+#    url: ''
     prs : []
 
   integration : 'True'
