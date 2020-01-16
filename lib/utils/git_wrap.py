@@ -99,7 +99,11 @@ class git_repo:
 
     def checkout(self, branch, newbranch=None):
         cmd = [ 'git', 'checkout', branch ]
-        if newbranch: cmd.extend(['-b', newbranch])
+        if newbranch:
+            if newbranch == branch:
+                self.logger.warning("Branch " + branch + 'has been specified for both  branch and newbranch')
+            else:
+                cmd.extend(['-b', newbranch])
         (ret,output) = self.run(cmd)
 
     def sync_upstream(self, upstream='upstream', master='develop', options=['--ff-only']):
