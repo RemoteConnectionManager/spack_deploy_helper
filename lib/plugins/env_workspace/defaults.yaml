@@ -1,0 +1,35 @@
+defaults:
+  base_env_dir: "{{DEPLOY_PARENT_ROOTPATH}}/environments"
+
+argparse:
+  subparser:
+    EnvWorkspaceManager:
+      command: 'envmanager'
+      help: 'manage working environments'
+      methods:
+        list:
+          help: 'list available working directories'
+          base_env:
+            action: 'store'
+            default: "{{defaults.base_env_dir}}"
+            help: 'Base folder to search work dirs'
+
+logging_configs:
+  loggers:
+    plugin.EnvWorkspaceManager:
+      level: INFO
+      handlers: [console_bare]
+      propagate: False
+
+    plugin.EnvWorkspaceManager.run.input:
+      level: INFO
+      handlers: [console_colored_in]
+      propagate: False
+    plugin.EnvWorkspaceManager.run.output:
+      level: INFO
+      handlers: [console_colored_out]
+      propagate: False
+    plugin.EnvWorkspaceManager.run.error:
+      level: INFO
+      handlers: [console_colored_err]
+      propagate: False
