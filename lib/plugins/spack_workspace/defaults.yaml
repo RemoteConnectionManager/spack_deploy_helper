@@ -9,9 +9,6 @@ defaults:
   modules : 'modules'
   linkinstall : '../../install'
   origin :
-    master : 'develop'
-    branches :
-      - 'develop'
     pull_flags :
       - 'ff-only'
   upstream :
