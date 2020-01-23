@@ -41,7 +41,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         return uuid
 
     def list(self):
-        print('The current workspaces found in ' + self.base_path + ' are:')
+        print('The current git repositories found in ' + self.base_path + ' are:')
         count = 0
         for root, dirs, files in os.walk(self.base_path, topdown=True):
             if is_git_clone(root):
