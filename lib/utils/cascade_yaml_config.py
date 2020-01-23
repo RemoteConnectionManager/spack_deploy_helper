@@ -125,7 +125,7 @@ def setup_from_args_and_configs(log_controller=None):
         env_dir = work_dir
     else:
         logger.warning(" workdir path is not absolute-->" + base_args.workdir + "<--")
-        work_dir = os.path.join(parent_root_path, 'deploy', base_args.workdir)
+        work_dir = os.path.join(parent_root_path, 'deploy', 'environments', base_args.workdir)
         logger.warning(" setting output work folder to -->" + work_dir + "<--")
         env_dir = os.path.join(parent_root_path, 'environments', base_args.workdir)
         logger.warning(" setting input environment folder to -->" + env_dir + "<--")
@@ -161,12 +161,18 @@ def setup_from_args_and_configs(log_controller=None):
     #print("######"+str(env_spack_session))
     #print("######"+str(env_spack_session.get('include', [os.path.join(root_path, 'config')])))
     # print("///////////////", config_session)
+    existing_config_folders = []
+    for path in config_session.get(key_name, env_spack_session.get('include', [os.path.join(root_path, 'config')])):
+        if path[0] != '/':
+            path=os.path.abspath(os.path.join(root_path, path))
+        if os.path.isdir(path) and os.path.exists(path):
+            existing_config_folders.append(path)
 
     base_parser.add_argument('-' + key_name[0],
                              '--' + key_name,
                              action='append',
                              help='yaml config folders',
-                             default = env_spack_session.get('include', config_session.get(key_name, [os.path.join(root_path, 'config')])))
+                             default = existing_config_folders)
 
     key_name = 'hosts_dir'
 
