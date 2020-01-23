@@ -1,0 +1,7 @@
+defaults:
+  origin :
+    url : 'https://github.com/RemoteConnectionManager/spack.git'
+    branches :
+      - 'clean/develop'
+
+
