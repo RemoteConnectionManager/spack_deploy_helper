@@ -8,7 +8,7 @@ modules:
   enable:
     - tcl
   tcl:
-    naming_scheme:  '${PACKAGE}/${VERSION}-${COMPILERNAME}-${COMPILERVER}'
+    naming_scheme: '{name}/{version}-{compiler.name}-{compiler.version}'
     whitelist:
     - python
 #    - '^python'
