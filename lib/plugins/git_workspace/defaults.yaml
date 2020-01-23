@@ -1,6 +1,7 @@
 defaults:
   origin:
     url: '{{ defaults.upstream.url }}'
+    master: '{{ defaults.upstream.master }}'
     pull_flags :
       - 'ff-only'
   upstream:
