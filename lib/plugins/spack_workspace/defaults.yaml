@@ -4,10 +4,8 @@ defaults:
   git_dest_dir : "{{DEPLOY_WORKDIR}}/spack"
   output_config_dir : "{{defaults.git_dest_dir}}/etc"
   cache : "{{DEPLOY_WORKDIR}}/cache"
-  linkcache : "{{DEPLOY_PARENT_ROOTPATH}}/cache"
-  install : 'install'
-  modules : 'modules'
-  linkinstall : '../../install'
+  install : '{{DEPLOY_WORKDIR}}/install'
+  modules : '{{DEPLOY_WORKDIR}}/modules'
   origin :
     pull_flags :
       - 'ff-only'

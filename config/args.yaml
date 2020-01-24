@@ -17,10 +17,6 @@ args:
     action: 'store'
     default: "{{ defaults.install }}"
     help: 'folder where install packages, if start with / considered absolute, otherwise considered relative to dest'
-  linkinstall:
-    action: 'store'
-    default: "{{ defaults.linkinstall }}"
-    help: 'existing install folder to sym link from into actual install'
   origin:
     action: 'store'
     default: "{{ defaults.origin.url }}"
