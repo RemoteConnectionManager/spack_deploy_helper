@@ -38,5 +38,5 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 #else: printline += " MISSING -->" + deployed_path
                 print(printline)
                 count += 1
-                del dirs
+                dirs[:] = []
 

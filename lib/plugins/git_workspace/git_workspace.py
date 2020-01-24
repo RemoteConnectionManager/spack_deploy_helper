@@ -22,6 +22,7 @@ logging.debug("__file__:" + os.path.realpath(__file__))
 #ls.set_args()
 
 def is_git_clone(path):
+    print("@@@@@ check git checkout in: "+path)
     return os.path.exists(os.path.join(path, '.git'))
 
 class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
@@ -47,7 +48,8 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             if is_git_clone(root):
                 print("  " + str(count) + " : " + root)
                 count += 1
-                del dirs
+                dirs[:] = []
+                #del dirs
 
     def remove(self, uuid):
         if str(uuid[0]) == '/':
