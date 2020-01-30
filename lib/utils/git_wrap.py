@@ -49,18 +49,18 @@ class git_repo:
         git_root = os.path.abspath(output.strip())
 
         #print("in path ",self.folder," git rev_parse ret: ",ret, ' git top:', git_root)
-        self.logger.debug("in path " + self.folder + " git rev_parse ret: " + str(int(ret)) + ' git top:'+ git_root.decode('utf-8'))
+        self.logger.debug("in path " + self.folder + " git rev_parse ret: " + str(int(ret)) + ' git top:'+ git_root)
         if 0 != ret or git_root != self.folder:
             cmd = ['git', 'init']
             (ret,output) = self.run(cmd)
-            self.logger.debug("git init in >>" + self.folder + "<< >>" + git_root.decode('utf-8') + "<< ret= "+ str(ret))
+            self.logger.debug("git init in >>" + self.folder + "<< >>" + git_root + "<< ret= "+ str(ret))
             #print("git init in ",">>" + self.folder + "<<",">>" + git_root + "<< ret= ",ret)
 
     def get_remotes(self):
         cmd = ['git', 'remote']
         (ret,output) = self.run(cmd)
         remotes = list()
-        for line in io.StringIO(output.decode()):
+        for line in io.StringIO(output):
             r=line.strip()
             remotes.append(r)
             #print("-->" + r + "<--")
