@@ -1,11 +1,22 @@
 defaults:
   base_env_dir: "{{DEPLOY_PARENT_ROOTPATH}}/environments"
+  merge_config_folders : "{{DEPLOY_MERGE_CONFIG_FOLDERS}}"
+  cache : "{{DEPLOY_WORKDIR}}/cache"
+  install : '{{DEPLOY_WORKDIR}}/install'
+  modules : '{{DEPLOY_WORKDIR}}/modules'
 
 argparse:
   subparser:
     EnvWorkspaceManager:
       command: 'envmanager'
       help: 'manage working environments'
+      config:
+        spack_yaml_files :
+          - 'packages.yaml'
+          - 'modules.yaml'
+          - 'compilers.yaml'
+          - 'config.yaml'
+          - 'mirrors.yaml'
       methods:
         list:
           help: 'list available working directories'
@@ -13,6 +24,40 @@ argparse:
             action: 'store'
             default: "{{defaults.base_env_dir}}"
             help: 'Base folder to search work dirs'
+        config_setup:
+          spack_root:
+            action: 'store'
+            default: "{{ defaults.git_dest_dir }}"
+            help: 'folder where is spack instance (cloned) if start with / considered absolute, otherwise considered relative to workdir'
+          clearconfig :
+            action: 'store_true'
+            default : "{{ defaults.clearconfig }}"
+            help: 'clear existing spack configurations'
+          runconfig :
+            action: 'store_true'
+            default : "{{ defaults.runconfig }}"
+            help: 'run config.sh files present in config folders'
+          out_config_dir :
+            action: 'store'
+            default: "{{ defaults.output_config_dir }}"
+            help: 'folder where generated config files are written, if start with / considered absolute, otherwise considered relative to workdir'
+          merge_config_folders :
+            action: 'store'
+            help: 'List of config folders to merge and substitute into out_config_dir'
+            default : '{{ defaults.merge_config_folders }}'
+          cache:
+            action: 'store'
+            default: "{{ defaults.cache }}"
+            help: 'folder where cache is, if start with / considered absolute, otherwise considered relative to workdir'
+          install:
+            action: 'store'
+            default: "{{ defaults.install }}"
+            help: 'folder where install packages, if start with / considered absolute, otherwise considered relative to workdir'
+          modules:
+            action: 'store'
+            default: "{{ defaults.modules }}"
+            help: 'folder where put tcl modules, if start with / considered absolute, otherwise considered relative to dest'
+
 
 logging_configs:
   loggers:

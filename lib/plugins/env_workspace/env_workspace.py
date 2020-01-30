@@ -1,8 +1,7 @@
 import os
-import shutil
-import uuid
+import glob
 import logging
-
+import copy
 import utils
 import cascade_yaml_config
 
@@ -18,8 +17,14 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
     def __init__(self, **kwargs):
         super(EnvWorkspaceManager, self).__init__(**kwargs)
+        join_string= "\n    "
         for par in kwargs:
-            self.logger.debug("init par "+ par+" --> "+str(kwargs[par]))
+            out = "init par "+ par+" --> "
+            if isinstance(kwargs[par], list):
+                out += join_string + join_string.join(kwargs[par])
+            else:
+                out += str(kwargs[par])
+            self.logger.debug(out)
 
 
 
@@ -32,7 +37,7 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         for root, dirs, files in os.walk(base_env, topdown=True):
             if is_workdir(root):
                 rel_path = os.path.relpath(root, base_env)
-                deployed_path =  os.path.abspath(os.path.join(cascade_yaml_config.parent_root_path, 'deploy', 'environments', rel_path))
+                deployed_path =  os.path.abspath(os.path.join(cascade_yaml_config.parent_root_path, 'deploy',  rel_path))
                 printline = "  " + str(count) + " : " + os.path.relpath(root, base_env)
                 if os.path.exists(deployed_path): printline += " -->" + deployed_path
                 #else: printline += " MISSING -->" + deployed_path
@@ -40,3 +45,70 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 count += 1
                 dirs[:] = []
 
+    def config_setup(self,
+                     spack_root='spack',
+                     out_config_dir = os.path.join('etc','spack'),
+                     merge_config_folders = [],
+                     cache='cache',
+                     install='install',
+                     modules='modules',
+                     clearconfig=True,
+                     runconfig=False):
+
+        # print("@@@@@@@@@@@@@@@@@@@@",self.dry_run)
+        if spack_root [0] != '/':
+            dest = os.path.join(self.base_path, spack_root)
+        else:
+            dest = spack_root
+
+
+        if out_config_dir:
+            if out_config_dir[0] != '/':
+                spack_config_dir = os.path.abspath(os.path.join(dest, out_config_dir))
+            else:
+                if not os.path.exists(out_config_dir) : os.makedirs(out_config_dir)
+                spack_config_dir = out_config_dir
+
+        if os.path.exists(spack_config_dir) :
+
+            if clearconfig:
+                self.logger.info("Clear config Folder ->"+spack_config_dir+"<-")
+                for f in glob.glob(spack_config_dir+ "/*.yaml"):
+                    os.remove(f)
+
+            for f in self.manager_conf.get('config', dict()).get('spack_yaml_files',[]) :
+                print("-------------- " + f)
+                merge_files=[]
+                for p in merge_config_folders:
+                    print("#### config path: " + p)
+                    test=os.path.abspath(os.path.join(p,f))
+                    if os.path.exists(test): merge_files = merge_files +[test]
+
+                if merge_files :
+                    self.logger.debug("configuring "+ f + " with files: "+str(merge_files))
+                    current_key_subst = copy.deepcopy(cascade_yaml_config.global_key_subst)
+                    current_key_subst['DEPLOY_SPACK_CACHE'] = cache
+                    current_key_subst['DEPLOY_SPACK_INSTALL'] = install
+                    current_key_subst['DEPLOY_SPACK_MODULES'] = modules
+                    for subst_key in current_key_subst:
+                      utils.hiyapyco.jinja2env.globals[subst_key] = current_key_subst[subst_key]
+
+                    merged_f = utils.hiyapyco.load(
+                        *merge_files,
+                        interpolate=True,
+                        method=utils.hiyapyco.METHOD_MERGE,
+                        failonmissingfiles=True
+                    )
+
+                    self.logger.debug("merged "+f+" yaml-->"+str(merged_f)+"<--")
+
+                    outfile = os.path.basename(f)
+                    target = os.path.join(spack_config_dir, outfile)
+                    self.logger.debug(" output config_file " + outfile + "<-- ")
+                    if not os.path.exists(target):
+                        out=utils.hiyapyco.dump(merged_f, default_flow_style=False)
+                        out = utils.stringtemplate(out).safe_substitute(current_key_subst)
+                        self.logger.info("WRITING config_file " + outfile + " -->" + target + "<-- ")
+                        open(target, "w").write(out)
+                else :
+                    self.logger.info("no template file for "+ f + " : skipping ")
