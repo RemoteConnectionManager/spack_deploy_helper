@@ -26,10 +26,13 @@ logging.debug("__file__:" + os.path.realpath(__file__))
 mylogger = logging.getLogger(__name__)
 
 # get config folders
-base_parser,config_folders, plugin_folders, platform_folders = cascade_yaml_config.setup_from_args_and_configs(log_controller=ls)
-mylogger.info("%%%%%%%%%% config folders %%%%%% " + str(config_folders))
-mylogger.info("%%%%%%%%%% plugin folders %%%%%% " + str(plugin_folders))
-mylogger.info("%%%%%%%%%% platform folders %%%%%% " + str(platform_folders))
+base_parser,config_folders, plugin_folders, platform_folders, merge_config_folders = cascade_yaml_config.setup_from_args_and_configs(log_controller=ls)
+join_string= "\n    "
+mylogger.info("%%%%%%%%%% config folders %%%%%% " + join_string + join_string.join(config_folders))
+mylogger.info("%%%%%%%%%% plugin folders %%%%%% " + join_string + join_string.join(plugin_folders))
+mylogger.info("%%%%%%%%%% platform folders %%%%%% " + join_string + join_string.join(platform_folders))
+mylogger.info("%%%%%%%%%% merge config folders %%%%%% " + join_string + join_string.join(merge_config_folders))
+
 
 # create the top-level parser
 # base_parser = argparse.ArgumentParser(prog='spack-deploy',add_help=False )
@@ -85,6 +88,7 @@ copy_args = copy.deepcopy(vars(global_args))
 copy_args['config_folders'] = config_folders
 copy_args['plugin_folders'] = plugin_folders
 copy_args['platform_folders'] = platform_folders
+copy_args['merge_config_folders'] = merge_config_folders
 copy_args['top_config'] = top_config
 
 

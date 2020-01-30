@@ -161,18 +161,28 @@ def setup_from_args_and_configs(log_controller=None):
     #print("######"+str(env_spack_session))
     #print("######"+str(env_spack_session.get('include', [os.path.join(root_path, 'config')])))
     # print("///////////////", config_session)
-    existing_config_folders = []
-    for path in config_session.get(key_name, env_spack_session.get('include', [os.path.join(root_path, 'config')])):
+    defaults_config_folders = []
+    for path in config_session.get(key_name, []):
         if path[0] != '/':
             path=os.path.abspath(os.path.join(root_path, path))
         if os.path.isdir(path) and os.path.exists(path):
-            existing_config_folders.append(path)
+            defaults_config_folders.append(path)
+
+    environment_config_folders = []
+    for path in env_spack_session.get('include', []):
+        if path[0] != '/':
+            path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(env_spack_yaml_files[0])), path))
+        if os.path.isdir(path) and os.path.exists(path):
+            environment_config_folders.append(path)
+
+    config_folders = defaults_config_folders + environment_config_folders
+    config_folders = [ii for n,ii in enumerate(config_folders) if ii not in config_folders[:n]]
 
     base_parser.add_argument('-' + key_name[0],
                              '--' + key_name,
                              action='append',
                              help='yaml config folders',
-                             default = existing_config_folders)
+                             default = config_folders)
 
     key_name = 'hosts_dir'
 
@@ -248,15 +258,26 @@ def setup_from_args_and_configs(log_controller=None):
 
 
     config_folders = merge_folder_list([os.path.join(root_path, 'config')] +
-                                       platform_folders +
-                                       [env_dir, work_dir],
+                                        platform_folders +
+#                                        [env_dir, work_dir],
+                                        [env_dir],
                                         merge_folders=base_args.config_folders,
                                         prefixes=[os.getcwd(),os.path.join(root_path, 'config')])
     plugin_folders = merge_folder_list([],
                                         merge_folders=base_args.plugin_folders,
                                         prefixes=[os.getcwd(),lib_path])
 
-    return base_parser, config_folders, plugin_folders, platform_folders
+
+    #compute merging config_folders by removing environment folders from config folders
+    merge_config_folders =[ ]
+    for folder in config_folders:
+        if not folder in environment_config_folders:
+            merge_config_folders.append(folder)
+
+
+    global_key_subst['DEPLOY_MERGE_CONFIG_FOLDERS'] = merge_config_folders
+
+    return base_parser, config_folders, plugin_folders, platform_folders, merge_config_folders
 
 
 
@@ -352,7 +373,7 @@ class ArgparseSubcommandManager(object):
             self.conf_to_save = OrderedDict()
 
         conf = copy.deepcopy(self.conf_to_save.get('config',OrderedDict()))
-        for k in ['config_folders', 'plugin_folders', 'platform_folders']:
+        for k in ['config_folders', 'plugin_folders', 'platform_folders', 'merge_config_folders']:
             conf[k] = kwargs.get(k,[])
             setattr(self, k,conf[k] )
         self.conf_to_save['config'] = conf
