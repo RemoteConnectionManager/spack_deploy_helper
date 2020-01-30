@@ -24,7 +24,7 @@ def run(cmd,logger=None,
     # logger.debug("PATH: " + os.environ['PATH'])
     # print("running-->"+' '.join(cmd))
     if not dry_run :
-        myprocess = subprocess.Popen(cmd, cwd=folder,stdout=subprocess.PIPE,stderr=subprocess.PIPE, env=os.environ)
+        myprocess = subprocess.Popen(cmd, cwd=folder,stdout=subprocess.PIPE,stderr=subprocess.PIPE, env=os.environ, bufsize=1, universal_newlines=True)
         if pipe_output:
             # for f in [myprocess.stdout, myprocess.stderr]:
             #     fd = f.fileno()
