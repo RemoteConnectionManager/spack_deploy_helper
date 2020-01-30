@@ -1,9 +1,14 @@
 import os
 import logging
 import subprocess
-import io
 import re
 import collections
+try:
+    # Python 2
+    from cStringIO import StringIO
+except ImportError:
+    # Python 3
+    from io import StringIO
 
 from .run import run
 
@@ -60,7 +65,7 @@ class git_repo:
         cmd = ['git', 'remote']
         (ret,output) = self.run(cmd)
         remotes = list()
-        for line in io.StringIO(output):
+        for line in StringIO(output):
             r=line.strip()
             remotes.append(r)
             #print("-->" + r + "<--")
@@ -147,7 +152,7 @@ class git_repo:
             self.logger.error("git branch failed")
             return []
         branches = list()
-        for line in io.StringIO(output.decode()):
+        for line in StringIO(output.decode()):
             if line[0]=='*':
                 branches.insert(0,line[2:].strip())
             else:
@@ -166,7 +171,7 @@ def get_branches(url, branch_pattern='.*?\s+refs/heads/(.*?)\s+', branch_format_
     headRE = re.compile(branch_pattern)
 
     remote_branches = list()
-    for line in io.StringIO(output.decode()):
+    for line in StringIO(output.decode()):
         match = headRE.match(line)
 
         if match:
