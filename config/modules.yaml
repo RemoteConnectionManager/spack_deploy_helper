@@ -1,0 +1,10 @@
+modules:
+  enable:
+    - tcl
+  tcl:
+    naming_scheme: '{name}/{version}-{compiler.name}-{compiler.version}'
+    hash_length: 2
+    whitelist:
+    - python
+        
+
