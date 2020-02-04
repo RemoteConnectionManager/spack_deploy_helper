@@ -1,8 +1,22 @@
 packages:
+  xkeyboard-config:
+    variants: +xorg
+  font-util:
+    variants:
+    - fonts=font-adobe-75dpi
+  turbovnc:
+    variants: 
+    - +x11deps
+    - +server
   qt:
-    variants: +examples+opengl+dbus
+    variants: 
+    - +examples
+    - +opengl
+    - +dbus
   emacs:
-    variants: +X toolkit=gtk
+    variants: 
+    - +X 
+    - toolkit=gtk
   rcm:
     variants:
       - +server 
