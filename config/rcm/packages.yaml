@@ -19,5 +19,7 @@ packages:
   vte:
     version:
     - 0.28.2
-
+#this seem required by python3
+  gettext:
+    variants: ~libxml2
 
