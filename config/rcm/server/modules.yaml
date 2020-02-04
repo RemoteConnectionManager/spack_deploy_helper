@@ -1,15 +1,22 @@
 modules:
   tcl:
     whitelist:
+    - font-util
+    - xkbutils
+    - setxkbmap
+    - xlsfonts
+    - xdpyinfo
+    - xfontsel
+    - xkbevd
+    - xkbutils
+    - setxkbmap
+    - xfs
     - xauth
     - xhost
     - xkbcomp
     - xedit
     - emacs
     - image-magick
-    - xlsfonts
-    - xdpyinfo
-    - xfontsel
     - fluxbox
     - lxde-lxterminal
     - lxde-libfm
@@ -20,4 +27,5 @@ modules:
     - leafpad
     - gpicview
     - lxde-icon-theme
+    - python
     - py-six
