@@ -121,7 +121,7 @@ def setup_from_args_and_configs(log_controller=None):
     #log_controller.set_args()
 
     if base_args.workdir[0] == '/':
-        work_dir = base_args.workdir
+        work_dir = os.path.abspath(base_args.workdir)
         env_dir = work_dir
     else:
         logger.warning(" workdir path is not absolute-->" + base_args.workdir + "<--")
