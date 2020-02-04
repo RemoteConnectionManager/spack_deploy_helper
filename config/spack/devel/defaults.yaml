@@ -1,4 +1,5 @@
 defaults:
+  integration_type: 'devel/'
 #  origin :
 #    url : 'https://github.com/RemoteConnectionManager/spack.git'
 #    branches :
@@ -18,7 +19,6 @@ defaults:
   integration: 'True'
   upstream_update: 'True'
   rebase_update: 'True'
-  cache: '../../cache'
 
 logging_configs:
   loggers:

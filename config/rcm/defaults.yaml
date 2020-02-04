@@ -2,9 +2,9 @@
 
 
 defaults:
+  integration_name: 'rcm'
   origin :
     url : 'https://github.com/RemoteConnectionManager/spack.git'
-    master : 'integrate/rcm'
     branches :
       - 'pr/turbovnc'
 #      - 'pr/pyinstaller'

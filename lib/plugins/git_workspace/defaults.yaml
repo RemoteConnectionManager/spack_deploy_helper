@@ -1,7 +1,9 @@
 defaults:
+  integration_name: '{{ defaults.upstream.master }}'
+  integration_type: 'integrate/'
   origin:
     url: '{{ defaults.upstream.url }}'
-    master: '{{ defaults.upstream.master }}'
+    master: '{{ defaults.integration_type }}{{ defaults.integration_name }}'
     pull_flags :
       - 'ff-only'
   upstream:
