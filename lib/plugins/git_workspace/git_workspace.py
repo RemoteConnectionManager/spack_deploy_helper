@@ -81,10 +81,11 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                    origin_update=False,
                    upstream_update=False,
                    rebase_update=False,
-                   branches=['clean/master'],
+                   integration_branch='integration',
+                   integration_branches=[],
                    prlist=[],
                    origin='',
-                   origin_master='',
+                   origin_master='master',
                    pull_flags=['ff-only'],
                    upstream=''):
 
@@ -97,7 +98,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         # print("@@@@@@@@@@@@@@@@@@@@", dest, self.dry_run)
         dev_git = utils.git_repo(dest, logger=self.logger, dry_run=self.dry_run)
 
-        origin_branches = utils.get_branches(origin, branch_selection=branches)
+        origin_branches = utils.get_branches(origin, branch_selection=[origin_master] + integration_branches)
         upstream_branches = utils.get_branches(
             upstream,
             branch_pattern='.*?\s+refs/pull/([0-9]*?)/head\s+',
@@ -134,7 +135,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                     dev_git.checkout(upstream_clean)
                     if upstream_update:
                         dev_git.sync_upstream()
-                    dev_git.checkout(upstream_clean, newbranch=origin_master)
+                    dev_git.checkout(upstream_clean, newbranch=integration_branch)
 
                     if upstream_update:
                         dev_git.sync_upstream()
@@ -187,15 +188,15 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
                     for n, branch in local_pr.items():
                         self.logger.info(
-                            "itegrating pr %s (%s) into %s by updating into %s" % (n, branch, origin_master, branch + '_update', ))
+                            "itegrating pr %s (%s) into %s by updating into %s" % (n, branch, integration_branch, branch + '_update', ))
                         dev_git.checkout(branch, newbranch=branch + '_update')
                         dev_git.merge(upstream_clean, comment='sync with upstream develop ')
-                        dev_git.checkout(origin_master)
+                        dev_git.checkout(integration_branch)
                         dev_git.merge(branch + '_update', comment='merged ' + branch)
 
-                    dev_git.checkout(origin_master)
+                    dev_git.checkout(integration_branch)
                     for branch in origin_branches[1:]:
-                        self.logger.info("merging %s into %s" % (branch, origin_master))
+                        self.logger.info("merging %s into %s" % (branch, integration_branch))
                         dev_git.merge(branch, comment='merged ' + branch)
             else:
                 dev_git.fetch(name='origin', branches=[origin_master])

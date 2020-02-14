@@ -1,9 +1,11 @@
 defaults:
   integration_name: '{{ defaults.upstream.master }}'
   integration_type: 'integrate/'
+
   origin:
     url: '{{ defaults.upstream.url }}'
-    master: '{{ defaults.integration_type }}{{ defaults.integration_name }}'
+    master: '{{ defaults.upstream.master }}'
+    integration_branch: '{{ defaults.integration_type }}{{ defaults.integration_name }}'
     pull_flags :
       - 'ff-only'
   upstream:
@@ -12,8 +14,8 @@ defaults:
 
   integration : 'True'
   origin_update : 'True'
-#  upstream_update : 'False'
-#  rebase_update : 'False'
+  upstream_update : 'False'
+  rebase_update : 'False'
 
 argparse:
   subparser:
@@ -38,14 +40,18 @@ argparse:
           origin_master:
             action: 'store'
             default: "{{ defaults.origin.master }}"
-            help: 'name of the branch that will be created.'
+            help: 'name of the origin master branch, base for integration.'
           upstream_master :
             action: 'store'
             default: "{{ defaults.upstream.master }}"
             help: 'upstream branch to sync with.'
-          branches :
+          integration_branch :
             action: 'store'
-            help: 'Regular expressions of origin branches to fetch.  The first one specified will be the upstream clean copy.'
+            default: "{{ defaults.origin.integration_branch }}"
+            help: 'name of the branch that will be created for integration.'
+          integration_branches :
+            action: 'store'
+            help: 'Regular expressions of origin branches to fetch.  '
             default : '{{ defaults.origin.branches }}'
           prlist :
             action: 'store'
@@ -62,11 +68,11 @@ argparse:
           upstream_update :
             action: 'store_true'
             default : '{{ defaults.upstream_update }}'
-            help: 'update first branch (upstream/master/clean) from upstream and check that all branches can be merged but do not actually merge them'
+            help: 'update origin_master from upstream_master and check that all integration_branches can be merged but do not actually merge them'
           rebase_update :
             action: 'store_true'
             default : '{{ defaults.rebase_update }}'
-            help: 'all the origin branches fetched will be rebased from the clean upstream'
+            help: 'all the origin branches fetched will be rebased from the master upstream'
           integration :
             action: 'store_true'
             default : "{{ defaults.integration }}"
