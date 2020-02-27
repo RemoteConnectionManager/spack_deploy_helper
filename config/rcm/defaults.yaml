@@ -7,7 +7,8 @@ defaults:
     url : 'https://github.com/RemoteConnectionManager/spack.git'
     master: 'clean/develop'
     branches :
-      - 'pr/turbovnc'
+      - 'packages/turbovnc'
+      - 'packages/libjpeg-turbo'
 #      - 'pr/pyinstaller'
 #fixed with merged 7493#      - 'pr/fix/glib_dtrace_pythonhome'
 #      - 'packages/qt5-dbus'
