@@ -22,10 +22,10 @@ config:
 #  config_folders:
 #    - 'config'
   hosts_dir: '../hosts'
-  plugin_folders:
-    - 'plugins/git_workspace'
-    - 'plugins/spack_workspace'
-    - 'plugins/env_workspace'
+#  plugin_folders:
+#    - 'plugins/git_workspace'
+#    - 'plugins/spack_workspace'
+#    - 'plugins/env_workspace'
 
 #  host_tags :
 #    galileo : 'galileo'
