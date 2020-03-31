@@ -1,7 +1,7 @@
 
 
 defaults:
-  git_dest_dir : "{{DEPLOY_WORKDIR}}/spack"
+  git_dest_dir : "{{DEPLOY_WORKDIR}}/spack-{{ defaults.origin.master }}"
   output_config_dir : "{{defaults.git_dest_dir}}/etc"
   cache : "{{DEPLOY_WORKDIR}}/cache"
   install : '{{DEPLOY_WORKDIR}}/install'
