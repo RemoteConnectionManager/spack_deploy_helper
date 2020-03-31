@@ -98,7 +98,8 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         # print("@@@@@@@@@@@@@@@@@@@@", dest, self.dry_run)
         dev_git = utils.git_repo(dest, logger=self.logger, dry_run=self.dry_run)
 
-        origin_branches = utils.get_branches(origin, branch_selection=[origin_master] + integration_branches)
+        origin_branches = [origin_master] + utils.get_branches(origin, branch_selection= integration_branches)
+        self.logger.info("searching %s found  origin_branches %s" % (str([origin_master] + integration_branches), str(origin_branches)))
         upstream_branches = utils.get_branches(
             upstream,
             branch_pattern='.*?\s+refs/pull/([0-9]*?)/head\s+',
