@@ -111,6 +111,11 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         local_pr = utils.trasf_match(upstream_branches, in_match='.*/([0-9]*)/(.*)', out_format='pull/{name}/clean')
         self.logger.info("found %s searching for upstream_branches %s->" % (str(local_pr), str(upstream_branches)))
 
+        remote_names = {'origin': 'origin'}
+        if upstream != origin:
+            remote_names['upstream'] = 'upstream' 
+        else:
+                remote_names['upstream'] = 'origin'
 
         if not os.path.exists(dest):
             self.logger.info("MISSING destination_dir-->" + dest + "<-- ")
@@ -123,11 +128,11 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
             self.logger.info("Adding remote origin %s fetching branches %s" % (origin, str(origin_branches)))
             dev_git.add_remote(origin, name='origin', fetch_branches=origin_branches)
-            self.logger.info("Adding remote upstream %s " % (upstream))
-            dev_git.add_remote(upstream, name='upstream')
+            if upstream != origin:
+                dev_git.add_remote(upstream, name='upstream')
+                self.logger.info("Adding remote upstream %s " % (upstream))
 
-
-            dev_git.fetch(name='origin', branches=origin_branches)
+            dev_git.fetch(name='origin', prefix="{name}/",  branches=origin_branches)
 
             if integration:
                 if len(origin_branches) > 0:
@@ -135,11 +140,11 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                     # print("--------------------------------------" + upstream_clean + "-----------------------")
                     dev_git.checkout(upstream_clean)
                     if upstream_update:
-                        dev_git.sync_upstream()
+                        dev_git.sync_upstream(upstream=remote_name['upsream'] )
                     dev_git.checkout(upstream_clean, newbranch=integration_branch)
 
                     if upstream_update:
-                        dev_git.sync_upstream()
+                        dev_git.sync_upstream(upstream=remote_name['upsream'])
 
                     for b in origin_branches[1:]:
                         if upstream_update:
@@ -185,7 +190,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
 
 
-                    dev_git.fetch(name='upstream', branches=local_pr)
+                    dev_git.fetch(name=remote_names['upstream'], branches=local_pr)
 
                     for n, branch in local_pr.items():
                         self.logger.info(
@@ -221,4 +226,4 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                         merge_options = []
                         if rebase_update:
                             merge_options.append('--rebase')
-                        dev_git.sync_upstream(options=merge_options)
+                        dev_git.sync_upstream(upstream=remote_name['upsream'], options=merge_options)
