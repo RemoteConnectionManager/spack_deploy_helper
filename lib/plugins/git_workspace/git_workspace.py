@@ -136,7 +136,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
             if integration:
                 if len(origin_branches) > 0:
-                    upstream_clean = origin_branches[0]
+                    upstream_clean = 'origin/' + origin_branches[0]
                     # print("--------------------------------------" + upstream_clean + "-----------------------")
                     dev_git.checkout(upstream_clean)
                     if upstream_update:
