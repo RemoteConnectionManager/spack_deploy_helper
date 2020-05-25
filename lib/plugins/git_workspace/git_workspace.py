@@ -140,13 +140,14 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                     # print("--------------------------------------" + upstream_clean + "-----------------------")
                     dev_git.checkout(upstream_clean)
                     if upstream_update:
-                        dev_git.sync_upstream(upstream=remote_name['upsream'] )
+                        dev_git.sync_upstream(upstream=remote_names['upstream'] )
                     dev_git.checkout(upstream_clean, newbranch=integration_branch)
 
                     if upstream_update:
-                        dev_git.sync_upstream(upstream=remote_name['upsream'])
+                        dev_git.sync_upstream(upstream=remote_names['upstream'])
 
                     for b in origin_branches[1:]:
+                        b = 'origin/' + b
                         if upstream_update:
                             merge_branch = b + '_merge'
                             self.logger.info("merge updated upstream branch: " + b + " into " + merge_branch)
@@ -203,7 +204,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                     dev_git.checkout(integration_branch)
                     for branch in origin_branches[1:]:
                         self.logger.info("merging %s into %s" % (branch, integration_branch))
-                        dev_git.merge(branch, comment='merged ' + branch)
+                        dev_git.merge('origin/' + branch, comment='merged ' + branch)
             else:
                 dev_git.fetch(name='origin', branches=[origin_master])
                 dev_git.checkout(origin_master)
@@ -226,4 +227,4 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                         merge_options = []
                         if rebase_update:
                             merge_options.append('--rebase')
-                        dev_git.sync_upstream(upstream=remote_name['upsream'], options=merge_options)
+                        dev_git.sync_upstream(upstream=remote_names['upstream'], options=merge_options)
