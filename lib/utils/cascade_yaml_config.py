@@ -227,6 +227,7 @@ def setup_from_args_and_configs(log_controller=None):
                                             merge_folders=[os.path.join(platform_match, config_session.get('config_dir', 'config'))],
                                             prefixes=[os.getcwd(), hosts_dir])
         logger.info(" platform folders -->" + str(platform_folders) + "<--")
+        global_key_subst['DEPLOY_PLATFORM_NAME'] = platform_match
         global_key_subst['DEPLOY_HOST_CONFIGPATH'] = platform_folders[0]
 
     key_name = 'plugin_folders'
