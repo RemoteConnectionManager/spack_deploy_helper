@@ -160,6 +160,27 @@ class git_repo:
         self.logger.debug("branches-->"+str(branches)+"<<-")
         return branches
 
+    def copy_repo(self, tarfile, output_dir):
+        actual_tarfile = ''
+        if tarfile:
+            actual_tarfile = os.path.abspath(tarfile)
+        else:
+            if self.folder != output_dir:
+                import tempfile
+                f,fname = tempfile.mkstemp()
+                actual_tarfile = os.path.abspath(fname)
+        if actual_tarfile:
+            cmd = ['tar', '-czf', actual_tarfile, '.']
+            (ret,output,err) = run(cmd,logger=self.logger,folder=self.folder)
+
+            if self.folder != output_dir:
+                os.makedirs(output_dir)
+                cmd = ['tar', '-xzf', actual_tarfile]
+                (ret,output,err) = run(cmd,logger=self.logger,folder=output_dir)
+                if not tarfile:
+                    os.remove(actual_tarfile)
+
+
 # ------ List the branches on the origin
 # And select only those that match our branch regexp
 def get_branches(url, branch_pattern='.*?\s+refs/heads/(.*?)\s+', branch_format_string='{branch}', branch_selection=[]):

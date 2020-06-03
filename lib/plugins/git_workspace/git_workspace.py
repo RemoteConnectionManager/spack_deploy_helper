@@ -77,6 +77,8 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
     def deploy(self,
                    git_dest='src',
+                   tempdir='',
+                   tarfile='',
                    integration=False,
                    origin_update=False,
                    upstream_update=False,
@@ -91,9 +93,19 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
 
         if git_dest[0] != '/':
-            dest = os.path.join(self.base_path, git_dest)
+            final_dest = os.path.join(self.base_path, git_dest)
         else:
-            dest = git_dest
+            final_dest = git_dest
+        if tempdir:
+            if os.path.exists(tempdir):
+                print("ERROR : Existing temporary folder: " + tempdir)
+                exit()
+                if os.path.exists(final_dest):
+                    print("ERROR : specidied temporary folder: " + tempdir + " But Git destination already esists: " + final_dest )
+                    exit()
+            dest = tempdir
+        else:
+            dest = final_dest
 
         # print("@@@@@@@@@@@@@@@@@@@@", dest, self.dry_run)
         dev_git = utils.git_repo(dest, logger=self.logger, dry_run=self.dry_run)
@@ -209,6 +221,23 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 dev_git.fetch(name='origin', branches=[origin_master])
                 dev_git.checkout(origin_master)
 
+            dev_git.copy_repo( tarfile, final_dest) 
+            #actual_tarfile = ''
+            #if tarfile:
+            #    actual_tarfile = tarfile
+            #else:
+            #    if tempdir:
+            #        import tempfile
+            #        f,fname = tempfile.mkstemp()
+            #        actual_tarfile = fname
+            #if actual_tarfile:
+            #    import subprocess
+            #    subprocess.call(['tar', '-czf', actual_tarfile, '--directory=' + dest])
+            #    if tempdir:
+            #        os.makedirs(final_dest)
+            #        subprocess.call(['tar', '-xzf', actual_tarfile, '--directory=' + final_dest])
+            #        if not tarfile:
+            #            os.remove(actual_tarfile)
         else:
             self.logger.warning("Folder ->" + dest + "<- already existing")
             if origin_update:

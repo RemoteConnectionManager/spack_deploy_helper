@@ -29,6 +29,14 @@ argparse:
             action: 'store'
             default: "{{ defaults.git_dest_dir }}"
             help: 'Destination (sub) folder, if not abspath, relative to workspace'
+          tempdir:
+            action: 'store'
+            default: "{{ defaults.git_temp_dir }}"
+            help: 'Temporary folder, to speed up git fetch and merge'
+          tarfile:
+            action: 'store'
+            default: "{{ defaults.git_tar_file }}"
+            help: 'Tar file to store git merge results'
           origin:
             action: 'store'
             default: "{{ defaults.origin.url }}"
