@@ -228,16 +228,6 @@ def setup_from_args_and_configs(log_controller=None):
 
     # now reparse with this new arguments
     base_args = base_parser.parse_known_args()[0]
-    # print("@@@@@@@@@ args.hosts_dir ::::::", str(base_args.hosts_dir).split('/'))
-    if base_args.hosts_dir[0] == '/':
-        hosts_dir = base_args.hosts_dir
-    else:
-        hosts_dir = os.path.join(root_path, str(base_args.hosts_dir))
-    # print("@@@@@@@@@ hosts_dir ::::::", hosts_dir)
-    default_paths = ['config']
-    if os.path.exists(hosts_dir):
-        default_paths.append(hosts_dir)
-
 
 
 
@@ -253,7 +243,6 @@ def setup_from_args_and_configs(log_controller=None):
     config_session = base_config[['config']]
 
 
-    platform_match = utils.myintrospect(tags=config_session.get('host_tags', dict())).platform_tag()
     platform_folders=[]
     if platform_match:
         logger.info(" platform -->" + str(platform_match) + "<--")
@@ -261,7 +250,6 @@ def setup_from_args_and_configs(log_controller=None):
                                             merge_folders=[os.path.join(platform_match, config_session.get('config_dir', 'config'))],
                                             prefixes=[os.getcwd(), hosts_dir])
         logger.info(" platform folders -->" + str(platform_folders) + "<--")
-        global_key_subst['DEPLOY_PLATFORM_NAME'] = platform_match
         global_key_subst['DEPLOY_HOST_CONFIGPATH'] = platform_folders[0]
 
     key_name = 'plugin_folders'
