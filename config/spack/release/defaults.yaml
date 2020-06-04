@@ -1,0 +1,10 @@
+defaults:
+  spack_version : '0.14.2'
+  upstream :
+    master : "v0.14.2"
+    prs :
+     - '15729' #Fixes compilaton of gcc 8.4.0, already merged in develop but missing in 0.14.2
+  origin :
+    integration_branch: '{{ defaults.integration_type }}{{ defaults.spack_version }}'
+
+

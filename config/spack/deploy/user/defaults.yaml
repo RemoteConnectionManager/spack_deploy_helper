@@ -1,0 +1,6 @@
+defaults:
+  spack:
+#    source_prefix : /cineca/prod/opt/tools/spack
+    source_prefix : "{{DEPLOY_WORKDIR}}"
+    source_postfix : ""
+
