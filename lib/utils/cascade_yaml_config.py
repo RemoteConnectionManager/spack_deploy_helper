@@ -135,14 +135,55 @@ def setup_from_args_and_configs(log_controller=None):
 # print("%%%%% workdir %%%%",base_args.workdir)
 
     #get yaml files involved
+    base_yaml_files = find_config_file_list(
+                list_paths=[work_dir, env_dir],
+                default_paths=['config'],
+                glob_suffix='defaults.yaml' )
+   # print("#######################base yaml files", base_yaml_files)
+
+############# get hosts_dir and platform  from default config ###############
+    base_config_session = CascadeYamlConfig(yaml_files=base_yaml_files)[['config']]
+    key_name = 'hosts_dir'
+
+    base_parser.add_argument('--' + key_name,
+                             action='store',
+                             help='hosts config base dir',
+                             default=abs_deploy_path(base_config_session.get(key_name,  'config/hosts'),
+                                                     prefixes=[root_path]))
+
+    # now reparse with this new arguments
+    base_args = base_parser.parse_known_args()[0]
+    # print("@@@@@@@@@ args.hosts_dir ::::::", str(base_args.hosts_dir).split('/'))
+    if base_args.hosts_dir[0] == '/':
+        hosts_dir = base_args.hosts_dir
+    else:
+        hosts_dir = os.path.join(root_path, str(base_args.hosts_dir))
+
+    default_paths = ['config']
+    if os.path.exists(hosts_dir):
+        default_paths.append(hosts_dir)
+
+    #get yaml files involved
+    default_yaml_files = find_config_file_list(
+                list_paths=[work_dir, env_dir],
+                default_paths=default_paths,
+                glob_suffix='defaults.yaml' )
+    # print("#######################defaults yaml files", default_yaml_files)
+    default_config_session = CascadeYamlConfig(yaml_files=default_yaml_files)[['config']]
+    platform_match = utils.myintrospect(tags=default_config_session.get('host_tags', dict())).platform_tag()
+
+
+##################################   now add extracted  platform to be used as key in jninja templates in 
+##################################   parsing config files from now on
+    global_key_subst['DEPLOY_PLATFORM_NAME'] = platform_match
+##################################   from now on DEPLOY_PLATFORM_NAME should be available in jninja experssion {{DEPLOY_PLATFORM_NAME}}
+
+    #get yaml files involved with current susbstitutions
     yaml_files = find_config_file_list(
                 list_paths=[work_dir, env_dir],
                 default_paths=['config'],
                 glob_suffix='defaults.yaml' )
-    # print("#######################defaults yaml files", yaml_files)
-
     base_config = CascadeYamlConfig(yaml_files=yaml_files)
-
     #env spack yaml files involved
     env_spack_yaml_files = find_config_file_list(
                            list_paths=[work_dir, env_dir],
@@ -184,13 +225,6 @@ def setup_from_args_and_configs(log_controller=None):
                              help='yaml config folders',
                              default = config_folders)
 
-    key_name = 'hosts_dir'
-
-    base_parser.add_argument('--' + key_name,
-                             action='store',
-                             help='hosts config base dir',
-                             default=abs_deploy_path(config_session.get(key_name,  'config/hosts'),
-                                                     prefixes=[root_path]))
 
     # now reparse with this new arguments
     base_args = base_parser.parse_known_args()[0]
@@ -643,6 +677,7 @@ class CascadeYamlConfig:
                 # add global variable substitution to jinja env, so 
                 # used with {{DEPLOY_USERNAME'}}
                 for subst_key in global_key_subst:
+                    # print(".............. "+subst_key+" -->"+str(global_key_subst[subst_key])+"<--")
                     utils.hiyapyco.jinja2env.globals[subst_key] = global_key_subst[subst_key]
                 
                 self._conf = utils.hiyapyco.load(
@@ -691,7 +726,10 @@ class CascadeYamlConfig:
 
 #        if not default_values['list_paths']:
 #            default_values['list_paths']=argparse_get_config_paths()
-        par_hash=hash(str(default_values))
+
+#       added str(global_key_subst) to the string hashed as the computed dict depends also on the global subst parameters, so when
+#       chaget it must be recomputed and not reused thru the hash
+        par_hash=hash(str(default_values) + str(global_key_subst))
         logger.debug("CascadeYamlConfig.instances: " + str(CascadeYamlConfig.instances))
 
         if par_hash in  CascadeYamlConfig.instances:
