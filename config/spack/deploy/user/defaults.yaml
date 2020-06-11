@@ -1,6 +1,4 @@
 defaults:
-  spack:
-#    source_prefix : /cineca/prod/opt/tools/spack
-    source_prefix : "{{DEPLOY_WORKDIR}}"
-    source_postfix : ""
+  git_dest_dir : "{{ DEPLOY_WORKDIR }}/{{defaults.spack_version}}"
+  git_tar_file : "{{ DEPLOY_WORKDIR }}/{{defaults.spack_version}}.tgz"
 

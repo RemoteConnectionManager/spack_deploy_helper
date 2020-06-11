@@ -1,0 +1,5 @@
+defaults:
+  git_dest_dir : "{{defaults.production.spack.source.prefix}}/{{defaults.spack_version}}{{defaults.production.spack.source.postfix}}"
+  #git_dest_dir : "{{defaults.spack_version}}{{defaults.production.spack.source.postfix}}"
+  git_tar_file : "{{ DEPLOY_WORKDIR }}/{{defaults.spack_version}}.tgz"
+
