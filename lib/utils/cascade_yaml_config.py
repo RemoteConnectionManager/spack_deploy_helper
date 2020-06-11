@@ -125,9 +125,13 @@ def setup_from_args_and_configs(log_controller=None):
         env_dir = work_dir
     else:
         logger.warning(" workdir path is not absolute-->" + base_args.workdir + "<--")
-        work_dir = os.path.join(parent_root_path, 'deploy', base_args.workdir)
+        work_dir = os.path.abspath(os.path.join(os.getcwd(), base_args.workdir))
+        if os.path.exists(work_dir):
+            env_dir = work_dir
+        else:
+            work_dir = os.path.join(parent_root_path, 'deploy', base_args.workdir)
+            env_dir = os.path.join(parent_root_path, 'environments', base_args.workdir)
         logger.warning(" setting output work folder to -->" + work_dir + "<--")
-        env_dir = os.path.join(parent_root_path, 'environments', base_args.workdir)
         logger.warning(" setting input environment folder to -->" + env_dir + "<--")
 
     global_key_subst['DEPLOY_WORKDIR'] = work_dir
