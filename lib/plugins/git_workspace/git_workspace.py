@@ -98,10 +98,12 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             final_dest = git_dest
         if tempdir:
             if os.path.exists(tempdir):
-                print("ERROR : Existing temporary folder: " + tempdir)
-                exit()
+                import uuid
+                new_tempdir = os.path.normpath(tempdir) + str(uuid.uuid4().fields[-1])[:10]
+                self.logger.info("Existing temporary folder: %s substituting with %s" % (tempdir, new_tempdir))
+                tempdir = new_tempdir
                 if os.path.exists(final_dest):
-                    print("ERROR : specidied temporary folder: " + tempdir + " But Git destination already esists: " + final_dest )
+                    print("ERROR : specified temporary folder: " + tempdir + " But Git destination already esists: " + final_dest )
                     exit()
             dest = tempdir
         else:
