@@ -170,6 +170,14 @@ class git_repo:
                 f,fname = tempfile.mkstemp()
                 actual_tarfile = os.path.abspath(fname)
         if actual_tarfile:
+            if os.path.exists(actual_tarfile):
+                self.logger.warning("Overwriting  already present tarfile: " + actual_tarfile)
+            dirpath = os.path.dirname(actual_tarfile)
+            if not os.path.isdir(dirpath):
+                if not os.path.exists(dirpath):
+                    os.makedirs(dirpath)    
+                else:
+                    self.logger.error(" Invalid path component in tarfile : " + dirpath)
             cmd = ['tar', '-czf', actual_tarfile, '.']
             (ret,output,err) = run(cmd,logger=self.logger,folder=self.folder)
 
