@@ -180,6 +180,14 @@ def setup_from_args_and_configs(log_controller=None):
 ##################################   now add extracted  platform to be used as key in jninja templates in 
 ##################################   parsing config files from now on
     global_key_subst['DEPLOY_PLATFORM_NAME'] = platform_match
+    platform_config_folder = os.path.abspath(os.path.join(hosts_dir,platform_match, base_config_session.get('config_dir', 'config')))
+    if os.path.exists(platform_config_folder):
+        global_key_subst['DEPLOY_HOST_CONFIGPATH'] = platform_config_folder
+        platform_folders = [platform_config_folder]
+    else:
+        platform_folders = []
+               
+
 ##################################   from now on DEPLOY_PLATFORM_NAME should be available in jninja experssion {{DEPLOY_PLATFORM_NAME}}
 
     #get yaml files involved with current susbstitutions
@@ -247,14 +255,14 @@ def setup_from_args_and_configs(log_controller=None):
     config_session = base_config[['config']]
 
 
-    platform_folders=[]
-    if platform_match:
-        logger.info(" platform -->" + str(platform_match) + "<--")
-        platform_folders = merge_folder_list([],
-                                            merge_folders=[os.path.join(platform_match, config_session.get('config_dir', 'config'))],
-                                            prefixes=[os.getcwd(), hosts_dir])
-        logger.info(" platform folders -->" + str(platform_folders) + "<--")
-        global_key_subst['DEPLOY_HOST_CONFIGPATH'] = platform_folders[0]
+    #platform_folders=[]
+    #if platform_match:
+    #    logger.info(" platform -->" + str(platform_match) + "<--")
+    #    platform_folders = merge_folder_list([],
+    #                                        merge_folders=[os.path.join(platform_match, config_session.get('config_dir', 'config'))],
+    #                                        prefixes=[os.getcwd(), hosts_dir])
+    #    logger.info(" platform folders -->" + str(platform_folders) + "<--")
+    #    global_key_subst['DEPLOY_HOST_CONFIGPATH'] = platform_folders[0]
 
     key_name = 'plugin_folders'
     base_parser.add_argument('-' + key_name[0],

@@ -1,9 +1,3 @@
 defaults:
-  production:
-    spack:
-      source:
-        prefix: "{{DEPLOY_PARENT_ROOTPATH}}"
-        postfix: ""
-
-  git_dest_dir : "{{defaults.production.spack.source.prefix}}/{{defaults.spack_version}}{{defaults.production.spack.source.postfix}}"
-  git_tar_file : "{{DEPLOY_PARENT_ROOTPATH}}/spack_sources/{{DEPLOY_PLATFORM_NAME}}/{{defaults.spack_version}}.tgz"
+  git_dest_dir : "{{DEPLOY_WORKDIR}}/{{defaults.spack_version}}"
+  git_tar_file : "{{DEPLOY_WORKDIR}}/spack_sources/{{defaults.spack_version}}.tgz"
