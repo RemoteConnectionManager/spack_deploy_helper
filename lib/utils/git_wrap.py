@@ -182,11 +182,15 @@ class git_repo:
             (ret,output,err) = run(cmd,logger=self.logger,folder=self.folder)
 
             if self.folder != output_dir:
-                os.makedirs(output_dir)
-                cmd = ['tar', '-xzf', actual_tarfile]
-                (ret,output,err) = run(cmd,logger=self.logger,folder=output_dir)
-                if not tarfile:
-                    os.remove(actual_tarfile)
+                if os.path.exists(output_dir):
+                    self.logger.error(" existing output directory : " + output_dir)
+                    exit()
+                else: 
+                    os.makedirs(output_dir)
+                    cmd = ['tar', '-xzf', actual_tarfile]
+                    (ret,output,err) = run(cmd,logger=self.logger,folder=output_dir)
+                    if not tarfile:
+                        os.remove(actual_tarfile)
 
 
 # ------ List the branches on the origin
