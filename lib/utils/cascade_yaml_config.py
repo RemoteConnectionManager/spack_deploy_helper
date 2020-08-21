@@ -135,6 +135,13 @@ def setup_from_args_and_configs(log_controller=None):
         logger.warning(" setting input environment folder to -->" + env_dir + "<--")
 
     global_key_subst['DEPLOY_WORKDIR'] = work_dir
+    projects_path = os.path.normpath(os.path.join(parent_root_path, 'projects'))
+    if os.path.exists(projects_path):
+        global_key_subst['DEPLOY_PROJECTS_PATH'] = projects_path
+        project = os.path.normpath(os.path.relpath(os.path.normpath(work_dir), os.path.normpath(projects_path))).split(os.path.sep)[0]
+        if os.pardir != project:
+            global_key_subst['DEPLOY_PROJECTDIR'] = os.path.normpath(os.path.join(projects_path, project))
+            global_key_subst['DEPLOY_PROJECT_NAME'] = project
 
 # print("%%%%% workdir %%%%",base_args.workdir)
 
