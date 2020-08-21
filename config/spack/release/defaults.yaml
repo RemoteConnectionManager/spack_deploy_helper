@@ -4,7 +4,9 @@ defaults:
     master : "v0.14.2"
     prs :
      - '15729' #Fixes compilaton of gcc 8.4.0, already merged in develop but missing in 0.14.2
+     - '16749' #Fixes hanging when multiple users on spack 0.14.2 issue spack versions <spec with a large number of versions> ( happen on m100 login nodes)
+
   origin :
-    integration_branch: '{{ defaults.integration_type }}{{ defaults.spack_version }}'
+    integration_branch: '{{DEPLOY_PROJECT_NAME}}/{{ defaults.integration_type }}{{ defaults.spack_version }}'
 
 
