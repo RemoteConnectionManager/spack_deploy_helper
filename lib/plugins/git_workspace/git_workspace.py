@@ -96,15 +96,15 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             final_dest = os.path.join(self.base_path, git_dest)
         else:
             final_dest = git_dest
+        if os.path.exists(final_dest):
+            self.logger.error("Exiting: alreay existing Git folder destination: " + final_dest )
+            exit()
         if tempdir:
             if os.path.exists(tempdir):
                 import uuid
                 new_tempdir = os.path.normpath(tempdir) + str(uuid.uuid4().fields[-1])[:10]
                 self.logger.info("Existing temporary folder: %s substituting with %s" % (tempdir, new_tempdir))
                 tempdir = new_tempdir
-                if os.path.exists(final_dest):
-                    print("ERROR : specified temporary folder: " + tempdir + " But Git destination already esists: " + final_dest )
-                    exit()
             dest = tempdir
         else:
             dest = final_dest
@@ -224,22 +224,13 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 dev_git.checkout(origin_master)
 
             dev_git.copy_repo( tarfile, final_dest) 
-            #actual_tarfile = ''
-            #if tarfile:
-            #    actual_tarfile = tarfile
-            #else:
-            #    if tempdir:
-            #        import tempfile
-            #        f,fname = tempfile.mkstemp()
-            #        actual_tarfile = fname
-            #if actual_tarfile:
-            #    import subprocess
-            #    subprocess.call(['tar', '-czf', actual_tarfile, '--directory=' + dest])
-            #    if tempdir:
-            #        os.makedirs(final_dest)
-            #        subprocess.call(['tar', '-xzf', actual_tarfile, '--directory=' + final_dest])
-            #        if not tarfile:
-            #            os.remove(actual_tarfile)
+            final_dest = os.path.normpath(os.path.abspath(final_dest))
+            dest = os.path.normpath(os.path.abspath(dest))
+            if final_dest != dest :
+                if os.path.exists(dest):
+                    import shutil
+                    shutil.rmtree(dest)
+            
         else:
             self.logger.warning("Folder ->" + dest + "<- already existing")
             if origin_update:
