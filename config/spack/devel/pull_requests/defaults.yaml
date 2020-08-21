@@ -1,0 +1,16 @@
+defaults:
+  integration_type: 'patched/'
+  upstream :
+    prs :
+     - '17149' #To test if getting some problem related to config.guess, autotools: Fix config.guess detection
+#     - '16954' #To test if getting problem with naming repo in upstream
+     - '16485' #To test if want to generate modules with categories... a la BA
+#     - '15939' #To test if want to  share a spack instance with config
+#     - '15645' #To test if want to install source and allow debuggers to find 
+#     - '15256' #To test Environments: specify packages for developer builds
+#     - '15187' #To test  provide VASP package
+     - '14686' #To test  allow setting defaults for tcl modules
+     - '14373' #To test  add setup_run_environment to spectrum-mpi package 
+     - '13776' #To test  Make modules always autoload their direct run dependencies
+     - '11951' #To test  Allow user to specify location of spack user config path using environment variable SPACK_USER_CONFIG_PATH
+
