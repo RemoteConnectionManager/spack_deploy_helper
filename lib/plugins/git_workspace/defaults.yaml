@@ -1,6 +1,7 @@
 defaults:
   integration_name: '{{ defaults.upstream.master }}'
   integration_type: 'integrate/'
+  project_name: ''
 
   origin:
     url: '{{ defaults.upstream.url }}'
