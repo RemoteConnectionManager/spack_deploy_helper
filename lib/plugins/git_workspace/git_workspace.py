@@ -88,6 +88,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                    prlist=[],
                    origin='',
                    origin_master='master',
+                   upstream_master='master',
                    pull_flags=['ff-only'],
                    upstream=''):
 
@@ -154,11 +155,13 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                     # print("--------------------------------------" + upstream_clean + "-----------------------")
                     dev_git.checkout(upstream_clean)
                     if upstream_update:
-                        dev_git.sync_upstream(upstream=remote_names['upstream'] )
+                        dev_git.sync_upstream(upstream=remote_names['upstream'],
+                                              master=upstream_master)
                     dev_git.checkout(upstream_clean, newbranch=integration_branch)
 
                     if upstream_update:
-                        dev_git.sync_upstream(upstream=remote_names['upstream'])
+                        dev_git.sync_upstream(upstream=remote_names['upstream'],
+                                              master=upstream_master)
 
                     for b in origin_branches[1:]:
                         b = 'origin/' + b
