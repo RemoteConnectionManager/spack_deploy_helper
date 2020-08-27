@@ -7,8 +7,8 @@ defaults:
   origin :
     integration_branch: '{{DEPLOY_PROJECT_NAME}}/{{ defaults.integration_type }}{{ defaults.spack_version }}'
 
-#  upstream_update: 'True'
-#  rebase_update: 'True'
+  upstream_update: 'True'
+  rebase_update: 'True'
 
 logging_configs:
   loggers:
