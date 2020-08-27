@@ -1,8 +1,8 @@
 defaults:
-  integration_pr_tag: 'pr_0.14'
+  integration_pr_tag: 'pr_0.15'
   upstream :
     prs :
-     - '17149' #To test if getting some problem related to config.guess, autotools: Fix config.guess detection
+#     - '17149' #To test if getting some problem related to config.guess, autotools: Fix config.guess detection
 #     - '16954' #To test if getting problem with naming repo in upstream
      - '16485' #To test if want to generate modules with categories... a la BA
 #     - '15939' #To test if want to  share a spack instance with config
