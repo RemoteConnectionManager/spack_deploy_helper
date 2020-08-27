@@ -49,10 +49,6 @@ args:
     action: 'store_true'
     help: 'do not perform any action'
     default : "{{ defaults.dry_run }}"
-  do_update :
-    action: 'store_true'
-    default : '{{ defaults.do_update }}'
-    help: 'update existing checkout'
   integration :
     action: 'store_true'
     default : "{{ defaults.integration }}"
