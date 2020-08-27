@@ -70,7 +70,7 @@ def retrieve_plugins(plugin_folders):
 
 
 
-def merge_folder_list(in_folders, merge_folders=None, prefixes=None):
+def merge_folder_list(in_folders, merge_folders=None, prefixes=None, remove_and_add_when_present=False):
 
     if merge_folders is None:
         merge_folders = []
@@ -91,6 +91,10 @@ def merge_folder_list(in_folders, merge_folders=None, prefixes=None):
         # print("######",current_folders)
         if in_path not in current_folders:
             current_folders.append(str(in_path))
+        else:
+          if remove_and_add_when_present:
+              current_folders.remove(str(in_path))
+              current_folders.append(str(in_path))
 
     return current_folders
 
@@ -304,7 +308,8 @@ def setup_from_args_and_configs(log_controller=None):
 #                                        [env_dir, work_dir],
                                         [env_dir],
                                         merge_folders=base_args.config_folders,
-                                        prefixes=[os.getcwd(),os.path.join(root_path, 'config')])
+                                        prefixes=[os.getcwd(),os.path.join(root_path, 'config')],
+                                        remove_and_add_when_present=True)
     plugin_folders = merge_folder_list([],
                                         merge_folders=base_args.plugin_folders,
                                         prefixes=[os.getcwd(),lib_path])
