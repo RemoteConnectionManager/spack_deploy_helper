@@ -64,10 +64,14 @@ argparse:
             action: 'store_true'
             default : "{{ defaults.clearconfig }}"
             help: 'clear existing spack configurations'
-          platformconfig :
+          use_env_include_config :
             action: 'store_true'
-            default : "{{ defaults.platformconfig }}"
-            help: 'search for host platform specific configuration'
+            default : "{{ defaults.use_env_include_config }}"
+            help: 'use configuration files in folder included in spack.yaml file'
+          use_plugin_config :
+            action: 'store_true'
+            default : "{{ defaults.use_plugin_config }}"
+            help: 'use configuration files in plugin config folders '
           runconfig :
             action: 'store_true'
             default : "{{ defaults.runconfig }}"

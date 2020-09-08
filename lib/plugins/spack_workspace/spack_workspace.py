@@ -56,6 +56,8 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                      install='install',
                      modules='modules',
                      clearconfig=True,
+                     use_env_include_config=False,
+                     use_plugin_config=False,
                      runconfig=False):
 
 
@@ -152,8 +154,22 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             #config_path_list=config_path_list + [test]
             #config_path_list=[test] + config_path_list
 
-        config_path_list = self.plugin_folders + self.config_folders
-        self.logger.debug(" config_path_list -->" + str(config_path_list) )
+        config_path_list = []
+        # self.logger.info("@@@@ use_plugin_config -->" + str(use_plugin_config) )
+        # self.logger.info("@@@@ use_env_include_config -->" + str(use_env_include_config) )
+        # self.logger.info("@@@@ merge config folders -->" + str(self.merge_config_folders) )
+        # self.logger.info("@@000@@ config_path_list -->" + str(config_path_list) )
+        # print(type(use_plugin_config), use_plugin_config)
+        if  use_plugin_config :
+            config_path_list.extend(self.plugin_folders)
+            # self.logger.info("@@111@@ config_path_list -->" + str(config_path_list) )
+        if  use_env_include_config:
+            config_path_list.extend(self.config_folders)
+            # self.logger.info("@@222@@ config_path_list -->" + str(config_path_list) )
+        else:
+            config_path_list.extend( self.merge_config_folders)
+            # self.logger.info("@@333@@ config_path_list -->" + str(config_path_list) )
+        # self.logger.info("@@@@ config_path_list -->" + str(config_path_list) )
 
 
         ########## merge, interpolate and write spack config files#########
@@ -170,8 +186,9 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             if out_config_dir[0] != '/':
                 spack_config_dir = os.path.abspath(os.path.join(dest, out_config_dir))
             else:
-                os.makedirs(out_config_dir)
                 spack_config_dir = out_config_dir
+            if not os.path.exists(spack_config_dir):
+                os.makedirs(spack_config_dir)
 
         if os.path.exists(spack_config_dir) :
             if clearconfig:
