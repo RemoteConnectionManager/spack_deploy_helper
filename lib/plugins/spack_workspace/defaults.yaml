@@ -38,6 +38,7 @@ argparse:
           - 'compilers.yaml'
           - 'config.yaml'
           - 'mirrors.yaml'
+          - 'repos.yaml'
 
       methods:
         folder_setup:
