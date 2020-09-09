@@ -77,19 +77,19 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         else:
             cachedir=os.path.abspath(cachedir)
         self.logger.debug("actual cache_dir-->"+cachedir+"<--")
-        try:
-            os.makedirs(cachedir)
-        except OSError:
-            if not os.path.isdir(cachedir):
-                raise
+#        try:
+#            os.makedirs(cachedir)
+#        except OSError:
+#            if not os.path.isdir(cachedir):
+#                raise
         #if not os.path.exists(cachedir):
         #    os.makedirs(cachedir)
         if os.path.exists(os.path.join(dest, 'var', 'spack')):
             deploy_cache=os.path.join(dest, 'var', 'spack','cache')
             self.logger.debug("deploy cache_dir-->"+deploy_cache+"<--")
-            if not os.path.exists(deploy_cache):
-                os.symlink(cachedir,deploy_cache)
-                self.logger.info("symlinked -->"+cachedir+"<-->"+deploy_cache)
+#            if not os.path.exists(deploy_cache):
+#                os.symlink(cachedir,deploy_cache)
+#                self.logger.info("symlinked -->"+cachedir+"<-->"+deploy_cache)
 
         ########## install folder handling ##############
         if  install:
@@ -101,9 +101,9 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         else:
             install_dir = os.path.join(dest,'opt','spack')
         install_dir=os.path.abspath(install_dir)
-        if not os.path.exists(install_dir):
-            self.logger.info("creating install_dir-->"+install_dir+"<--")
-            os.makedirs(install_dir)
+#        if not os.path.exists(install_dir):
+#            self.logger.info("creating install_dir-->"+install_dir+"<--")
+#            os.makedirs(install_dir)
         self.logger.debug("install_dir-->"+install_dir+"<--")
 
 
@@ -115,9 +115,9 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             else:
                 modules_dir = modules
             modules_dir=os.path.abspath(modules_dir)
-            if not os.path.exists(modules_dir):
-                self.logger.info("creating modules_dir-->"+modules_dir+"<--")
-                os.makedirs(modules_dir)
+#            if not os.path.exists(modules_dir):
+#                self.logger.info("creating modules_dir-->"+modules_dir+"<--")
+#                os.makedirs(modules_dir)
             self.logger.debug("modules_dir-->"+modules_dir+"<--")
 
 
