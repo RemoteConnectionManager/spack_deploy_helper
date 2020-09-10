@@ -18,10 +18,12 @@ import log_config
 
 root_path = os.path.dirname(lib_path)
 parent_root_path = os.path.dirname(root_path)
+parent_parent_root_path = os.path.dirname(parent_root_path)
 current_username = pwd.getpwuid( os.getuid() )[ 0 ]
 global_key_subst = {'DEPLOY_USERNAME': current_username,
                     'DEPLOY_ROOTPATH': root_path,
                     'DEPLOY_PARENT_ROOTPATH': parent_root_path,
+                    'DEPLOY_PARENT_PARENT_ROOTPATH': parent_parent_root_path,
                     'DEPLOY_LIBPATH': lib_path}
 logger = logging.getLogger(__name__)
 
@@ -139,6 +141,7 @@ def setup_from_args_and_configs(log_controller=None):
         logger.warning(" setting input environment folder to -->" + env_dir + "<--")
 
     global_key_subst['DEPLOY_WORKDIR'] = work_dir
+    global_key_subst['DEPLOY_WORKNAME'] = os.path.basename(work_dir)
     projects_path = os.path.normpath(os.path.join(parent_root_path, 'projects'))
     if os.path.exists(projects_path):
         global_key_subst['DEPLOY_PROJECTS_PATH'] = projects_path
