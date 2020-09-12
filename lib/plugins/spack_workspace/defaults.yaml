@@ -19,6 +19,8 @@ defaults:
 ##     - '7759' # enable using spack-installed packages as externals
 ##mybe break spack find     - '11871' #share spack source possibly among  users
      - '11598' #Try to put spack source on local disk, so nothing on install point there
+     - '11951' #To test  Allow user to specify location of spack user config path using environment variable SPACK_USER_CONFIG_PATH
+
 #     #introduce error on ccompiler find on marconi     - '11989' #Load compiler from modules
 #     #merged     - '11372' #concretize environments together 
 #
