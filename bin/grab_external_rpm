@@ -1,0 +1,85 @@
+#!/usr/bin/env python
+
+import subprocess
+import os
+import re
+import sys
+import argparse
+import shutil
+
+def splitpath(path):
+    parts=[]
+    (path, tail)=os.path.split( path)
+    while path and tail:
+         parts.append( tail)
+         (path,tail)=os.path.split(path)
+    parts.append( os.path.join(path,tail) )
+    return map( os.path.normpath, parts)[::-1]
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--rpm', nargs='*', default=[])
+parser.add_argument('--map', nargs=2, action='append', default=[])
+parser.add_argument('--prefix', default='./')
+parser.add_argument('--debug', action='store_true', default=False)
+args = parser.parse_args()
+
+print(args)
+
+reg_exp_list={}
+for s in vars(args)['rpm']:
+    try:
+        reg_exp_list[re.compile(s)] = s
+    except:
+        print("bad rpm regex-->"+s+"<--")
+
+map_list={}
+for reg,subst in vars(args)['map']:
+    try:
+        map_list[re.compile(reg)] = subst
+    except:
+        print("bad rpm regex-->"+reg+"<--")
+
+prefix = vars(args)['prefix']
+debug = vars(args)['debug']
+
+#jp = subprocess.Popen('rpm -qa | grep -i slurm', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+p = subprocess.Popen('rpm -qa', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+for line in p.stdout.readlines():
+    rpm_name = line.strip()
+    ignored = True
+    for reg_exp in reg_exp_list:
+        #print("testing rpm: " + rpm_name + " with regexp " + reg_exp_list[reg_exp])
+        if reg_exp.match(rpm_name): 
+            print("handling rpm: " + rpm_name)
+            p_filenames = subprocess.Popen('rpm -ql ' + rpm_name, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            for line_fname in p_filenames.stdout.readlines():
+                filename = line_fname.strip()
+                skipped = True
+                for map_reg_exp in map_list:
+                    if map_reg_exp.match(filename): 
+                        if os.path.isfile(filename):
+                            dest_filename = map_reg_exp.sub(prefix + map_list[map_reg_exp], filename) 
+                            dest_dirname = os.path.dirname(dest_filename)
+                            if not os.path.exists(dest_dirname):
+                                os.makedirs(dest_dirname)
+                                print("created folder: " + dest_dirname)
+                                
+                            if os.path.islink(filename):
+                                linkto = os.readlink(filename)
+                                print("TRY link:" + linkto + " -->" + dest_filename +"<")
+                                os.chdir(dest_dirname)
+                                os.symlink(linkto, dest_filename) 
+                            else:
+                                print("cp " + filename + " " + dest_filename)
+                                shutil.copyfile(filename, dest_filename)
+                        else: 
+                            print("MISSING PATH: >>" + filename + "<<")
+                        skipped = False
+                        break
+                if debug and skipped: print(filename + " SKIPPED")
+            retval_rpm = p_filenames.wait()
+            ignored = False
+            break
+    if debug and ignored : print(rpm_name + " IGNORED")
+retval = p.wait()
