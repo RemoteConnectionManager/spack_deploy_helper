@@ -1,0 +1,11 @@
+defaults:
+  spack_version : '0.16.0'
+  upstream :
+    master : "v0.16.0"
+    prs :
+     - '11951' #Allow user to specify location of spack user config path
+
+  origin :
+    integration_branch: '{{DEPLOY_PROJECT_NAME}}/{{ defaults.integration_type }}{{ defaults.spack_version }}'
+
+
