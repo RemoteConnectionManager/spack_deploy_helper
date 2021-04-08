@@ -42,7 +42,8 @@ class git_repo:
     def release_tag(self):
         cmd = ['git', 'describe', '--tags', '--long']
         (ret,output,err) = run(cmd,logger=self.logger,folder=self.folder,stop_on_error=False)
-        tag = output.decode().splitlines()[0].strip()
+        #tag = output.decode().splitlines()[0].strip()
+        tag = output.splitlines()[0].strip()
         release_tag = tag.split("/")[-1:][0]
         return release_tag
 
