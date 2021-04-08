@@ -13,6 +13,7 @@ from .run import run,source
 from .mytemplate import filetemplate,stringtemplate
 from .log_config import log_setup
 from .external import hiyapyco
+from .spack import is_spack_root
 
 #print("###TOP in__init__ ######## "+__name__)
 

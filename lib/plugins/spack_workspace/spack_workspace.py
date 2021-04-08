@@ -13,10 +13,6 @@ import cascade_yaml_config
 logging.debug("imported __file__:" + os.path.realpath(__file__))
 
 
-def is_spack_root(path):
-    print("#######is_spack_root---->",path)
-    return os.path.exists(os.path.join(path, 'bin', 'spack'))
-
 
 class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
@@ -36,7 +32,7 @@ class SpackWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         base_path = os.path.abspath(base_path)
         print('Searching workspaces into:', base_path)
         for root, dirs, files in os.walk(base_path, topdown=True):
-            if is_spack_root(root):
+            if utils.is_spack_root(root):
                 print(" OOOOOOOOOOOOO list OOOOO found spack folder ", root)
                 dirs[:] = []
 
