@@ -9,7 +9,7 @@ import logging
 
 from run import run
 
-logging.getLogger(__name__).setLevel(logging.DEBUG)
+#logging.getLogger(__name__).setLevel(logging.DEBUG)
 
 class baseintrospect:
     def __init__(self):

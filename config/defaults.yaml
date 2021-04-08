@@ -103,7 +103,7 @@ logging_configs:
       handlers: [console]
       level: INFO
     root:
-      level: INFO
+      level: WARNING
       handlers: [console]
       propagate: False
     cascade_yaml_config:
@@ -120,7 +120,7 @@ logging_configs:
       propagate: False
     __main__:
       handlers: [console_empty]
-      level: INFO
+      level: WARNING
       propagate: False
     utils:
       handlers: [console]
