@@ -1,7 +1,7 @@
 defaults:
-  spack_version : '0.16.0'
+  spack_version : '0.16.1'
   upstream :
-    master : "v0.16.0"
+    master : "v0.16.1"
     prs :
      - '11951' #Allow user to specify location of spack user config path
 
