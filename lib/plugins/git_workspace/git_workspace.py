@@ -147,7 +147,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 dev_git.add_remote(upstream, name='upstream')
                 self.logger.info("Adding remote upstream %s " % (upstream))
 
-            dev_git.fetch(name='origin', prefix="{name}/",  branches=origin_branches)
+            dev_git.fetch(name='origin', prefix="refs/remotes/{name}/",  branches=origin_branches)
 
             if integration:
                 if len(origin_branches) > 0:
