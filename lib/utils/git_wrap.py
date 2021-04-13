@@ -41,6 +41,8 @@ class git_repo:
 
     def release_tag(self):
         cmd = ['git', 'describe', '--tags', '--long']
+        self.logger.info("in path " + self.folder + "execute:: " + ' '.join(cmd))
+
         (ret,output,err) = run(cmd,logger=self.logger,folder=self.folder,stop_on_error=False)
         #tag = output.decode().splitlines()[0].strip()
         tag = output.splitlines()[0].strip()
