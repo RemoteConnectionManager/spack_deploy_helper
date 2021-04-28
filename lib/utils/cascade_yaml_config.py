@@ -20,10 +20,12 @@ root_path = os.path.dirname(lib_path)
 parent_root_path = os.path.dirname(root_path)
 parent_parent_root_path = os.path.dirname(parent_root_path)
 current_username = pwd.getpwuid( os.getuid() )[ 0 ]
+tmpdir = os.environ.get('TMPDIR','/tmp')
 global_key_subst = {'DEPLOY_USERNAME': current_username,
                     'DEPLOY_ROOTPATH': root_path,
                     'DEPLOY_PARENT_ROOTPATH': parent_root_path,
                     'DEPLOY_PARENT_PARENT_ROOTPATH': parent_parent_root_path,
+                    'DEPLOY_TMPDIR': tmpdir,
                     'DEPLOY_LIBPATH': lib_path}
 logger = logging.getLogger(__name__)
 
@@ -230,10 +232,11 @@ def setup_from_args_and_configs(log_controller=None):
     # print("///////////////", config_session)
     defaults_config_folders = []
     for path in config_session.get(key_name, []):
-        if path[0] != '/':
-            path=os.path.abspath(os.path.join(root_path, path))
-        if os.path.isdir(path) and os.path.exists(path):
-            defaults_config_folders.append(path)
+        if path:
+            if path[0] != '/':
+                path=os.path.abspath(os.path.join(root_path, path))
+            if os.path.isdir(path) and os.path.exists(path):
+                defaults_config_folders.append(path)
 
     environment_config_folders = []
     for path in env_spack_session.get('include', []):
