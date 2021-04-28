@@ -22,6 +22,7 @@ class baseintrospect:
         self.sysintro['hostname']=socket.getfqdn()
 
         logging.getLogger(__name__).debug("sysintro-->"+str(self.sysintro)+"<<-")
+        #print("sysintro-->"+str(self.sysintro)+"<<-")
 
 class commandintrospect(baseintrospect):
     def __init__(self,commands=[]):
@@ -51,9 +52,16 @@ class myintrospect(commandintrospect):
         self.tags=tags
 
     def platform_tag(self):
+        #search tag in order, first in hostname and then in plaform string
         hostname=self.sysintro['hostname']
         for k in self.tags:
+            #print("search tag: "+k)
             m=re.search(k,hostname)
+            if m : return self.tags[k]
+        platformstring=self.sysintro['sysplatform']
+        for k in self.tags:
+            #print("search tag: "+k)
+            m=re.search(k,platformstring)
             if m : return self.tags[k]
         return(None)
 
@@ -63,7 +71,7 @@ if __name__ == '__main__':
 
     print("__file__:" + os.path.realpath(__file__))
     for k,v in baseintrospect().sysintro.items() : print("sysintro["+ k +"]=" + v )
-    me=myintrospect(tags={'calori': 'ws_mint', 'galileo':'galileo', 'marconi':'marconi', 'eni':'eni' })
+    me=myintrospect(tags={'calori': 'ws_mint', 'galileo':'galileo', 'marconi':'marconi','centos.8':'centos8','centos':'centos','Linux':'genericlinux' })
     for k,v in me.commands.items() : print("commands["+ k +"]=" + str(v) )
     print("myintrospection:  host->" + me.platform_tag())
 
