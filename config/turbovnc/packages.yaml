@@ -1,0 +1,11 @@
+packages:
+  xkeyboard-config:
+    variants: +xorg
+  font-util:
+    variants:
+    - fonts=font-adobe-75dpi
+  turbovnc:
+    variants:
+    - +x11deps
+    - +server
+
