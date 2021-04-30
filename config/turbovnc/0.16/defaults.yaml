@@ -1,0 +1,13 @@
+defaults:
+  origin :
+    url : 'https://github.com/RemoteConnectionManager/spack.git'
+    master: 'clean/0.16.1'
+    branches :
+      - 'packages/0.16/turbovnc'
+      - 'packages/0.16/libjpeg-turbo'
+
+
+
+
+
+
