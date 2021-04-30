@@ -1,0 +1,6 @@
+packages:
+  pango:
+    variants: +X
+  cairo:
+    variants: +X
+

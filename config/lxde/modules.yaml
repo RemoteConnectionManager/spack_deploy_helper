@@ -1,0 +1,10 @@
+modules:
+  tcl:
+    whitelist:
+    - lxde-lxterminal
+    - lxde-libfm
+    - lxde-menu-cache
+    - lxde-icon-theme
+    - pcmanfm
+    - tint2
+
