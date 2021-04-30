@@ -1,0 +1,9 @@
+defaults:
+  origin :
+    branches :
+      - 'packages/0.16/lxde-lxterminal'
+      - 'packages/0.16/lxde-gpicview'
+      - 'packages/0.16/lxde-leafpad'
+      - 'packages/0.16/lxde-openbox'
+      - 'packages/0.16/lxde-pcmanfm'
+      - 'packages/0.16/lxde-tint2'
