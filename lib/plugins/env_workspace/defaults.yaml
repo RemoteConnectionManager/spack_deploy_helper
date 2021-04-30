@@ -1,4 +1,8 @@
 defaults:
+  upstream :
+    url : 'https://github.com/LLNL/spack.git'
+    master : 'develop'
+
   base_env_dir: "{{DEPLOY_PARENT_ROOTPATH}}/environments"
   merge_config_folders : "{{DEPLOY_MERGE_CONFIG_FOLDERS}}"
   cache : "{{DEPLOY_WORKDIR}}/cache"
