@@ -7,3 +7,4 @@ defaults:
       - 'packages/0.16/lxde-openbox'
       - 'packages/0.16/lxde-pcmanfm'
       - 'packages/0.16/lxde-tint2'
+      - 'packages/0.16/lxde-icon-theme'
