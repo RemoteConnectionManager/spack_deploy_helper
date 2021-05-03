@@ -147,11 +147,14 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 dev_git.add_remote(upstream, name='upstream')
                 self.logger.info("Adding remote upstream %s " % (upstream))
 
-            dev_git.fetch(name='origin', prefix="refs/remotes/{name}/",  branches=origin_branches)
+            dev_git.fetch(name='origin',
+#                          prefix="refs/remotes/{name}/",
+                          branches=origin_branches)
 
             if integration:
                 if len(origin_branches) > 0:
-                    upstream_clean = 'origin/' + origin_branches[0]
+                    #upstream_clean = 'origin/' + origin_branches[0]
+                    upstream_clean = origin_branches[0]
                     # print("--------------------------------------" + upstream_clean + "-----------------------")
                     dev_git.checkout(upstream_clean)
                     if upstream_update:
@@ -164,7 +167,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                                               master=upstream_master)
 
                     for b in origin_branches[1:]:
-                        b = 'origin/' + b
+                        #b = 'origin/' + b
                         if upstream_update:
                             merge_branch = b + '_merge'
                             self.logger.info("merge updated upstream branch: " + b + " into " + merge_branch)
@@ -181,25 +184,27 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
                                 self.logger.info("direct in_place rebase updated upstream of branch: " + b)
                                 dev_git.checkout(b)
+                                direct_rebase_branch = b + '_directrebase'
+                                dev_git.checkout(b, newbranch=direct_rebase_branch)
                                 dev_git.rebase(branch=upstream_clean, options=['-Xtheirs'])
 
                                 self.logger.info(
-                                    "comparing direct in_place rebased branch: " + b + " with merged,rebased and remerged branch " + rebase_branch)
-                                out_diff = dev_git.compare_branches(b, rebase_branch)
+                                    "comparing direct in_place rebased branch: " + direct_rebase_branch + " with merged,rebased and remerged branch " + rebase_branch)
+                                out_diff = dev_git.compare_branches(direct_rebase_branch, rebase_branch)
                                 if out_diff == '':
                                     dev_git.delete(rebase_branch)
                                 else:
-                                    self.logger.warning("DIFF " + b + " " + rebase_branch + "\n" + out_diff)
+                                    self.logger.warning("DIFF " + direct_rebase_branch + " " + rebase_branch + "\n" + out_diff)
 
                                 #dev_git.merge(merge_branch, options=['-Xtheirs'])
                                 self.logger.info(
                                     "comparing direct in_place rebased %s with simply merged %s " % (b, merge_branch))
-                                out_diff = dev_git.compare_branches(b, merge_branch)
+                                out_diff = dev_git.compare_branches(direct_rebase_branch, merge_branch)
                                 if out_diff == '':
                                     self.logger.info("removing " + merge_branch)
                                     dev_git.delete(merge_branch)
                                 else:
-                                    self.logger.warning("DIFF " + b + " " + merge_branch + "\n" + out_diff)
+                                    self.logger.warning("DIFF " + direct_rebase_branch + " " + merge_branch + "\n" + out_diff)
                             # not needed? dev_git.checkout(b)
 
                             # dev_git.delete(merge_branch)
@@ -221,7 +226,8 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                     dev_git.checkout(integration_branch)
                     for branch in origin_branches[1:]:
                         self.logger.info("merging %s into %s" % (branch, integration_branch))
-                        dev_git.merge('origin/' + branch, comment='merged ' + branch)
+                        #dev_git.merge('origin/' + branch, comment='merged ' + branch)
+                        dev_git.merge(branch, comment='merged ' + branch)
             else:
                 dev_git.fetch(name='origin', branches=[origin_master])
                 dev_git.checkout(origin_master)
