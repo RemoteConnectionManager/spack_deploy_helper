@@ -6,6 +6,7 @@ defaults:
       - 'packages/0.16/turbovnc'
       - 'packages/0.16/libjpeg-turbo'
       - 'packages/xkeyboard-config'
+      - 'packages/xkbcomp'
       - 'packages/pam'
 
 
