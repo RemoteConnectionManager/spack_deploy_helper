@@ -195,12 +195,16 @@ def setup_from_args_and_configs(log_controller=None):
 
 ##################################   now add extracted  platform to be used as key in jninja templates in 
 ##################################   parsing config files from now on
-    global_key_subst['DEPLOY_PLATFORM_NAME'] = platform_match
-    platform_config_folder = os.path.abspath(os.path.join(hosts_dir,platform_match, base_config_session.get('config_dir', 'config')))
-    if os.path.exists(platform_config_folder):
-        global_key_subst['DEPLOY_HOST_CONFIGPATH'] = platform_config_folder
-        platform_folders = [platform_config_folder]
-    else:
+    if platform_match :
+        global_key_subst['DEPLOY_PLATFORM_NAME'] = platform_match
+        platform_config_folder = os.path.abspath(os.path.join(hosts_dir,platform_match, base_config_session.get('config_dir', 'config')))
+        if os.path.exists(platform_config_folder):
+            global_key_subst['DEPLOY_HOST_CONFIGPATH'] = platform_config_folder
+            platform_folders = [platform_config_folder]
+        else:
+            platform_folders = []
+    else:        
+        logger.warning("UNABLE to find a platform match ")
         platform_folders = []
                
 
