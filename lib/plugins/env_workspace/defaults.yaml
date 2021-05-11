@@ -8,6 +8,8 @@ defaults:
   cache : "{{DEPLOY_WORKDIR}}/cache"
   install : '{{DEPLOY_WORKDIR}}/install'
   modules : '{{DEPLOY_WORKDIR}}/modules'
+  spack_roots : '{{DEPLOY_WORKDIR}}/spack_roots'
+
 
 argparse:
   subparser:
@@ -29,6 +31,12 @@ argparse:
             action: 'store'
             default: "{{defaults.base_env_dir}}"
             help: 'Base folder to search work dirs'
+        list_spack_roots:
+          help: 'list available spack roots'
+          spack_roots:
+            action: 'store'
+            default: "{{defaults.spack_roots}}"
+            help: 'Base folder to search spack roots'
         config_setup:
           spack_root:
             action: 'store'

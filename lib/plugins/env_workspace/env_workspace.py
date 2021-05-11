@@ -27,6 +27,19 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             self.logger.debug(out)
 
 
+    def list_spack_roots(self, spack_roots=''):
+        if not spack_roots:
+            spack_roots = self.base_path
+        else:
+            if spack_roots[0] != '/':
+                spack_roots = os.path.join(self.base_path, spack_roots)
+        spack_roots = os.path.abspath(spack_roots)
+        print('Searching workspaces into:', spack_roots)
+        for root, dirs, files in os.walk(spack_roots, topdown=True):
+            if utils.is_spack_root(root):
+                print(" OOOOOOOOOOOOO list OOOOO found spack folder ", root)
+                dirs[:] = []
+
 
 
     def list(self, base_env=''):
