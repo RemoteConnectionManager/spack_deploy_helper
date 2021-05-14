@@ -1,0 +1,13 @@
+packages:
+  all:
+    providers:
+      gl:
+        - opengl
+        - mesa
+      glx:
+        - opengl
+        - mesa+glx
+      glu:
+        - openglu
+        - mesa-glu
+ 

@@ -1,0 +1,9 @@
+modules:
+  tcl:
+    whitelist:
+    - virtualgl
+    virtualgl:
+      environment:
+        set:
+          VIRTUAL_GL_FAKE_LIBRARIES: ${PREFIX}/lib64/libvglfaker.so
+
