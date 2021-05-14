@@ -5,9 +5,9 @@ defaults:
     branches :
       - 'packages/0.16/turbovnc'
       - 'packages/0.16/libjpeg-turbo'
-      - 'packages/xkeyboard-config'
-      - 'packages/xkbcomp'
-      - 'packages/pam'
+      - 'packages/0.16/xkeyboard-config'
+      - 'packages/0.16/xkbcomp'
+      - 'packages/0.16/pam'
 
 
 
