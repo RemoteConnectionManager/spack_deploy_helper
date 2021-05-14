@@ -1,0 +1,10 @@
+packages:
+  gtkplus:
+    version:
+    - 2.24.32
+    variants: +X
+
+  vte:
+    version:
+    - 0.28.2
+
