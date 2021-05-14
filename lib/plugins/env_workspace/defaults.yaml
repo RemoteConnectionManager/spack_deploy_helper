@@ -9,6 +9,11 @@ defaults:
   install : '{{DEPLOY_WORKDIR}}/install'
   modules : '{{DEPLOY_WORKDIR}}/modules'
   spack_roots : '{{DEPLOY_WORKDIR}}/spack_roots'
+  config_setup:
+    spack_commands: 
+     - 'spack compiler find --scope site'
+
+
 
 
 argparse:
@@ -70,6 +75,10 @@ argparse:
             action: 'store'
             default: "{{ defaults.modules }}"
             help: 'folder where put tcl modules, if start with / considered absolute, otherwise considered relative to dest'
+          spack_commands:
+            action: 'store'
+            default: "{{ defaults.config_setup.spack_commands }}"
+            help: 'spack commands to execute for configuring spack root'
 
 
 logging_configs:

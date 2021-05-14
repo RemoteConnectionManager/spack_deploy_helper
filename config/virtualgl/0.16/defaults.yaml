@@ -3,3 +3,8 @@ defaults:
     branches :
       - 'packages/0.16/virtualgl-update'
 
+  config_setup:
+    spack_commands: 
+      - 'DISPLAY=:0 spack external find --scope site --not-buildable opengl'
+
+

@@ -65,6 +65,7 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                      cache='cache',
                      install='install',
                      modules='modules',
+                     spack_commands='spack compiler find --scope site',
                      clearconfig=True,
                      runconfig=False):
 
@@ -125,3 +126,8 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                         open(target, "w").write(out)
                 else :
                     self.logger.info("no template file for "+ f + " : skipping ")
+
+            utils.source(os.path.join(dest,'share','spack','setup-env.sh'))
+            for command in spack_commands:
+                 print("############## executing: " + command) 
+
