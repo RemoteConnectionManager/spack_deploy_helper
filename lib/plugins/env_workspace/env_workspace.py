@@ -65,11 +65,18 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                      cache='cache',
                      install='install',
                      modules='modules',
-                     spack_commands='spack compiler find --scope site',
+                     spack_commands=[],
                      clearconfig=True,
                      runconfig=False):
 
         # print("@@@@@@@@@@@@@@@@@@@@",self.dry_run)
+        current_key_subst = copy.deepcopy(cascade_yaml_config.global_key_subst)
+        current_key_subst['DEPLOY_SPACK_CACHE'] = cache
+        current_key_subst['DEPLOY_SPACK_INSTALL'] = install
+        current_key_subst['DEPLOY_SPACK_MODULES'] = modules
+        for subst_key in current_key_subst:
+            utils.hiyapyco.jinja2env.globals[subst_key] = current_key_subst[subst_key]
+
         if spack_root [0] != '/':
             dest = os.path.join(self.base_path, spack_root)
         else:
@@ -88,6 +95,12 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             if clearconfig:
                 self.logger.info("Clear config Folder ->"+spack_config_dir+"<-")
                 for f in glob.glob(spack_config_dir+ "/*.yaml"):
+                    if self.dry_run:
+                        print("##### dry run remove: " + f )
+                    else:
+                        print("##### removing: " + f )
+                        os.remove(f)
+
                     os.remove(f)
 
             for f in self.manager_conf.get('config', dict()).get('spack_yaml_files',[]) :
@@ -100,12 +113,6 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
                 if merge_files :
                     self.logger.debug("configuring "+ f + " with files: "+str(merge_files))
-                    current_key_subst = copy.deepcopy(cascade_yaml_config.global_key_subst)
-                    current_key_subst['DEPLOY_SPACK_CACHE'] = cache
-                    current_key_subst['DEPLOY_SPACK_INSTALL'] = install
-                    current_key_subst['DEPLOY_SPACK_MODULES'] = modules
-                    for subst_key in current_key_subst:
-                      utils.hiyapyco.jinja2env.globals[subst_key] = current_key_subst[subst_key]
 
                     merged_f = utils.hiyapyco.load(
                         *merge_files,
@@ -122,12 +129,22 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                     if not os.path.exists(target):
                         out=utils.hiyapyco.dump(merged_f, default_flow_style=False)
                         out = utils.stringtemplate(out).safe_substitute(current_key_subst)
-                        self.logger.info("WRITING config_file " + outfile + " -->" + target + "<-- ")
-                        open(target, "w").write(out)
+                        if self.dry_run:
+                            print("##### dry run write: " + target )
+                        else:
+                            self.logger.info("WRITING config_file " + outfile + " -->" + target + "<-- ")
+                            open(target, "w").write(out)
                 else :
                     self.logger.info("no template file for "+ f + " : skipping ")
 
             utils.source(os.path.join(dest,'share','spack','setup-env.sh'))
             for command in spack_commands:
-                 print("############## executing: " + command) 
+                templ= utils.stringtemplate(command)
+                cmd=templ.safe_substitute(current_key_subst)
+                if self.dry_run:
+                    print("############## dry run  executing: " + cmd) 
+                else:
+                    (ret,out,err)=utils.run(cmd.split(),logger=self.logger)
+                    self.logger.info("  " + out )
+
 
