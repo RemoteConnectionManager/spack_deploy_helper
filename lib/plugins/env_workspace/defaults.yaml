@@ -11,6 +11,7 @@ defaults:
   spack_roots : '{{DEPLOY_WORKDIR}}/spack_roots'
   config_setup:
     spack_commands: 
+     - 'spack config get config'
      - 'spack compiler find --scope site'
 
 
