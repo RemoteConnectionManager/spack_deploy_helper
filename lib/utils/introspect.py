@@ -9,7 +9,17 @@ import logging
 
 from run import run
 
+import external.distro as distro
 #logging.getLogger(__name__).setLevel(logging.DEBUG)
+
+def distro_name():
+    distname, version, _ = distro.linux_distribution(full_distribution_name=False)
+    version = re.split(r'[^\w-]', version)
+    if 'ubuntu' in distname:
+        version = '.'.join(version[0:2])
+    else:
+        version = version[0]
+    return "%s%s" % (distname.replace('-', '_'),version.replace('-', '_'))
 
 class baseintrospect:
     def __init__(self):
@@ -20,6 +30,9 @@ class baseintrospect:
         self.sysintro['commandline']=' '.join(sys.argv)
         self.sysintro['workdir']=os.path.abspath('.')
         self.sysintro['hostname']=socket.getfqdn()
+        self.sysintro['clustername']='.'.join(self.sysintro['hostname'].split('.')[1:][:1])
+        self.sysintro['domainname']='.'.join(self.sysintro['hostname'].split('.')[-2:])
+        self.sysintro['distroname']=distro_name()
 
         logging.getLogger(__name__).debug("sysintro-->"+str(self.sysintro)+"<<-")
         #print("sysintro-->"+str(self.sysintro)+"<<-")
@@ -66,12 +79,24 @@ class myintrospect(commandintrospect):
         return(None)
 
 
+    def multi_platform_tag(self):
+        #Return a list off all tags matching , in priority order of host, cluster, domain, distname
+        tags=[]
+        for parameter in ['hostname', 'clustername', 'domainname', 'distroname']:
+            for k in self.tags:
+                if self.sysintro[parameter] == k:
+                    tags.append(self.tags[k])
+                    break
+        return tags
+
+
 #################
 if __name__ == '__main__':
 
     print("__file__:" + os.path.realpath(__file__))
     for k,v in baseintrospect().sysintro.items() : print("sysintro["+ k +"]=" + v )
-    me=myintrospect(tags={'calori': 'ws_mint', 'galileo':'galileo', 'marconi':'marconi','centos.8':'centos8','centos':'centos','Linux':'genericlinux' })
+    me=myintrospect(tags={'calori': 'ws_mint', 'galileo':'galileo', 'marconi':'marconi','m100':'m100', 'rhel8':'rhel8','centos.8':'centos8','centos':'centos','Linux':'genericlinux' })
     for k,v in me.commands.items() : print("commands["+ k +"]=" + str(v) )
     print("myintrospection:  host->" + me.platform_tag())
+    print("myintrospection:  tags->" + str(me.multi_platform_tag()))
 
