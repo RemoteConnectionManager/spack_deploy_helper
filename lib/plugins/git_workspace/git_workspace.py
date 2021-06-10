@@ -99,7 +99,7 @@ class GitWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             final_dest = git_dest
         if os.path.exists(final_dest):
             self.logger.error("Exiting: alreay existing Git folder destination: " + final_dest )
-            exit()
+            exit(-1)
         if tempdir:
             if os.path.exists(tempdir):
                 import uuid
