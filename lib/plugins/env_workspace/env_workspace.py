@@ -101,7 +101,6 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                         print("##### removing: " + f )
                         os.remove(f)
 
-                    os.remove(f)
 
             for f in self.manager_conf.get('config', dict()).get('spack_yaml_files',[]) :
                 print("-------------- " + f)
