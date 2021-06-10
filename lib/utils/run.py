@@ -24,7 +24,11 @@ def run(cmd,logger=None,
     # logger.debug("PATH: " + os.environ['PATH'])
     # print("running-->"+' '.join(cmd))
     if not dry_run :
-        myprocess = subprocess.Popen(cmd, cwd=folder,stdout=subprocess.PIPE,stderr=subprocess.PIPE, env=os.environ, bufsize=1, universal_newlines=True)
+        try:
+            myprocess = subprocess.Popen(cmd, cwd=folder,stdout=subprocess.PIPE,stderr=subprocess.PIPE, env=os.environ,  bufsize=1, universal_newlines=True)
+        except FileNotFoundError:
+            logger.warning("bad executable: " + cmd[0] + " try to use shell on:  " +' '.join(cmd))
+            myprocess = subprocess.Popen(' '.join(cmd), cwd=folder,stdout=subprocess.PIPE,stderr=subprocess.PIPE, env=os.environ, shell=True, bufsize=1, universal_newlines=True)
         if pipe_output:
             # for f in [myprocess.stdout, myprocess.stderr]:
             #     fd = f.fileno()
