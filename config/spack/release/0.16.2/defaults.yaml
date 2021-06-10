@@ -1,0 +1,12 @@
+defaults:
+  spack_version : '0.16.2'
+  upstream :
+    master : "v0.16.2"
+
+  origin :
+    integration_branch: '{{DEPLOY_PROJECT_NAME}}/{{ defaults.integration_type }}{{ defaults.spack_version }}'
+    branches :
+      - 'pull/0.16/11951'
+
+
+
