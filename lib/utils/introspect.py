@@ -6,6 +6,7 @@ import sys
 import platform
 import socket
 import logging
+from collections import OrderedDict
 
 from run import run
 
@@ -29,10 +30,10 @@ class baseintrospect:
         self.sysintro['sysplatform']=platform.platform()
         self.sysintro['commandline']=' '.join(sys.argv)
         self.sysintro['workdir']=os.path.abspath('.')
-        self.sysintro['hostname']=socket.getfqdn()
-        self.sysintro['clustername']='.'.join(self.sysintro['hostname'].split('.')[1:][:1])
-        self.sysintro['domainname']='.'.join(self.sysintro['hostname'].split('.')[-2:])
-        self.sysintro['distroname']=distro_name()
+        self.sysintro['DEPLOY_HOST']=socket.getfqdn()
+        self.sysintro['DEPLOY_CLUSTER']='.'.join(self.sysintro['DEPLOY_HOST'].split('.')[1:][:1])
+        self.sysintro['DEPLOY_DOMAIN']='.'.join(self.sysintro['DEPLOY_HOST'].split('.')[-2:])
+        self.sysintro['DEPLOY_DISTRO']=distro_name()
 
         logging.getLogger(__name__).debug("sysintro-->"+str(self.sysintro)+"<<-")
         #print("sysintro-->"+str(self.sysintro)+"<<-")
@@ -66,7 +67,7 @@ class myintrospect(commandintrospect):
 
     def platform_tag(self):
         #search tag in order, first in hostname and then in plaform string
-        hostname=self.sysintro['hostname']
+        hostname=self.sysintro['DEPLOY_HOST']
         for k in self.tags:
             #print("search tag: "+k)
             m=re.search(k,hostname)
@@ -81,11 +82,11 @@ class myintrospect(commandintrospect):
 
     def multi_platform_tag(self):
         #Return a list off all tags matching , in priority order of host, cluster, domain, distname
-        tags=[]
-        for parameter in ['hostname', 'clustername', 'domainname', 'distroname']:
+        tags=OrderedDict()
+        for parameter in ['DEPLOY_HOST', 'DEPLOY_CLUSTER', 'DEPLOY_DOMAIN', 'DEPLOY_DISTRO']:
             for k in self.tags:
                 if self.sysintro[parameter] == k:
-                    tags.append(self.tags[k])
+                    tags[parameter] = self.tags[k]
                     break
         return tags
 

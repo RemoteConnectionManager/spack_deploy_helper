@@ -191,21 +191,34 @@ def setup_from_args_and_configs(log_controller=None):
     # print("#######################defaults yaml files", default_yaml_files)
     default_config_session = CascadeYamlConfig(yaml_files=default_yaml_files)[['config']]
     platform_match = utils.myintrospect(tags=default_config_session.get('host_tags', dict())).platform_tag()
+    platform_matches = utils.myintrospect(tags=default_config_session.get('host_tags', dict())).multi_platform_tag()
 
 
 ##################################   now add extracted  platform to be used as key in jninja templates in 
 ##################################   parsing config files from now on
-    if platform_match :
-        global_key_subst['DEPLOY_PLATFORM_NAME'] = platform_match
-        platform_config_folder = os.path.abspath(os.path.join(hosts_dir,platform_match, base_config_session.get('config_dir', 'config')))
+    platform_folders=[]
+    for var in platform_matches:
+        global_key_subst[var] = platform_matches[var]
+        platform_config_folder = os.path.abspath(
+            os.path.join(hosts_dir,
+                         platform_matches[var],
+                         base_config_session.get('config_dir', 'config')))
         if os.path.exists(platform_config_folder):
-            global_key_subst['DEPLOY_HOST_CONFIGPATH'] = platform_config_folder
-            platform_folders = [platform_config_folder]
-        else:
-            platform_folders = []
-    else:        
-        logger.warning("UNABLE to find a platform match ")
-        platform_folders = []
+            platform_folders.append(platform_config_folder)
+    if platform_folders==[]:
+        logger.warning("NO platform matches ")
+
+#    if platform_match :
+#        global_key_subst['DEPLOY_PLATFORM_NAME'] = platform_match
+#        platform_config_folder = os.path.abspath(os.path.join(hosts_dir,platform_match, base_config_session.get('config_dir', 'config')))
+#        if os.path.exists(platform_config_folder):
+#            global_key_subst['DEPLOY_HOST_CONFIGPATH'] = platform_config_folder
+#            platform_folders = [platform_config_folder]
+#        else:
+#            platform_folders = []
+#    else:        
+#        logger.warning("UNABLE to find a platform match ")
+#        platform_folders = []
                
 
 ##################################   from now on DEPLOY_PLATFORM_NAME should be available in jninja experssion {{DEPLOY_PLATFORM_NAME}}
