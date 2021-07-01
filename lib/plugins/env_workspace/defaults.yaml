@@ -12,7 +12,6 @@ defaults:
   config_setup:
     spack_commands: 
      - 'spack config get config'
-     - 'spack compiler find --scope site'
 
 
 
