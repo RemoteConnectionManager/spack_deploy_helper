@@ -197,6 +197,7 @@ def setup_from_args_and_configs(log_controller=None):
 ##################################   now add extracted  platform to be used as key in jninja templates in 
 ##################################   parsing config files from now on
     platform_folders=[]
+    global_key_subst['DEPLOY_HOSTS_DIR'] = hosts_dir
     for var in platform_matches:
         global_key_subst[var] = platform_matches[var]
         platform_config_folder = os.path.abspath(
