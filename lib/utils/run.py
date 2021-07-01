@@ -6,6 +6,7 @@ import logging
 import json
 import fcntl
 import time
+import errno
 
 module_logger = logging.getLogger(__name__)
 def run(cmd,logger=None,
@@ -26,9 +27,10 @@ def run(cmd,logger=None,
     if not dry_run :
         try:
             myprocess = subprocess.Popen(cmd, cwd=folder,stdout=subprocess.PIPE,stderr=subprocess.PIPE, env=os.environ,  bufsize=1, universal_newlines=True)
-        except FileNotFoundError:
-            logger.warning("bad executable: " + cmd[0] + " try to use shell on:  " +' '.join(cmd))
-            myprocess = subprocess.Popen(' '.join(cmd), cwd=folder,stdout=subprocess.PIPE,stderr=subprocess.PIPE, env=os.environ, shell=True, bufsize=1, universal_newlines=True)
+        except OSError as e:
+            if e.errno == errno.ENOENT:
+                logger.warning("bad executable: " + cmd[0] + " try to use shell on:  " +' '.join(cmd))
+                myprocess = subprocess.Popen(' '.join(cmd), cwd=folder,stdout=subprocess.PIPE,stderr=subprocess.PIPE, env=os.environ, shell=True, bufsize=1, universal_newlines=True)
         if pipe_output:
             # for f in [myprocess.stdout, myprocess.stderr]:
             #     fd = f.fileno()
