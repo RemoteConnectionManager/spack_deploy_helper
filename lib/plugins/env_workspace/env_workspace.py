@@ -106,9 +106,10 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 print("-------------- " + f)
                 merge_files=[]
                 for p in merge_config_folders:
-                    print("#### config path: " + p)
                     test=os.path.abspath(os.path.join(p,f))
-                    if os.path.exists(test): merge_files = merge_files +[test]
+                    if os.path.exists(test):
+                         print("#### config file: " + test)
+                         merge_files = merge_files +[test]
 
                 if merge_files :
                     self.logger.debug("configuring "+ f + " with files: "+str(merge_files))
