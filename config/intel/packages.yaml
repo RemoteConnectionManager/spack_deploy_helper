@@ -1,0 +1,7 @@
+packages:
+  all:
+    compiler: [intel, gcc]
+    providers:
+      mpi: [intel-mpi, openmpi]
+      lapack: [intel-mkl, netlib-lapack]
+

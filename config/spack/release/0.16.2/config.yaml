@@ -1,0 +1,5 @@
+config:
+  install_tree: 
+    root: "{{DEPLOY_SPACK_INSTALL}}"
+
+
