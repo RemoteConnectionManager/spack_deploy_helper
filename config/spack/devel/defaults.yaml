@@ -1,15 +1,14 @@
 defaults:
-  spack_version : 'devel'
+  spack_version : 'develop'
   upstream :
     master : "develop"
-  runconfig: 'True'
-  integration: 'True'
-  origin :
-    integration_branch: '{{DEPLOY_PROJECT_NAME}}/{{ defaults.integration_type }}{{ defaults.spack_version }}'
 
-  upstream_update: 'True'
+  origin :
+    integration_branch: '{{ defaults.integration_type }}{{ defaults.spack_version }}/{{DEPLOY_PROJECT_NAME}}_{{DEPLOY_WORKNAME}}'
   rebase_update: 'True'
 
+  runconfig: 'True'
+  integration: 'True'
 logging_configs:
   loggers:
     cascade_yaml_config:
