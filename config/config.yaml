@@ -3,7 +3,7 @@ config:
   - $tempdir
 
   source_cache: "{{DEPLOY_SPACK_CACHE}}"
-  #install_tree: "{{DEPLOY_SPACK_INSTALL}}"
+  install_tree: "{{DEPLOY_SPACK_INSTALL}}"
   module_roots:
     tcl: "{{DEPLOY_SPACK_MODULES}}"
 
