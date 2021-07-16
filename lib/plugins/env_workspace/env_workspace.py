@@ -144,7 +144,7 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 if self.dry_run:
                     print("############## dry run  executing: " + cmd) 
                 else:
-                    (ret,out,err)=utils.run(cmd.split(),logger=self.logger)
+                    (ret,out,err)=utils.run(cmd.split(),logger=self.logger,pipe_output=True)
                     self.logger.info("  " + out )
 
 
