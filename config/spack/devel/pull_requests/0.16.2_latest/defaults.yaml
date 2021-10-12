@@ -1,0 +1,12 @@
+defaults:
+  upstream :
+    prs :
+      - '24156' #modules: allow user to remove arch dir
+      - '24367' #modules: configurable module defaults
+      - '25727' #Modules: Allow spec formatting in suffixes
+      - '25636' #gui support for vtk 9
+      - '24367' #configurable module defaults
+      - '23489' #GROMACS build several flafors
+
+
+
