@@ -1,0 +1,10 @@
+defaults:
+  origin :
+    branches :
+      - 'packages/0.16/fix_bzip2_pkgconfig'
+
+
+
+
+
+
