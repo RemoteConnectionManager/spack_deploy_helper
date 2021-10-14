@@ -6,6 +6,7 @@ defaults:
       - '25727' #Modules: Allow spec formatting in suffixes
       - '25636' #gui support for vtk 9
       - '23489' #GROMACS build several flafors
+      - '25976' #fix opengl version and add mesa-demos
 
 
 
