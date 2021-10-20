@@ -1,5 +1,5 @@
 packages:
-  bxip2:
+  bzip2:
     variants:
     - +pkgconfig
 
