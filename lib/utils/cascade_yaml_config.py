@@ -29,6 +29,9 @@ global_key_subst = {'DEPLOY_USERNAME': current_username,
                     'DEPLOY_LIBPATH': lib_path}
 logger = logging.getLogger(__name__)
 
+def formatter(prog):
+    return argparse.ArgumentDefaultsHelpFormatter( prog, max_help_position=200, width=1000)
+
 def yaml_environment_import(varlist=[]):
     import  utils.external.jinja2
     env=dict()
@@ -622,7 +625,7 @@ class ArgparseSubcommandManager(object):
             self.subparser = subparsers.add_parser(self.manager_subcommand,
                                                    help= self.manager_help,
                                                    parents = parents,
-                                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+                                                   formatter_class=formatter)
             self.subparsers = self.subparser.add_subparsers(dest='sub_' + self.manager_subcommand, metavar=subparsers_help)
         else:
             self.subparsers=subparsers
@@ -640,7 +643,7 @@ class ArgparseSubcommandManager(object):
             self.methods_subparsers[method] = self.subparsers.add_parser(method,
                                                                     help=method_conf.get('help',''),
                                                                     parents=parents,
-                                                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+                                                                    formatter_class=formatter)
             for par in  methods_conf_args:
                 arguments = methods_conf_args[par]
                 # print("add subparser ",name,method,par," :::"+str(arguments))

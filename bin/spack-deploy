@@ -91,7 +91,7 @@ ls.set_args(log_configs=top_config[['logging_configs']])
 common_parser = argparse.ArgumentParser(prog=__name__,
                                         parents=[base_parser],
                                         add_help=False,
-                                        formatter_class=argparse.ArgumentDefaultsHelpFormatter  )
+                                        formatter_class=cascade_yaml_config.formatter  )
 
 #common_args=top_config_dict.get('argparse', dict()).get('common',dict())
 common_args=top_config[['argparse', 'common']]
@@ -112,7 +112,7 @@ copy_args['top_config'] = top_config
 
 parser = argparse.ArgumentParser(prog=os.path.basename(__file__),
                                  parents=[common_parser],
-                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+                                 formatter_class=cascade_yaml_config.formatter )
 subparsers = parser.add_subparsers(help='Utility for hierarchical configuration deployment',
                                    dest='subparser_name')
 subparsers.required=True
