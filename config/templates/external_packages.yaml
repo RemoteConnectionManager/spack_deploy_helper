@@ -1,0 +1,6 @@
+packages:
+  ${DEPLOY_NAME}:
+    externals:
+    - spec: ${DEPLOY_NAME}@${DEPLOY_VERSION}
+      prefix: ${DEPLOY_PREFIX}
+
