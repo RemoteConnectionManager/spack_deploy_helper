@@ -82,6 +82,11 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         else:
             dest = spack_root
 
+        if spack_commands :
+           ret =  utils.source(os.path.join(spack_root,'share','spack','setup-env.sh'))
+           if ret:
+               self.logger.warning("Spack setup env failed and spack commands not empty EXITING ")
+               return(1) 
 
         if out_config_dir:
             if out_config_dir[0] != '/':
@@ -137,7 +142,6 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 else :
                     self.logger.info("no template file for "+ f + " : skipping ")
 
-            utils.source(os.path.join(dest,'share','spack','setup-env.sh'))
             for command in spack_commands:
                 templ= utils.stringtemplate(command)
                 cmd=templ.safe_substitute(current_key_subst)

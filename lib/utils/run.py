@@ -96,5 +96,7 @@ def source(sourcefile,logger=None):
         pipe = subprocess.Popen(['/bin/bash', '-c', '%s && %s' %(source,dump)], stdout=subprocess.PIPE)
         env = json.loads(pipe.stdout.read().decode('utf-8'))
         os.environ = env
+        return (0)
     else:
         logger.warning("### NON EXISTING "+ sourcefile)
+        return(1)
