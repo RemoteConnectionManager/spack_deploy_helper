@@ -12,4 +12,4 @@ defaults:
       - 'spack install intel-oneapi-mpi%gcc'
       - 'spack install intel-oneapi-mkl%gcc'
       # define installed intel-oneapi-<component>  as external
-      - '/bin/bash {{DEPLOY_ROOTPATH}}/scripts/add_external.sh {{DEPLOY_ROOTPATH}}/config/templates/external_packages.yaml intel-oneapi-mpi%gcc intel-oneapi-mkl%gcc intel-oneapi-tbb%gcc '
+      - '/bin/bash {{DEPLOY_PARENT_ROOTPATH}}/scripts/add_external.sh {{DEPLOY_ROOTPATH}}/config/templates/external_packages.yaml intel-oneapi-mpi%gcc intel-oneapi-mkl%gcc intel-oneapi-tbb%gcc '
