@@ -1,0 +1,5 @@
+defaults:
+  config_setup:
+    spack_commands:
+      - 'spack external find --scope site openssl'
+
