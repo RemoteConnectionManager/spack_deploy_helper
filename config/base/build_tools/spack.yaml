@@ -1,0 +1,24 @@
+spack:
+  definitions:
+  - system_openssl:
+    - openssl@${SYS_OPENSSL_VER}
+  - tools:
+    - cmake
+    - git
+    - perl
+    - autoconf
+    - automake
+    - m4
+    - patchelf
+
+  - all:
+    - $system_openssl
+    - $tools
+  - system_compiler:
+    - '%${COMPILER_SPEC}'
+  specs:
+  - matrix:
+    - - $all
+    - - $system_compiler
+  view: false
+  concretization: together

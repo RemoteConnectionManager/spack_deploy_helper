@@ -1,0 +1,13 @@
+defaults:
+  config_setup:
+    spack_commands:
+      # build gnu build tools
+      # Create a temporary enviroment folder to assemble buiuld tools
+      - mkdir -p /tmp/spack_temp_env
+      # configure a spack.yaml template for the temp environment
+      - "spack-python {{DEPLOY_ROOTPATH}}/config/base/build_tools/generate_env.py {{DEPLOY_ROOTPATH}}/config/base/build_tools/spack.yaml /tmp/spack_temp_env/spack.yaml"
+      #- "spack-python -c \"import sys; import string; substitutions={'GCC_VER' : str(sorted([ s.version for s in spack.compilers.all_compiler_specs() if 'gcc' in str(s) ])[0]), 'SYS_OPENSSL_VER' : spack.config.get('packages')['openssl']['externals'][0]['spec'].split('@')[1]}; [sys.stdout.write(string.Template( line).safe_substitute(substitutions)) for line in sys.stdin].clear() \" \<{{DEPLOY_ROOTPATH}}/config/base/build_tools/spack.yaml > /tmp/spack_temp_env/spack.yaml"
+      # the export DUMMY force python parsing to use shell subcommand option
+      - 'export DUMMY; spack env activate -d /tmp/spack_temp_env; spack concretize -f; spack install; spack env deactivate'
+      # define some build tools as external
+      - '/bin/bash {{DEPLOY_ROOTPATH}}/scripts/add_external.sh gcc autoconf automake cmake '
