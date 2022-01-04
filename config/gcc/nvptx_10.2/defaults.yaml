@@ -1,0 +1,13 @@
+defaults:
+  config_setup:
+    spack_commands:
+      # install newer gcc with nvptx and cuda
+      - 'export SYS_COMPILER_SPEC=$(spack-python {{DEPLOY_ROOTPATH}}/scripts/get_sys_compiler_spec.py); spack spec -I gcc@10.2.0%${SYS_COMPILER_SPEC} +nvptx ~bootstrap '
+      - 'export SYS_COMPILER_SPEC=$(spack-python {{DEPLOY_ROOTPATH}}/scripts/get_sys_compiler_spec.py); spack install gcc@10.2.0%${SYS_COMPILER_SPEC} +nvptx ~bootstrap '
+      # map new gcc compiler, from now it will be the default gcc compiler
+      - 'export DEPLOY_GCC_PREFIX=$(spack location -i gcc@10.2.0); spack compiler find --scope site $DEPLOY_GCC_PREFIX'
+
+      # define some build tools as external
+      - '/bin/bash {{DEPLOY_ROOTPATH}}/scripts/add_external.sh gcc@10.2.0 autoconf automake cmake cuda'
+      - '/bin/bash {{DEPLOY_ROOTPATH}}/scripts/add_external.sh oneapi cuda'
+
