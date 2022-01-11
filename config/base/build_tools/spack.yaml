@@ -1,7 +1,7 @@
 spack:
   definitions:
-  - system_openssl:
-    - openssl@${SYS_OPENSSL_VER}
+  - selected_openssl:
+    - ${OPENSSL_SPEC}
   - tools:
     - cmake
     - git
@@ -12,7 +12,7 @@ spack:
     - patchelf
 
   - all:
-    - $system_openssl
+    - $selected_openssl
     - $tools
   - system_compiler:
     - '%${COMPILER_SPEC}'
