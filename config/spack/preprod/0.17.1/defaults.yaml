@@ -1,0 +1,28 @@
+defaults:
+  spack_version : '0.17.1'
+  upstream :
+    master : "v0.17.1"
+    prs :
+      #already merged - '24156' #modules: allow user to remove arch dir
+      #already merged - '24367' #modules: configurable module defaults
+      - '25727' #Modules: Allow spec formatting in suffixes
+        #already merged      - '25636' #gui support for vtk 9
+      - '23489' #GROMACS build several flafors
+
+  origin :
+    integration_branch: 'preprod_{{DEPLOY_PROJECT_NAME}}_{{ defaults.spack_version }}'
+    url : 'https://github.com/RemoteConnectionManager/spack.git'
+    master: 'clean/{{ defaults.spack_version }}'
+
+  upstream_rebase: 'True'
+  upstream_update: 'True'
+
+  runconfig: 'True'
+  integration: 'True'
+logging_configs:
+  loggers:
+    cascade_yaml_config:
+      level: WARNING
+
+
+
