@@ -229,7 +229,7 @@ def setup_from_args_and_configs(log_controller=None):
 
     #get yaml files involved with current susbstitutions
     yaml_files = find_config_file_list(
-                list_paths=[work_dir, env_dir],
+                list_paths= platform_folders + [work_dir, env_dir],
                 default_paths=['config'],
                 glob_suffix='defaults.yaml' )
     base_config = CascadeYamlConfig(yaml_files=yaml_files)
