@@ -6,8 +6,9 @@ defaults:
       # map newly installed intel-oneapi-compilers in the standard intel suggested way: https://software.intel.com/content/www/us/en/develop/documentation/installation-guide-for-intel-oneapi-toolkits-linux/top/installation/install-using-package-managers/spack.html
       - 'export DEPLOY_INTEL_PREFIX=$(spack location -i intel-oneapi-compilers); spack compiler add --scope site $DEPLOY_INTEL_PREFIX/compiler/latest/linux/bin/intel64; spack compiler add --scope site $DEPLOY_INTEL_PREFIX/compiler/latest/linux/bin'
       # insert a custom compiler mapping mixing old intel for fortran and the new intel-oneapi for the c-cpp stuff
+      - 'rm /tmp/add_compiler.yaml'
       #- 'export DEPLOY_INTEL_PREFIX=$(spack location -i intel-oneapi-compilers); export DEPLOY_INTEL_VERSION=$(spack-python -c \"str(sorted([ s.version for s in spack.compilers.all_compiler_specs() if "oneapi" in str(s) ])[0])\"); export DEPLOY_OS=$(spack arch -o); envsubst <{{DEPLOY_ROOTPATH}}/config/intel/oneapi/oneapi_xxx_compiler.yaml  > /tmp/add_compiler.yaml'
-      - 'spack-python  {{DEPLOY_ROOTPATH}}/config/intel/oneapi/configure_compiler.py {{DEPLOY_ROOTPATH}}/config/intel/oneapi/oneapi_xxx_compiler.yaml  > /tmp/add_compiler.yaml'
+      - 'spack-python  {{DEPLOY_ROOTPATH}}/config/intel/oneapi/configure_compiler.py {{DEPLOY_ROOTPATH}}/config/intel/oneapi/oneapi_xxx_compiler.yaml  /tmp/add_compiler.yaml'
       - 'spack config  --scope site add -f /tmp/add_compiler.yaml'
       #  with system gcc ( now is the only one gcc compiler) nstall intel-oneapi-<component> : mpi mkl and tbb as a dep 
       - 'spack install intel-oneapi-mpi%gcc'
