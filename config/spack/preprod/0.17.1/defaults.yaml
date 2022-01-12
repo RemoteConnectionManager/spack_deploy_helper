@@ -7,7 +7,6 @@ defaults:
       #already merged - '24367' #modules: configurable module defaults
       - '25727' #Modules: Allow spec formatting in suffixes
         #already merged      - '25636' #gui support for vtk 9
-      - '23489' #GROMACS build several flafors
 
   origin :
     integration_branch: 'preprod_{{DEPLOY_PROJECT_NAME}}_{{ defaults.spack_version }}'
