@@ -1,0 +1,20 @@
+packages:
+
+  openmpi:
+    variants:
+    - ~gpfs
+#    - +lustre
+
+  mpifileutils:
+    variants:
+    - ~gpfs
+    - +lustre
+
+  mvapich2:
+    variants:
+    - file_systems=lustre
+
+  fdb:
+    variants:
+    - backends=lustre
+
