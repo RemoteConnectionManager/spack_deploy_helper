@@ -11,13 +11,14 @@ ere the symlink file was located
 done
 ROOTPATH="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-
+touch ${TMPDIR}/add_external.yaml
+rm ${TMPDIR}/add_external.yaml
 for (( i=2; i <= "$#"; i++ )); do
 #    echo "arg position: ${i}"
 #    echo "arg value: ${!i}"
 
-    spack-python ${ROOTPATH}/add_external.py  ${!i} /tmp/add_external.yaml $1
+    spack-python ${ROOTPATH}/add_external.py  ${!i} ${TMPDIR}/add_external.yaml $1
 #    cat /tmp/add_external.yaml
-    spack config  --scope site add -f /tmp/add_external.yaml
+    spack config  --scope site add -f ${TMPDIR}/add_external.yaml
 done
 
