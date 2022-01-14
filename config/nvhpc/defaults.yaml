@@ -1,0 +1,12 @@
+defaults:
+  config_setup:
+    spack_commands:
+      # install newer gcc with nvptx and cuda
+      - 'export SYS_COMPILER_SPEC=$(spack-python {{DEPLOY_ROOTPATH}}/scripts/get_sys_compiler_spec.py); spack spec -I nvhpc%${SYS_COMPILER_SPEC} +mpi'
+      - 'export SYS_COMPILER_SPEC=$(spack-python {{DEPLOY_ROOTPATH}}/scripts/get_sys_compiler_spec.py); spack install nvhpc%${SYS_COMPILER_SPEC} +mpi'
+      # map new nvhpc compiler
+      - 'export dummy; spack load nvhpc; spack compiler find --scope site; spack unload nvhpc'
+
+      # define some build tools as external
+      - '/bin/bash {{DEPLOY_ROOTPATH}}/scripts/add_external.sh nvhpc autoconf automake cmake cuda'
+
