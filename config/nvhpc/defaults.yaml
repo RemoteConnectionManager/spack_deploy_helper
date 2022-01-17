@@ -1,7 +1,7 @@
 defaults:
   config_setup:
     spack_commands:
-      # install newer gcc with nvptx and cuda
+      # install latest available nvhpc including it's mpi
       - 'export SYS_COMPILER_SPEC=$(spack-python {{DEPLOY_ROOTPATH}}/scripts/get_sys_compiler_spec.py); spack spec -I nvhpc%${SYS_COMPILER_SPEC} +mpi'
       - 'export SYS_COMPILER_SPEC=$(spack-python {{DEPLOY_ROOTPATH}}/scripts/get_sys_compiler_spec.py); spack install nvhpc%${SYS_COMPILER_SPEC} +mpi'
       # map new nvhpc compiler
