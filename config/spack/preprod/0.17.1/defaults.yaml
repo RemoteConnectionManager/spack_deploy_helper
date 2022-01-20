@@ -1,4 +1,5 @@
 defaults:
+  spack_major_version : '0.17'
   spack_version : '0.17.1'
   upstream :
     master : "v0.17.1"
@@ -9,7 +10,7 @@ defaults:
         #already merged      - '25636' #gui support for vtk 9
 
   origin :
-    integration_branch: 'preprod_{{DEPLOY_PROJECT_NAME}}_{{ defaults.spack_version }}'
+    integration_branch: '{{ defaults.integration_type }}{{DEPLOY_WORKNAME}}_{{ defaults.spack_version }}'
     url : 'https://github.com/RemoteConnectionManager/spack.git'
     master: 'clean/{{ defaults.spack_version }}'
 
