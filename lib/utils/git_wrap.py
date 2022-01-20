@@ -103,6 +103,7 @@ class git_repo:
 
             return
 
+        #print("running-->"+str(cmd))
         (ret,output) = self.run(cmd)
 
     def checkout(self, branch, newbranch=None):
@@ -201,7 +202,7 @@ class git_repo:
 def get_branches(url, branch_pattern='.*?\s+refs/heads/(.*?)\s+', branch_format_string='{branch}', branch_selection=[]):
 
     cmd = ['git', 'ls-remote', url]
-    module_logger.debug("execute-->"+str(cmd)+"<<-")
+    module_logger.info("execute-->"+str(cmd)+"<<-")
     output = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
 
     headRE = re.compile(branch_pattern)
