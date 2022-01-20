@@ -1,6 +1,6 @@
 defaults:
   upstream :
-    url : 'https://github.com/LLNL/spack.git'
+    url : 'https://github.com/spack/spack.git'
     master : 'develop'
 
   base_env_dir: "{{DEPLOY_PARENT_ROOTPATH}}/environments"
