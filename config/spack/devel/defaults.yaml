@@ -1,10 +1,11 @@
 defaults:
+  spack_major_version : '0.17'
   spack_version : 'develop'
   upstream :
     master : "develop"
 
   origin :
-    integration_branch: '{{ defaults.integration_type }}{{ defaults.spack_version }}/{{DEPLOY_PROJECT_NAME}}_{{DEPLOY_WORKNAME}}'
+    integration_branch: '{{ defaults.integration_type }}{{DEPLOY_WORKNAME}}_{{ defaults.spack_version }}'
   upstream_rebase: 'True'
   upstream_update: 'True'
 
