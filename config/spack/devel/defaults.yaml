@@ -3,9 +3,17 @@ defaults:
   spack_version : 'develop'
   upstream :
     master : "develop"
+    prs :
+      #already merged - '24156' #modules: allow user to remove arch dir
+      #already merged - '24367' #modules: configurable module defaults
+      - '25727' #Modules: Allow spec formatting in suffixes
+        #already merged      - '25636' #gui support for vtk 9
 
   origin :
     integration_branch: '{{ defaults.integration_type }}{{DEPLOY_WORKNAME}}_{{ defaults.spack_version }}'
+    url : 'https://github.com/RemoteConnectionManager/spack.git'
+    master: 'clean/{{ defaults.spack_version }}'
+
   upstream_rebase: 'True'
   upstream_update: 'True'
 
