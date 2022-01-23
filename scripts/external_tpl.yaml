@@ -1,0 +1,7 @@
+packages:
+  ${NAME}:
+    externals:
+    - spec: ${NAME}@${VERSION}${VARIANTS}
+      prefix: ${PREFIX}
+      buildable: false
+
