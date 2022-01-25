@@ -1,7 +1,7 @@
 spack:
   definitions:
   - selected_openssl:
-    - ${OPENSSL_SPEC}
+    - ${openssl_SPEC}
   - tools:
     - cmake
     - git
@@ -10,13 +10,12 @@ spack:
     - automake
     - m4
     - patchelf
-    - emacs
 
   - all:
     - $selected_openssl
     - $tools
   - system_compiler:
-    - '%${COMPILER_SPEC}'
+    - '%${SYS_GCC}'
   specs:
   - matrix:
     - - $all
