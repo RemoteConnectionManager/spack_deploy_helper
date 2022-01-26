@@ -1,0 +1,21 @@
+spack:
+  definitions:
+  - selected_openssl:
+    - ${openssl_SPEC}
+  - tools:
+    - perl
+    - python
+    - emacs
+    - curl@7.79.0
+
+  - all:
+    - $selected_openssl
+    - $tools
+  - system_compiler:
+    - '%${SYS_GCC}'
+  specs:
+  - matrix:
+    - - $all
+    - - $system_compiler
+  view: false
+  concretization: together

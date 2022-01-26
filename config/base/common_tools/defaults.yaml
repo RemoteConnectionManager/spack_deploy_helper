@@ -1,0 +1,11 @@
+defaults:
+  config_setup:
+    spack_commands:
+      # build gnu common tools
+      # start the build scipt with output folder inside generated_envs
+      - '/bin/bash  {{DEPLOY_ROOTPATH}}/config/base/common_tools/build.sh {{DEPLOY_PARENT_PARENT_ROOTPATH}}/generated_envs/{{ defaults.spack_version }}_{{DEPLOY_WORKNAME}}/common_tools'
+      # define some common tools as external
+      - 'spack-python {{DEPLOY_ROOTPATH}}/scripts/select_spec.py --tplfile external_tpl.yaml  --outfile {{DEPLOY_PARENT_PARENT_ROOTPATH}}/generated_envs/{{ defaults.spack_version }}_{{DEPLOY_WORKNAME}}/config_external_common_tools.yaml --header packages: --add  python perl'
+      - 'spack config  --scope site add -f {{DEPLOY_PARENT_PARENT_ROOTPATH}}/generated_envs/{{ defaults.spack_version }}_{{DEPLOY_WORKNAME}}/config_external_common_tools.yaml'
+
+      #- '/bin/bash {{DEPLOY_ROOTPATH}}/scripts/add_external.sh gcc autoconf automake cmake '
