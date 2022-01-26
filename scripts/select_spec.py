@@ -102,6 +102,7 @@ if __name__ == '__main__':
     parser.add_argument("-c", "--compiler", help="compiler spec", default='')
     parser.add_argument('-e', "--external", metavar='spec', nargs='+', help='external specs')
     parser.add_argument('--add', action='store_true')
+    parser.add_argument( "--header", help="header string", default='')
     args = parser.parse_args()
 
     
@@ -152,6 +153,8 @@ if __name__ == '__main__':
         log.debug("substitutions:" + str(substitutions))
         outstring += string.Template( template).safe_substitute(substitutions) + '\n'
         
+    if args.header:
+        outstring = args.header + "\n" + outstring
     if args.outfile:
         if args.outfile[0] == '/':
             outfile = args.outfile

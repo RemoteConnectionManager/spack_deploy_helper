@@ -1,4 +1,3 @@
-packages:
   ${NAME}:
     externals:
     - spec: ${NAME}@${VERSION}${VARIANTS}

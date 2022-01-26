@@ -14,7 +14,7 @@ defaults:
       #- 'export DEPLOY_GCC_PREFIX=$(spack location -i gcc@10.2.0); spack compiler find --scope site $DEPLOY_GCC_PREFIX'
 
       # define cuda as external
-      - 'spack-python {{DEPLOY_ROOTPATH}}/scripts/select_spec.py --tplfile external_tpl.yaml  --outfile {{DEPLOY_PARENT_PARENT_ROOTPATH}}/generated_envs/{{ defaults.spack_version }}_{{DEPLOY_WORKNAME}}/config_external_cuda.yaml --add cuda' 
+      - 'spack-python {{DEPLOY_ROOTPATH}}/scripts/select_spec.py --tplfile external_tpl.yaml  --outfile {{DEPLOY_PARENT_PARENT_ROOTPATH}}/generated_envs/{{ defaults.spack_version }}_{{DEPLOY_WORKNAME}}/config_external_cuda.yaml --header packages: --add cuda' 
       - 'spack config  --scope site add -f {{DEPLOY_PARENT_PARENT_ROOTPATH}}/generated_envs/{{ defaults.spack_version }}_{{DEPLOY_WORKNAME}}/config_external_cuda.yaml'
 
       #- '/bin/bash {{DEPLOY_ROOTPATH}}/scripts/add_external.sh gcc@10.2.0 autoconf automake cmake cuda'
