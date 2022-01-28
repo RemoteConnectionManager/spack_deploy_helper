@@ -103,8 +103,10 @@ if __name__ == '__main__':
     parser.add_argument('-e', "--external", metavar='spec', nargs='+', help='external specs')
     parser.add_argument('--add', action='store_true')
     parser.add_argument( "--header", help="header string", default='')
+    parser.add_argument( "--loglevel", help="log level", default='warning')
     args = parser.parse_args()
 
+    log.setLevel(getattr(logging, args.loglevel.upper()))
     
     if args.add:
          log.info("Adding mode:")
