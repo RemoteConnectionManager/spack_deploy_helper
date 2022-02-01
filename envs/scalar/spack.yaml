@@ -1,0 +1,53 @@
+spack:
+  definitions:
+  - intel_libs:
+    - intel-oneapi-mkl
+
+  - gcc_libs:
+    - openblas
+    - netlib-xblas
+    - netlib-lapack
+
+  - compiler_libs: []
+
+  - libraries:
+    - boost
+    - fftw -mpi
+    - gsl
+    - hdf5 +hl +threadsafe -mpi
+    - metis
+    - netcdf-c -mpi 
+    - netcdf-fortran 
+    - zlib
+    - libszip
+    - cgal
+      #- libint tune=cp2k-lmax-7 +fortran
+      #- libint tune=molgw-lmax-7 +fortran
+
+  - tools:
+    - grib-api #deprecated, needs --deprecated in fetch
+    - cdo 
+    - proj
+#X11    - grads
+#X11    - gnuplot
+    - eccodes +fortran+openmp+netcdf   
+#binary only and proprietary    - gurobi
+#X11    - ncview 
+    - gmt +ffmpeg +gdal   ^json-c +ipo
+#X11    - grass +blas +lapack  +geos + gdal +zstd +sqlite +freetype 
+
+  - all:
+    - $libraries
+    - $tools
+    - $compiler_libs
+
+  - compilers: []
+
+  specs:
+  - matrix:
+    - - $all
+    - - $compilers
+
+  view: false
+  concretization: together
+

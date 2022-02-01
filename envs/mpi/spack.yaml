@@ -1,0 +1,53 @@
+spack:
+        #  packages:
+        #    slurm:
+        #      buildable: true
+
+  definitions:
+  - openmpi:
+    
+      #- openmpi +cuda +legacylaunchers +pmi ~gpfs +pmix fabrics=ucx schedulers=slurm
+      #^slurm +pmix  ^ucx +cuda+gdrcopy+thread_multiple
+      #- openmpi +cuda +legacylaunchers +pmi ~gpfs +pmix fabrics=ucx schedulers=slurm
+      #^slurm@2011.8.1 +pmix  ^ucx +cuda+gdrcopy+thread_multiple
+       
+    
+      #- openmpi +cuda+legacylaunchers+pmi~gpfs fabrics=ucx schedulers=slurm ^slurm@20.11.8  ^ucx
+      #+cuda+gdrcopy+thread_multiple ^pmix@2.2.3
+      #- openmpi +cuda+legacylaunchers+pmi~gpfs fabrics=ucx schedulers=slurm ^slurm@20.11.8  ^ucx
+      #+cuda+gdrcopy+thread_multiple
+    - openmpi
+    - netlib-scalapack
+    - netlib-lapack 
+  - intel_libs:
+    - intel-oneapi-mpi
+    - intel-oneapi-mkl
+
+  - compiler_libs: []
+
+  - libraries:
+    - adios
+    - boost +mpi 
+    - fftw 
+    - hdf5  +hl
+    - netcdf-c +mpi +parallel-netcdf
+    - parallel-netcdf 
+    - parmetis 
+    - py-mpi4py 
+    - cgal 
+      #- petsc +mpi   ^openmpi
+  - applications:
+    - nwchem
+  - all:
+    - $compiler_libs
+    - $libraries
+    - $applications
+
+  - compilers: []
+
+  specs:
+  - matrix:
+    - - $all
+    - - $compilers
+  view: false
+  concretization: together

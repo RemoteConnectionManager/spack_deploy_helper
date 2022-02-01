@@ -25,3 +25,8 @@ defaults:
       # define some build tools as external
       #- '/bin/bash {{DEPLOY_ROOTPATH}}/scripts/add_external.sh oneapi autoconf automake cmake '
 
+      # generate environments
+      - '{{DEPLOY_ROOTPATH}}/envs/build.sh scalar {{DEPLOY_PARENT_PARENT_ROOTPATH}}/generated_envs/{{ defaults.spack_version }}_{{DEPLOY_WORKNAME}} intel intel-oneapi-mkl'
+      - '{{DEPLOY_ROOTPATH}}/envs/build.sh scalar {{DEPLOY_PARENT_PARENT_ROOTPATH}}/generated_envs/{{ defaults.spack_version }}_{{DEPLOY_WORKNAME}} oneapi intel-oneapi-mkl'
+      - '{{DEPLOY_ROOTPATH}}/envs/build.sh mpi {{DEPLOY_PARENT_PARENT_ROOTPATH}}/generated_envs/{{ defaults.spack_version }}_{{DEPLOY_WORKNAME}} intel intel-oneapi-mpi  intel-oneapi-mkl'
+      - '{{DEPLOY_ROOTPATH}}/envs/build.sh mpi {{DEPLOY_PARENT_PARENT_ROOTPATH}}/generated_envs/{{ defaults.spack_version }}_{{DEPLOY_WORKNAME}} oneapi intel-oneapi-mpi  intel-oneapi-mkl'
