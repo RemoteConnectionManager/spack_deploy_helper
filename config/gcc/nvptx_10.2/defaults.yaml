@@ -24,6 +24,6 @@ defaults:
       #- '/bin/bash {{DEPLOY_ROOTPATH}}/scripts/add_external.sh nvhpc cuda'
 
       # generate environments
-      - '{{DEPLOY_ROOTPATH}}/envs/build.sh scalar {{DEPLOY_PARENT_PARENT_ROOTPATH}}/generated_envs/{{ defaults.spack_version }}_{{DEPLOY_WORKNAME}} gcc openblas netlib-xblas netlib-lapack'
+      - '{{DEPLOY_ROOTPATH}}/envs/build.sh serial {{DEPLOY_PARENT_PARENT_ROOTPATH}}/generated_envs/{{ defaults.spack_version }}_{{DEPLOY_WORKNAME}} gcc openblas netlib-xblas netlib-lapack'
       - '{{DEPLOY_ROOTPATH}}/envs/build.sh mpi {{DEPLOY_PARENT_PARENT_ROOTPATH}}/generated_envs/{{ defaults.spack_version }}_{{DEPLOY_WORKNAME}} gcc openmpi netlib-scalapack netlib-lapack'
 
