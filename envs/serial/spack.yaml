@@ -25,7 +25,7 @@ spack:
       #- libint tune=molgw-lmax-7 +fortran
 
   - tools:
-    - grib-api #deprecated, needs --deprecated in fetch
+#    - grib-api #deprecated, needs --deprecated in fetch
     - cdo 
     - proj
 #X11    - grads
