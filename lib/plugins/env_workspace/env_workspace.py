@@ -65,6 +65,7 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                      cache='cache',
                      install='install',
                      modules='modules',
+                     user_cache='user_cache',
                      spack_commands=[],
                      clearconfig=True,
                      runconfig=False):
@@ -74,6 +75,10 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         current_key_subst['DEPLOY_SPACK_CACHE'] = cache
         current_key_subst['DEPLOY_SPACK_INSTALL'] = install
         current_key_subst['DEPLOY_SPACK_MODULES'] = modules
+        if user_cache :
+            current_key_subst['DEPLOY_SPACK_USER_CACHE_PATH'] = user_cache
+            os.environ['SPACK_USER_CACHE_PATH'] = user_cache
+            self.logger.warning("Spack commands should use SPACK_USER_CACHE_PATH  to: " + user_cache)
         for subst_key in current_key_subst:
             utils.hiyapyco.jinja2env.globals[subst_key] = current_key_subst[subst_key]
 

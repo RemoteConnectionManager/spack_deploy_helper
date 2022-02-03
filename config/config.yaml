@@ -10,6 +10,5 @@ config:
   install_tree:
     root: "{{DEPLOY_SPACK_INSTALL}}"
 
-  misc_cache: "{{DEPLOY_SPACK_INSTALL}}/__misc_cache"
 
 
