@@ -19,6 +19,7 @@ spack:
     - openmpi
     - netlib-scalapack
     - netlib-lapack 
+    - fftw 
   - intel_libs:
     - intel-oneapi-mpi
     - intel-oneapi-mkl
@@ -28,7 +29,6 @@ spack:
   - libraries:
     - adios
     - boost +mpi 
-    - fftw 
     - hdf5  +hl
     - netcdf-c +mpi +parallel-netcdf
     - parallel-netcdf 
@@ -36,11 +36,14 @@ spack:
     - py-mpi4py 
     - cgal 
       #- petsc +mpi   ^openmpi
+  - benchmarks:
+    - osu-micro-benchmarks
   - applications:
     - nwchem
   - all:
     - $compiler_libs
     - $libraries
+    - $benchmarks
     - $applications
 
   - compilers: []
