@@ -8,6 +8,7 @@ spack:
     - netlib-xblas
     - netlib-lapack
 
+
   - compiler_libs: []
 
   - libraries:
@@ -26,7 +27,6 @@ spack:
 
   - tools:
 #    - grib-api #deprecated, needs --deprecated in fetch
-    - cdo 
     - proj
 #X11    - grads
 #X11    - gnuplot
