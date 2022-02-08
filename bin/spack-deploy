@@ -22,9 +22,12 @@ import sys
 import argparse
 import copy
 import logging
+import inspect
 
 
 # set prefix.
+try: __file__
+except NameError: __file__ = os.path.abspath(inspect.getfile(lambda: None))
 current_file = os.path.realpath(os.path.expanduser(__file__))
 current_prefix = os.path.dirname(os.path.dirname(current_file))
 
