@@ -121,6 +121,7 @@ if __name__ == '__main__':
         compspecs = select_compiler(args.compiler, sysinstalled=False)
         if len(compspecs) > 0:
             compilers_subst['COMPILER'] = compspecs[0] 
+            compilers_subst['COMPILER_NAME'] = compspecs[0].split('@')[0] 
 
     template=args.tplstr
     tpldir=''
@@ -162,11 +163,20 @@ if __name__ == '__main__':
             outfile = args.outfile
         else:
             #if not absolute, outfile is relative to template file if template file exists otherwise to scriptfile
-            if tpldir:
-                outfile = os.path.join(tpldir,args.outfile)
-            else:
+            if not tpldir:
+                tpldir = os.path.dirname(os.path.abspath(inspect.getfile(lambda: None)))
+            try:
+                generated_envs_dir = os.path.join(
+                                         os.path.dirname(os.path.dirname(os.environ['SPACK_USER_CACHE_PATH'])),
+                                         'generated_envs',
+                                         os.path.basename(os.environ['SPACK_USER_CACHE_PATH']))
+                outfile = os.path.join(generated_envs_dir,args.outfile)
+            except Exception as e:
+                log.debug("generated_envs failed:" + str(e))
                 outfile = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(lambda: None))),args.outfile)
+        os.makedirs(os.path.dirname(outfile), mode = 0o755, exist_ok = True)
         with open(outfile,'w') as out:
             out.write(outstring)
+        print(outfile)
     else:
         print(outstring)
