@@ -1,47 +1,57 @@
 spack:
   definitions:
-  - intel_libs:
-    - intel-oneapi-mkl
-
-  - gcc_libs:
-    - openblas
-    - netlib-xblas
-    - netlib-lapack
-
-
-  - compiler_libs: []
-
   - libraries:
     - boost
     - fftw -mpi
     - gsl
     - hdf5 +hl +threadsafe -mpi
     - metis
-    - netcdf-c -mpi 
-    - netcdf-fortran 
+    - netcdf-c -mpi
+    - netcdf-fortran
     - zlib
     - libszip
     - cgal
       #- libint tune=cp2k-lmax-7 +fortran
       #- libint tune=molgw-lmax-7 +fortran
 
+  - libraries_gcc:
+    - openblas
+    - netlib-xblas
+    - netlib-lapack
+
+  - libraries_intel:
+    - intel-oneapi-mkl
+
+  - libraries_oneapi:
+    - intel-oneapi-mkl
+
   - tools:
 #    - grib-api #deprecated, needs --deprecated in fetch
     - proj
 #X11    - grads
 #X11    - gnuplot
-    - eccodes +fortran+openmp+netcdf   
+    - eccodes +fortran+openmp+netcdf
 #binary only and proprietary    - gurobi
 #X11    - ncview 
     - gmt +ffmpeg +gdal   ^json-c +ipo
 #X11    - grass +blas +lapack  +geos + gdal +zstd +sqlite +freetype 
 
+ #currently compiles only for gcc, so is just here
+  - tools_gcc:
+    - cdo
+
+  - tools_intel: []
+    
+  - tools_oneapi: []
+    
+###########    changes for compilers happens here #############
+  - compilers: ['%${COMPILER}']
   - all:
     - $libraries
     - $tools
-    - $compiler_libs
-
-  - compilers: []
+    - $libraries_${COMPILER_NAME}
+    - $tools_${COMPILER_NAME}
+###############################################################
 
   specs:
   - matrix:
@@ -50,4 +60,3 @@ spack:
 
   view: false
   concretization: together
-

@@ -4,28 +4,6 @@ spack:
         #      buildable: true
 
   definitions:
-  - openmpi:
-    
-      #- openmpi +cuda +legacylaunchers +pmi ~gpfs +pmix fabrics=ucx schedulers=slurm
-      #^slurm +pmix  ^ucx +cuda+gdrcopy+thread_multiple
-      #- openmpi +cuda +legacylaunchers +pmi ~gpfs +pmix fabrics=ucx schedulers=slurm
-      #^slurm@2011.8.1 +pmix  ^ucx +cuda+gdrcopy+thread_multiple
-       
-    
-      #- openmpi +cuda+legacylaunchers+pmi~gpfs fabrics=ucx schedulers=slurm ^slurm@20.11.8  ^ucx
-      #+cuda+gdrcopy+thread_multiple ^pmix@2.2.3
-      #- openmpi +cuda+legacylaunchers+pmi~gpfs fabrics=ucx schedulers=slurm ^slurm@20.11.8  ^ucx
-      #+cuda+gdrcopy+thread_multiple
-    - openmpi
-    - netlib-scalapack
-    - netlib-lapack 
-    - fftw 
-  - intel_libs:
-    - intel-oneapi-mpi
-    - intel-oneapi-mkl
-
-  - compiler_libs: []
-
   - libraries:
     - adios
     - boost +mpi 
@@ -36,17 +14,50 @@ spack:
     - py-mpi4py 
     - cgal 
       #- petsc +mpi   ^openmpi
+
+  - libraries_gcc:
+      #- openmpi +cuda +legacylaunchers +pmi ~gpfs +pmix fabrics=ucx schedulers=slurm
+      #^slurm +pmix  ^ucx +cuda+gdrcopy+thread_multiple
+      #- openmpi +cuda +legacylaunchers +pmi ~gpfs +pmix fabrics=ucx schedulers=slurm
+      #^slurm@2011.8.1 +pmix  ^ucx +cuda+gdrcopy+thread_multiple
+      #- openmpi +cuda+legacylaunchers+pmi~gpfs fabrics=ucx schedulers=slurm ^slurm@20.11.8  ^ucx
+      #+cuda+gdrcopy+thread_multiple ^pmix@2.2.3
+      #- openmpi +cuda+legacylaunchers+pmi~gpfs fabrics=ucx schedulers=slurm ^slurm@20.11.8  ^ucx
+      #+cuda+gdrcopy+thread_multiple
+    - openmpi
+    - netlib-scalapack
+    - netlib-lapack 
+    - fftw 
+
+  - libraries_intel:
+    - intel-oneapi-mpi
+    - intel-oneapi-mkl
+
+  - libraries_oneapi:
+    - intel-oneapi-mpi
+    - intel-oneapi-mkl
+
+  - applications: []
+
+  - applications_gcc: 
+    - nwchem
+
+  - applications_intel: []
+
+  - applications_oneapi: []
+
   - benchmarks:
     - osu-micro-benchmarks
-  - applications:
-    - nwchem
-  - all:
-    - $compiler_libs
-    - $libraries
-    - $benchmarks
-    - $applications
 
-  - compilers: []
+###########    changes for compilers happens here #############
+  - compilers: ['%${COMPILER}']
+  - all:
+    - $libraries
+    - $libraries_${COMPILER_NAME}
+    - $applications
+    - $applications_${COMPILER_NAME}
+    - $benchmarks
+###############################################################
 
   specs:
   - matrix:
