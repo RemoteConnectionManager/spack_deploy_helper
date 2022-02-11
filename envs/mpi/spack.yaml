@@ -40,7 +40,8 @@ spack:
   - applications: 
     - plumed@2.7.2
     - gromacs +mpi+openmp+plumed +lapack
-    - cp2k +mpi+elpa+plumed lmax=6 
+      #- cp2k +mpi+elpa+plumed lmax=6 
+    - namd 
 
   - applications_gcc: 
     - nwchem
