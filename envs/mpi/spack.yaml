@@ -41,13 +41,13 @@ spack:
     - plumed@2.7.2
     - gromacs +mpi+openmp+plumed +lapack
       #- cp2k +mpi+elpa+plumed lmax=6 
-    - namd 
 
   - applications_gcc: 
     - nwchem
 
-  - applications_intel: []
-
+  - applications_intel: 
+    #- namd fftw=mkl ^charmpp  backend=mpi pmi=slurmpmi2  ^slurm@20-11-8-1 +pmix 
+    - namd fftw=mkl -cuda ^charmpp  backend=mpi -cuda 
   - applications_oneapi: []
 
   - benchmarks:
