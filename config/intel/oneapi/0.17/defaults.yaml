@@ -1,0 +1,5 @@
+defaults:
+  origin:
+    branches:
+      - 'packages/0.16/base/intel_onapi_fixes'
+      - 'packages/0.17/fix_boost_intel_on_compute_nodes'
