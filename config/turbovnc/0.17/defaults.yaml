@@ -1,10 +1,10 @@
 defaults:
   origin :
     branches :
-      - 'packages/0.16/turbovnc'
-      - 'packages/0.16/libjpeg-turbo'
-      - 'packages/0.16/xkeyboard-config'
-      - 'packages/0.16/xkbcomp'
+      - 'packages/0.17/turbovnc'
+      - 'packages/0.17/libjpeg-turbo'
+      - 'packages/0.17/xkeyboard-config'
+      - 'packages/0.17/xkbcomp'
 
 
 
