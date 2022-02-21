@@ -1,8 +1,29 @@
 import sys
 import string
 import logging
+import errno
+import os
+import os.path
 
 exclude_variants=['build_type','languages','patches']
+
+def makedirs(folder, *args, **kwargs):
+  try:
+    return os.makedirs(folder, exist_ok=True, *args, **kwargs)
+  except TypeError: 
+    # Unexpected arguments encountered 
+    pass
+
+  try:
+    # Should work is TypeError was caused by exist_ok, eg., Py2
+    return os.makedirs(folder, *args, **kwargs)
+  except OSError as e:
+    if e.errno != errno.EEXIST:
+      raise
+
+    if os.path.isfile(folder):
+      # folder is a file, raise OSError just like os.makedirs() in Py3
+      raise
 
 def extended_version(in_spec):
     deps_version = str(in_spec.version)
@@ -174,7 +195,7 @@ if __name__ == '__main__':
             except Exception as e:
                 log.debug("generated_envs failed:" + str(e))
                 outfile = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(lambda: None))),args.outfile)
-        os.makedirs(os.path.dirname(outfile), mode = 0o755, exist_ok = True)
+        makedirs(os.path.dirname(outfile), mode = 0o755)
         with open(outfile,'w') as out:
             out.write(outstring)
         print(outfile)
