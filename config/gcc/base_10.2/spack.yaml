@@ -1,0 +1,12 @@
+spack:
+  definitions:
+  - all:
+    - gcc@10.2.0 
+  - system_compiler:
+    - '%${SYS_GCC}'
+  specs:
+  - matrix:
+    - - $all
+    - - $system_compiler
+  view: false
+  concretization: together

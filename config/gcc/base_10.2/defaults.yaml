@@ -1,0 +1,10 @@
+defaults:
+  config_setup:
+    spack_commands:
+      - '/bin/bash  {{DEPLOY_ROOTPATH}}/config/gcc/base_10.2/build.sh {{DEPLOY_PARENT_PARENT_ROOTPATH}}/generated_envs/{{ defaults.spack_version }}_{{DEPLOY_WORKNAME}}/base_10.2'
+      - 'export DEPLOY_GCC_PREFIX=$(spack-python {{DEPLOY_ROOTPATH}}/scripts/select_spec.py --tplfile prefix_tpl.yaml --add gcc@10.2.0); spack compiler find --scope site $DEPLOY_GCC_PREFIX'
+
+      # generate environments
+      - '{{DEPLOY_ROOTPATH}}/envs/build.sh serial gcc'
+      - '{{DEPLOY_ROOTPATH}}/envs/build.sh mpi gcc'
+
