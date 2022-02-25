@@ -4,6 +4,8 @@ import logging
 import errno
 import os
 import os.path
+import json
+import re
 
 exclude_variants=['build_type','languages','patches']
 
@@ -106,6 +108,43 @@ def spec_subst(spec_tuple, named_subst=False, compiler_spec=''):
         }
     return(substitutions)
 
+
+
+def installed_root_specs(env_lockfile, onlyroot=True):
+
+    with open(env_lockfile, 'r') as f:
+        data = json.load(f)
+    root_specs=data["roots"]
+    conc_specs=data["concrete_specs"]
+    root_spec_hashes = {}
+    for c in conc_specs:
+        if conc_specs[c]['name'] in [re.split('%|@| ', r['spec'])[0] for r in root_specs]:
+            prefixes = [s.prefix for s in spack.store.db.query(conc_specs[c]['name']) if s.build_hash() == c ]
+            print(conc_specs[c]['name'] + " - " + c + ' - ' + str([s._hash for s in spack.store.db.query(conc_specs[c]['name']) ]))
+            #prefixes = [s.prefix + ' '+s._hash for s in spack.store.db.query(conc_specs[c]['name']) if  not s.external]
+            if len(prefixes) == 1:
+                root_spec_hashes[c] = (
+                    conc_specs[c]['name'],
+                    prefixes[0],
+                    conc_specs[c]['version'],
+                    '',
+                    conc_specs[c]['name'] + '@' + conc_specs[c]['version'] +
+                    '%' + conc_specs[c]['compiler']['name'] + '@' + conc_specs[c]['compiler']['version']
+                )
+                print(root_spec_hashes[c])     
+    return root_spec_hashes
+
+#    root_spec_hashes = [
+#        (c , { 'name' : conc_specs[c]['name'],
+#               'version' : conc_specs[c]['version'],
+#               'compiler' : conc_specs[c]['compiler']['name'] + '@' + conc_specs[c]['compiler']['version']
+#             }
+#        )
+#        for c in conc_specs if conc_specs[c]['name'] in [re.split('%|@| ', r['spec'])[0] for r in root_specs]]
+#    for spec_hash in root_spec_hashes:
+#        [spec_hash]['prefixes'] = [s.prefix for s in spack.store.db.query(root_spec_hashes[spec_hash]['name']) if s._hash == spec_hash and not s.external]
+
+
 if __name__ == '__main__':
     import argparse
     import os
@@ -122,6 +161,7 @@ if __name__ == '__main__':
     parser.add_argument("-o", "--outfile", help="output file", default='')
     parser.add_argument("-c", "--compiler", help="compiler spec", default='')
     parser.add_argument('-e', "--external", metavar='spec', nargs='+', help='external specs')
+    parser.add_argument("-l", "--lockfile", help="lockfile file to parse for installed specs", default='')
     parser.add_argument('--add', action='store_true')
     parser.add_argument( "--header", help="header string", default='')
     parser.add_argument( "--loglevel", help="log level", default='warning')
@@ -162,16 +202,23 @@ if __name__ == '__main__':
     if args.external:
         for spec in args.external:
             common_subst.update( spec_subst(get_external_spec(spec), named_subst=True)  )
-    
+     
     substitutions = common_subst.copy()
+    specs_list = []
     for spec in args.specs:
+        specs_list.append(select_spec(spec))
+    if args.lockfile:
+        installed_specs=installed_root_specs(args.lockfile) 
+        for s in installed_specs:
+            specs_list.append(installed_specs[s])
+    for spec in specs_list:
         if args.add:
             substitutions = common_subst.copy()
-            substitutions.update( spec_subst(select_spec(spec)) )
+            substitutions.update( spec_subst(spec) )
             log.debug("substitutions:" + str(substitutions))
             outstring += string.Template( template).safe_substitute(substitutions) + '\n'
         else:
-            substitutions.update( spec_subst(select_spec(spec), named_subst=True ))
+            substitutions.update( spec_subst(spec, named_subst=True ))
 
     if not args.add:
         log.debug("substitutions:" + str(substitutions))
