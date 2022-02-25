@@ -118,9 +118,12 @@ def installed_root_specs(env_lockfile, onlyroot=True):
     conc_specs=data["concrete_specs"]
     root_spec_hashes = {}
     for c in conc_specs:
-        if conc_specs[c]['name'] in [re.split('%|@| ', r['spec'])[0] for r in root_specs]:
-            prefixes = [s.prefix for s in spack.store.db.query(conc_specs[c]['name']) if s.build_hash() == c ]
-            print(conc_specs[c]['name'] + " - " + c + ' - ' + str([s._hash for s in spack.store.db.query(conc_specs[c]['name']) ]))
+        # if onlyroot process only root specs
+        if not onlyroot or  conc_specs[c]['name'] in [re.split('%|@| ', r['spec'])[0] for r in root_specs]:
+            #conc_specs[c]['hash'] is the hash reported on json that match the one reported on find -l, that should be s._hash
+            #so prefixes should get collected for installed specs that match spack.lock
+            prefixes = [s.prefix for s in spack.store.db.query(conc_specs[c]['name']) if s._hash == conc_specs[c]['hash'] ]
+            #print(conc_specs[c]['name'] + " - " + conc_specs[c]['hash'] + ' - ' + str([s._hash for s in spack.store.db.query(conc_specs[c]['name']) ]))
             #prefixes = [s.prefix + ' '+s._hash for s in spack.store.db.query(conc_specs[c]['name']) if  not s.external]
             if len(prefixes) == 1:
                 root_spec_hashes[c] = (
@@ -131,18 +134,8 @@ def installed_root_specs(env_lockfile, onlyroot=True):
                     conc_specs[c]['name'] + '@' + conc_specs[c]['version'] +
                     '%' + conc_specs[c]['compiler']['name'] + '@' + conc_specs[c]['compiler']['version']
                 )
-                print(root_spec_hashes[c])     
+                #print(root_spec_hashes[c])     
     return root_spec_hashes
-
-#    root_spec_hashes = [
-#        (c , { 'name' : conc_specs[c]['name'],
-#               'version' : conc_specs[c]['version'],
-#               'compiler' : conc_specs[c]['compiler']['name'] + '@' + conc_specs[c]['compiler']['version']
-#             }
-#        )
-#        for c in conc_specs if conc_specs[c]['name'] in [re.split('%|@| ', r['spec'])[0] for r in root_specs]]
-#    for spec_hash in root_spec_hashes:
-#        [spec_hash]['prefixes'] = [s.prefix for s in spack.store.db.query(root_spec_hashes[spec_hash]['name']) if s._hash == spec_hash and not s.external]
 
 
 if __name__ == '__main__':
@@ -162,7 +155,9 @@ if __name__ == '__main__':
     parser.add_argument("-c", "--compiler", help="compiler spec", default='')
     parser.add_argument('-e', "--external", metavar='spec', nargs='+', help='external specs')
     parser.add_argument("-l", "--lockfile", help="lockfile file to parse for installed specs", default='')
-    parser.add_argument('--add', action='store_true')
+    parser.add_argument('--add', action='store_true', help="concatenate template instead that collecting substitutions")
+    parser.add_argument('--onlyroot', action='store_true', help="extract only root specs from lockfile")
+    parser.add_argument('--lockfile_select', action='store_true', help="spec specified as arguments are considered a selection from spec present in lockfile")
     parser.add_argument( "--header", help="header string", default='')
     parser.add_argument( "--loglevel", help="log level", default='warning')
     args = parser.parse_args()
@@ -204,13 +199,22 @@ if __name__ == '__main__':
             common_subst.update( spec_subst(get_external_spec(spec), named_subst=True)  )
      
     substitutions = common_subst.copy()
-    specs_list = []
-    for spec in args.specs:
-        specs_list.append(select_spec(spec))
+    args_specs_list = [select_spec(spec) for spec in args.specs]
+
     if args.lockfile:
-        installed_specs=installed_root_specs(args.lockfile) 
-        for s in installed_specs:
-            specs_list.append(installed_specs[s])
+        installed_specs=installed_root_specs(args.lockfile, onlyroot=args.onlyroot) 
+        if args.lockfile_select:
+            specs_list = []
+            args_specs_list_names = [t[0] for t in args_specs_list]
+            for s in installed_specs:
+                if installed_specs[s][0] in args_specs_list_names:
+                    specs_list.append(installed_specs[s])
+        else:
+            specs_list = args_specs_list
+            for s in installed_specs:
+                specs_list.append(installed_specs[s])
+    else:
+        specs_list = args_specs_list
     for spec in specs_list:
         if args.add:
             substitutions = common_subst.copy()
