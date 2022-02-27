@@ -1,4 +1,8 @@
 spack:
+  packages:
+    cuda:
+      externals:: []
+
   definitions:
   - all:
     - gcc@10.2.0 +nvptx ~bootstrap
