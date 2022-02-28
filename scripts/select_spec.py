@@ -185,7 +185,9 @@ if __name__ == '__main__':
         if args.tplfile[0] == '/':
             tplfile = args.tplfile
         else:
-            tplfile = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(lambda: None))),args.tplfile)
+            tplfile = os.path.normalize(os.path.join(os. getcwd(),tplfile))
+            if not os.path.exists(tplfile):
+                tplfile = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(lambda: None))),args.tplfile)
         try:
             with open(tplfile) as f:
                 template = f.read()
