@@ -2,18 +2,42 @@ spack:
   definitions:
   - selected_openssl:
     - ${openssl_SPEC}
-  - tools:
-    - cmake
+
+  - othertools:
     - git
     - perl
+    - patchelf
+
+  - utils:
+    - libtool
+    - bison
+    - diffutils
+    - pkgconf
+
+  - assemblers:
+    - nasm
+    - yasm
+
+  - autotools:
     - autoconf
+    - autoconf-archive
     - automake
     - m4
-    - patchelf
+    - texinfo
+    - gmake
+
+  - cmaketools:
+    - cmake
+    - ninja
 
   - all:
     - $selected_openssl
-    - $tools
+    - $autotools
+    - $cmaketools
+    - $othertools
+    - $utils
+    - $assemblers
+
   - system_compiler:
     - '%${SYS_GCC}'
   specs:
