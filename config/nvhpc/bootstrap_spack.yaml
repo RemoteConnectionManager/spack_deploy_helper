@@ -1,0 +1,4 @@
+spack:
+  definitions:
+  - all:
+    - nvhpc +mpi

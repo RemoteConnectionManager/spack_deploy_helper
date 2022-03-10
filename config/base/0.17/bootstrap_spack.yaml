@@ -1,0 +1,13 @@
+spack:
+  definitions:
+  - selected_openssl:
+    - ${openssl_SPEC}
+
+  - system_compiler:
+    - '${SYS_GCC}'
+  specs:
+  - matrix:
+    - - $all
+    - - $%system_compiler
+  view: false
+  concretization: together

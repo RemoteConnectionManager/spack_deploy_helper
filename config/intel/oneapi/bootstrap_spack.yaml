@@ -1,0 +1,15 @@
+spack:
+  packages:
+    intel-oneapi-mpi:
+      externals:: []
+    intel-oneapi-mkl:
+      externals:: []
+    intel-oneapi-vtune:
+      externals:: []
+
+  definitions:
+  - all:
+    - intel-oneapi-compilers
+    - intel-oneapi-mpi
+    - intel-oneapi-mkl
+    - intel-oneapi-vtune
