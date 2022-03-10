@@ -372,10 +372,12 @@ def argparse_add_arguments(parser,argument_dict):
             else:
                 if arguments['action'] == 'store_true':
                     arguments['default'] = eval(d)
+                    parser.add_argument('--no-' + a, action='store_false', dest=a)
                 else:
                     arguments['default'] = str(d)
 
         parser.add_argument('--' + a, **arguments)
+
 
 
 def merge_config(merge_conf, base_conf=dict(), nested_keys=[]):
@@ -649,6 +651,10 @@ class ArgparseSubcommandManager(object):
                 # print("add subparser ",name,method,par," :::"+str(arguments))
                 if 'default' in arguments:
                     self.methods_subparsers[method].add_argument('--' + par, **arguments)
+                    if 'action' in arguments:
+                        if arguments['action'] == 'store_true':
+                            self.methods_subparsers[method].add_argument('--no-' + par, action='store_false', dest=par )
+
                 else:
                     self.methods_subparsers[method].add_argument(par, **arguments)
 
