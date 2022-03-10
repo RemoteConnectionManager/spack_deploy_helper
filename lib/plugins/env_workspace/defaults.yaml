@@ -13,6 +13,11 @@ defaults:
   config_setup:
     spack_commands: 
      - 'spack config get config'
+  generate_env:
+    spackfile: 'bootstrap_spack.yaml'
+    headerfile: "{{DEPLOY_PARENT_ROOTPATH}}/setup.sh"
+    pre_commands: 
+     - 'spack config get config'
 
 
 
@@ -85,6 +90,51 @@ argparse:
             default: "{{ defaults.config_setup.spack_commands }}"
             help: 'spack commands to execute for configuring spack root'
 
+        generate_env:
+          spack_root:
+            action: 'store'
+            default: "{{ defaults.git_dest_dir }}"
+            help: 'folder where is spack instance (cloned) if start with / considered absolute, otherwise considered relative to workdir'
+          clearconfig :
+            action: 'store_true'
+            default : "{{ defaults.clearconfig }}"
+            help: 'clear existing spack configurations'
+          separate_files :
+            action: 'store_true'
+            default : "{{ defaults.separate_files }}"
+            help: 'write separate build files'
+          outdir:
+            action: 'store'
+            default: "{{DEPLOY_GENERATED_DIR}}"
+            help: 'folder where put generated files'
+          headerfile :
+            action: 'store'
+            default: "{{ defaults.generate_env.headerfile }}"
+            help: 'File to be copied as header at top of build outfile'
+          spackfile :
+            action: 'store'
+            default: "{{ defaults.generate_env.spackfile }}"
+            help: 'Envirot filenames inside merge_config_folders to be merged into a template environment spack file'
+          merge_config_folders :
+            action: 'store'
+            help: 'List of config folders to merge and substitute into out_config_dir'
+            default : '{{ defaults.merge_config_folders }}'
+          user_cache:
+            action: 'store'
+            default: "{{ defaults.user_cache }}"
+            help: 'folder where put user cache, if start with / considered absolute, otherwise considered relative to dest'
+          pre_commands:
+            action: 'store'
+            default: "{{ defaults.generate_env.pre_commands }}"
+            help: 'spack commands to execute before build env to configure spack root'
+          build_commands:
+            action: 'store'
+            default: "{{ defaults.generate_env.build_commands }}"
+            help: 'spack commands to execute for build env to configure spack root'
+          post_commands:
+            action: 'store'
+            default: "{{ defaults.generate_env.post_commands }}"
+            help: 'spack commands to execute after build env to configure spack root'
 
 logging_configs:
   loggers:
