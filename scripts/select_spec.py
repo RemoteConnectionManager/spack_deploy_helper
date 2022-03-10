@@ -6,6 +6,7 @@ import os
 import os.path
 import json
 import re
+import spack
 
 exclude_variants=['build_type','languages','patches']
 
@@ -41,14 +42,13 @@ def select_compiler(comp_spec, sysinstalled=True):
 
 def select_spec(in_spec):
     
-    logging.basicConfig(format='%(message)s')
     log = logging.getLogger(__name__)
     package_available_versions = spack.repo.get(in_spec).versions.keys()
     installed_specs = spack.store.db.query(in_spec)
     matching_specs=sorted([s for s in installed_specs if not s.external and s.version in package_available_versions], reverse=True, key=lambda spc: extended_version(spc))
     if len(matching_specs) == 0:
         log.error('no matching installed spec to ' + in_spec)
-        exit(1)
+        return(None)
     if len(matching_specs) > 1:
         log.warning("multiple matching installed spec to " + in_spec)
         log.debug(str(matching_specs))
@@ -137,12 +137,35 @@ def installed_root_specs(env_lockfile, onlyroot=True):
                 #print(root_spec_hashes[c])     
     return root_spec_hashes
 
+def map_intel_compilers(oneapi_prefix, gcc_prefix=''):
+    postfix1='compiler/latest/linux/bin/intel64'
+    postfix2='compiler/latest/linux/bin'
+    gcc_flags_schema={
+             'cflags': ('-gcc-name=','cc'),
+             'cxxflags': ('-gxx-name=','cxx'),
+             'fflags': ('-gcc-name=','cc')}
+
+    intel_compilers = spack.compilers.find_new_compilers([os.path.join(oneapi_prefix,postfix1),os.path.join(oneapi_prefix,postfix2)], scope=None)
+    flags={}
+    if gcc_prefix:
+        gcc_compilers = spack.compilers.find_new_compilers([gcc_prefix], scope=None)
+        if gcc_compilers:
+            for f in gcc_flags_schema:
+                 flags[f] = gcc_flags_schema[f][0] + spack.compilers._to_dict(gcc_compilers[0])['compiler']['paths'][gcc_flags_schema[f][1]]
+    intel_compilers_config=[]
+    for intel_compiler in intel_compilers:
+        compiler_dict = spack.compilers._to_dict(intel_compiler)
+        compiler_dict['compiler']['flags']=flags
+        intel_compilers_config.append(compiler_dict)
+    return(intel_compilers_config)
+
 
 if __name__ == '__main__':
     import argparse
     import os
     import inspect
 
+    logging.basicConfig(format='%(message)s')
     log = logging.getLogger(__name__)
 
     parser = argparse.ArgumentParser()
@@ -157,7 +180,10 @@ if __name__ == '__main__':
     parser.add_argument("-l", "--lockfile", help="lockfile file to parse for installed specs", default='')
     parser.add_argument('--add', action='store_true', help="concatenate template instead that collecting substitutions")
     parser.add_argument('--onlyroot', action='store_true', help="extract only root specs from lockfile")
-    parser.add_argument('--lockfile_select', action='store_true', help="spec specified as arguments are considered a selection from spec present in lockfile")
+    parser.add_argument('--lockfile_option',
+                         choices=('add','select','exclude'),
+                         default='select',
+                        help="option deciding how spec specified as arguments are combined with selection from spec extracted from lockfile")
     parser.add_argument( "--header", help="header string", default='')
     parser.add_argument( "--loglevel", help="log level", default='warning')
     args = parser.parse_args()
@@ -185,7 +211,7 @@ if __name__ == '__main__':
         if args.tplfile[0] == '/':
             tplfile = args.tplfile
         else:
-            tplfile = os.path.normalize(os.path.join(os. getcwd(),tplfile))
+            tplfile = os.path.normpath(os.path.join(os. getcwd(),args.tplfile))
             if not os.path.exists(tplfile):
                 tplfile = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(lambda: None))),args.tplfile)
         try:
@@ -205,13 +231,14 @@ if __name__ == '__main__':
 
     if args.lockfile:
         installed_specs=installed_root_specs(args.lockfile, onlyroot=args.onlyroot) 
-        if args.lockfile_select:
+        if args.lockfile_option in ['select','exclude']:
             specs_list = []
             args_specs_list_names = [t[0] for t in args_specs_list]
             for s in installed_specs:
-                if installed_specs[s][0] in args_specs_list_names:
+                #include if either present and selected or absent and excluded
+                if bool(installed_specs[s][0] in args_specs_list_names) == bool(args.lockfile_option == 'select'):
                     specs_list.append(installed_specs[s])
-        else:
+        else: # lockfile_option is add
             specs_list = args_specs_list
             for s in installed_specs:
                 specs_list.append(installed_specs[s])
