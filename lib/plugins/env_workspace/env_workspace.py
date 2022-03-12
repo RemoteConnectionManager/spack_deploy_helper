@@ -4,6 +4,7 @@ import logging
 import copy
 import utils
 import cascade_yaml_config
+import json
 
 logging.debug("__file__:" + os.path.realpath(__file__))
 
@@ -67,12 +68,37 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 count += 1
                 dirs[:] = []
 
+    def _merge_yaml_file_into_dict(self,
+                          merge_config_folders,
+                          yaml_file): 
+        print("-------------- " + yaml_file)
+        merge_files=[]
+        for p in merge_config_folders:
+            test=os.path.abspath(os.path.join(p,yaml_file))
+            if os.path.exists(test):
+                 print("#### config file: " + test)
+                 merge_files = merge_files +[test]
+
+        if merge_files :
+            self.logger.debug("configuring "+ yaml_file + " with files: "+str(merge_files))
+
+            merged_f = utils.hiyapyco.load(
+                *merge_files,
+                interpolate=True,
+                method=utils.hiyapyco.METHOD_MERGE,
+                failonmissingfiles=True
+            )
+            return(merged_f)
+        else:
+            self.logger.info("no template file for "+ yaml_file + " : skipping ")
+
     def _merge_yaml_files(self,
                           merge_config_folders,
                           current_key_subst, 
                           spack_config_dir,
                           clearconfig,
                           yaml_files): 
+
         if os.path.exists(spack_config_dir) :
 
             if clearconfig:
@@ -190,6 +216,8 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                      user_cache='user_cache',
                      outdir='/tmp/prova_env',
                      headerfile='',
+                     phases=['pre','build','post'],
+                     prefixes=['bootstrap'],
                      pre_commands=[],
                      build_commands=[],
                      post_commands=[],
@@ -199,6 +227,7 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
 
         current_key_subst = copy.deepcopy(cascade_yaml_config.global_key_subst)
+        current_key_subst['DEPLOY_GENERATED_SPACKFILE'] = spackfile
 
         if user_cache :
             os.environ['SPACK_USER_CACHE_PATH'] = user_cache
@@ -207,26 +236,69 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             utils.hiyapyco.jinja2env.globals[subst_key] = current_key_subst[subst_key]
 
 
-        if pre_commands or build_commands or post_commands :
-           ret =  utils.source(os.path.join(spack_root,'share','spack','setup-env.sh'))
-           if ret:
-               self.logger.warning("Spack setup env failed and spack commands not empty EXITING ")
-               return(1) 
+        env_dict = self._merge_yaml_file_into_dict( merge_config_folders, 'env.yaml')
+        for envname in env_dict:
+            susbstitutions_info = env_dict[envname].get('substitutions', {})
+            #substitutions = copy.deepcopy(cascade_yaml_config.global_key_subst)
+            substitutions={}
+            substitutions['DEPLOY_DOUBLE_COLON_HACK'] = ':'
+            substitutions['DEPLOY_GENERATED_PREFIX'] = envname
 
-        if outdir:
-            if outdir[0] != '/':
-                spack_config_dir = os.path.abspath(os.path.join(dest, outdir))
-            else:
-                if not os.path.exists(outdir) : os.makedirs(outdir)
-                spack_config_dir = outdir
+            # parse explicit substitutions
+            explicit_subst_info = susbstitutions_info.get('explicit', [])
+            for subst_info in explicit_subst_info:
+                for key in subst_info:
+                    value = subst_info[key]
+                    subst_value = utils.stringtemplate(value).safe_substitute(substitutions)
+                    print("adding: "+ key + " value: " + value + " -->" + subst_value)
+                    substitutions[key] =  subst_value
 
-        if os.path.exists(outdir) :
-            self._merge_yaml_files(merge_config_folders,
-                              current_key_subst, 
-                              outdir, 
-                              clearconfig,
-                              [spackfile])
+            # parse accumulators (list) substitutionsnd convert them into space separated string
+            # TODO: allow for customizable separator
+            accumulators_info = susbstitutions_info.get('accumulators', [])
+            for subst_info in accumulators_info:
+                for key in subst_info:
+                    values = subst_info[key]
+                    values_string = ''
+                    for value in values:
+                        values_string += utils.stringtemplate(value).safe_substitute(substitutions) + ' '
+                    substitutions[key] =  values_string
 
+            # parse commands: each command must return on stdout a  json string represting a dict for substitutions
+            # init_command is a single entry that can be overriden by hiyapico simple overriding, while commands is a list, where files in different dirs
+            # can add but not override
+            substitution_commands = []
+            init_command = susbstitutions_info.get('init_command', '')
+            if init_command: 
+                substitution_commands.append(init_command)
+            for c in susbstitutions_info.get('commands', []):
+                substitution_commands.append(c)
+            print(substitution_commands)
+            if substitution_commands:
+                ret =  utils.source(os.path.join(spack_root,'share','spack','setup-env.sh'))
+
+            for command in substitution_commands:
+                subst_command = utils.stringtemplate(command).safe_substitute(substitutions)
+                self.logger.info("executing substitution command--> " + subst_command)
+                (ret,out,err)=utils.run(subst_command.split(),logger=self.logger,pipe_output=True)
+                if out:
+                    subst_from_command = json.loads(out)
+                    substitutions.update(subst_from_command)
+            self.logger.debug("Active substitutions:")
+            for key in substitutions:
+                self.logger.debug(key + " --> " + substitutions[key])
+            spack_env_info = env_dict[envname]['spack']
+            spack_env=utils.hiyapyco.dump({'spack': spack_env_info}, default_flow_style=False)
+            spack_env_subst = utils.stringtemplate(spack_env).safe_substitute(substitutions)
+            spack_env_dir = utils.stringtemplate('@{GENERATED_ENV_FOLDER}').safe_substitute(substitutions)
+            if not os.path.exists(spack_env_dir) : os.makedirs(spack_env_dir)
+            open(os.path.join(spack_env_dir, 'spack.yaml'), "w").write(spack_env_subst)
+            self.logger.info("written " + os.path.join(spack_env_dir, 'spack.yaml'))
+     
+
+            ####   write out build and post command shell files,
+            ####   header taken from defined headerfile
+            headerfile = env_dict[envname].get('headerfile', '')
             header='#!/bin/bash \n'
             if headerfile:
                 if os.path.exists(headerfile):
@@ -236,30 +308,23 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 header += ('export SPACK_USER_CACHE_PATH="' + user_cache + '"\n')
             header += ('source ' + os.path.join(spack_root,'share','spack','setup-env.sh') + '\n')
             
-            command_phases = {'PRE': pre_commands, 'BUILD': build_commands, 'POST': post_commands}
+            command_phases = {'PRE':   env_dict[envname].get('pre_commands', []),
+                              'BUILD': env_dict[envname].get('build_commands', []),
+                              'POST':  env_dict[envname].get('post_commands', [])}
+
             if not separate_files :
-                f = open(os.path.join(outdir,'build.sh'), 'w')                
+                f = open(os.path.join(spack_env_dir,'build.sh'), 'w')                
                 f.write(header)
             for phase in command_phases:
                 if separate_files :
-                    f = open(os.path.join(outdir,'build_' + phase + '.sh'), 'w')                
+                    f = open(os.path.join(spack_env_dir, phase + '.sh'), 'w')                
                     f.write(header)
                 f.write('# phase: ' + phase + '\n')
                 for command in command_phases[phase]:
-                    templ= utils.stringtemplate(command)
-                    cmd=templ.safe_substitute(current_key_subst)
+                    cmd = utils.stringtemplate(command).safe_substitute(substitutions)
                     f.write(cmd + '\n')
                 if separate_files :
                     f.close()
             if not separate_files :
                 f.close()
-#            with open(os.path.join(outdir,'build.sh'), 'w') as f:
-        #        f.write(str(current_key_subst))
-#                f.write(header)
-#                for phase in command_phases:
-#                    f.write('# phase: ' + phase + '\n')
-#                    for command in command_phases[phase]:
-#                        templ= utils.stringtemplate(command)
-#                        cmd=templ.safe_substitute(current_key_subst)
-#                        f.write(cmd + '\n')
 
