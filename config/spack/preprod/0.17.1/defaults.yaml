@@ -1,6 +1,7 @@
 defaults:
   spack_major_version : '0.17'
   spack_version : '0.17.1'
+  generated_subdir : 'generati'
   upstream :
     master : "v0.17.1"
     prs :
