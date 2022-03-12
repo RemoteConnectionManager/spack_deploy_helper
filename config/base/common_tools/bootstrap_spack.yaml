@@ -1,7 +1,0 @@
-spack:
-  definitions:
-  - all:
-    - python
-    - emacs
-    - curl@7.79.0
-
