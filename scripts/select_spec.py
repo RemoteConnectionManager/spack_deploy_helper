@@ -255,7 +255,11 @@ if __name__ == '__main__':
 
     if not args.add:
         log.debug("substitutions:" + str(substitutions))
-        outstring += string.Template( template).safe_substitute(substitutions) + '\n'
+        if template:
+            outstring += string.Template( template).safe_substitute(substitutions) + '\n'
+        else:
+            log.info("void template string, output substitutions in json form")
+            outstring = json.dumps(substitutions)
         
     if args.header:
         outstring = args.header + "\n" + outstring
