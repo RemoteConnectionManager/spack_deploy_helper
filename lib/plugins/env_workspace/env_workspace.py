@@ -147,6 +147,27 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                     self.logger.info("no template file for "+ f + " : skipping ")
 
 
+    def _upstream_owner_spack_setup(self,spack_root,install,cache,modules, user_cache):
+        current_key_subst = copy.deepcopy(cascade_yaml_config.global_key_subst)
+        current_key_subst['DEPLOY_SPACK_CACHE'] = cache
+        os.environ['SPACK_ROOT_CACHE'] = cache
+        current_key_subst['DEPLOY_SPACK_INSTALL'] = install
+        os.environ['SPACK_ROOT_INSTALL'] = install
+        current_key_subst['DEPLOY_SPACK_MODULES'] = modules
+        os.environ['SPACK_ROOT_MODULES'] = modules
+        
+        if user_cache :
+            current_key_subst['DEPLOY_SPACK_USER_CACHE_PATH'] = user_cache
+            os.environ['SPACK_USER_CACHE_PATH'] = user_cache
+            self.logger.warning("Spack commands should use SPACK_USER_CACHE_PATH  to: " + user_cache)
+        for subst_key in current_key_subst:
+            utils.hiyapyco.jinja2env.globals[subst_key] = current_key_subst[subst_key]
+
+        ret =  utils.source(os.path.join(spack_root,'share','spack','setup-env.sh'))
+        if ret:
+            self.logger.warning("Spack setup env failed  EXITING ")
+            exit(1) 
+        
 
     def config_setup(self,
                      spack_root='spack',
@@ -161,27 +182,30 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                      runconfig=False):
 
         # print("@@@@@@@@@@@@@@@@@@@@",self.dry_run)
-        current_key_subst = copy.deepcopy(cascade_yaml_config.global_key_subst)
-        current_key_subst['DEPLOY_SPACK_CACHE'] = cache
-        current_key_subst['DEPLOY_SPACK_INSTALL'] = install
-        current_key_subst['DEPLOY_SPACK_MODULES'] = modules
-        if user_cache :
-            current_key_subst['DEPLOY_SPACK_USER_CACHE_PATH'] = user_cache
-            os.environ['SPACK_USER_CACHE_PATH'] = user_cache
-            self.logger.warning("Spack commands should use SPACK_USER_CACHE_PATH  to: " + user_cache)
-        for subst_key in current_key_subst:
-            utils.hiyapyco.jinja2env.globals[subst_key] = current_key_subst[subst_key]
-
         if spack_root [0] != '/':
             dest = os.path.join(self.base_path, spack_root)
         else:
             dest = spack_root
 
-        if spack_commands :
-           ret =  utils.source(os.path.join(spack_root,'share','spack','setup-env.sh'))
-           if ret:
-               self.logger.warning("Spack setup env failed and spack commands not empty EXITING ")
-               return(1) 
+        current_key_subst = self._upstream_owner_spack_setup(dest,install,cache,modules, user_cache)
+
+#        current_key_subst = copy.deepcopy(cascade_yaml_config.global_key_subst)
+#        current_key_subst['DEPLOY_SPACK_CACHE'] = cache
+#        current_key_subst['DEPLOY_SPACK_INSTALL'] = install
+#        current_key_subst['DEPLOY_SPACK_MODULES'] = modules
+#        if user_cache :
+#            current_key_subst['DEPLOY_SPACK_USER_CACHE_PATH'] = user_cache
+#            os.environ['SPACK_USER_CACHE_PATH'] = user_cache
+#            self.logger.warning("Spack commands should use SPACK_USER_CACHE_PATH  to: " + user_cache)
+#        for subst_key in current_key_subst:
+#            utils.hiyapyco.jinja2env.globals[subst_key] = current_key_subst[subst_key]
+
+
+#        if spack_commands :
+#           ret =  utils.source(os.path.join(spack_root,'share','spack','setup-env.sh'))
+#           if ret:
+#               self.logger.warning("Spack setup env failed and spack commands not empty EXITING ")
+#               return(1) 
 
         if out_config_dir:
             if out_config_dir[0] != '/':
@@ -214,26 +238,16 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                      spack_root='spack',
                      merge_config_folders = [],
                      user_cache='user_cache',
-                     outdir='/tmp/prova_env',
-                     headerfile='',
-                     phases=['pre','build','post'],
-                     prefixes=['bootstrap'],
-                     pre_commands=[],
-                     build_commands=[],
-                     post_commands=[],
+                     cache='cache',
+                     install='install',
+                     modules='modules',
                      clearconfig=True,
                      separate_files=False,
                      spackfile='spack.yaml'):
 
 
-        current_key_subst = copy.deepcopy(cascade_yaml_config.global_key_subst)
-        current_key_subst['DEPLOY_GENERATED_SPACKFILE'] = spackfile
+        current_key_subst = self._upstream_owner_spack_setup(spack_root,install,cache,modules, user_cache)
 
-        if user_cache :
-            os.environ['SPACK_USER_CACHE_PATH'] = user_cache
-
-        for subst_key in current_key_subst:
-            utils.hiyapyco.jinja2env.globals[subst_key] = current_key_subst[subst_key]
 
 
         env_dict = self._merge_yaml_file_into_dict( merge_config_folders, 'env.yaml')
@@ -306,6 +320,10 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                         header = h.read()
             if user_cache :
                 header += ('export SPACK_USER_CACHE_PATH="' + user_cache + '"\n')
+            header += ('export SPACK_ROOT_CACHE="' + cache + '"\n')
+            header += ('export SPACK_ROOT_INSTALL="' + install + '"\n')
+            header += ('export SPACK_ROOT_MODULES="' + modules + '"\n')
+
             header += ('source ' + os.path.join(spack_root,'share','spack','setup-env.sh') + '\n')
             
             command_phases = {'PRE':   env_dict[envname].get('pre_commands', []),
