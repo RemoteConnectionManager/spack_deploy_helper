@@ -51,7 +51,13 @@ if __name__ == '__main__':
 
     
     intel_compilers_config = select_spec.map_intel_compilers(prefixes['maincompiler'], prefixes.get('auxcompiler', ''))
+    log.debug("######## intel_compilers_config #############")
+    log.debug(str(intel_compilers_config))
     compiler_config = spack.compilers.get_compiler_config('site')
+    if compiler_config == {}:
+       compiler_config= []
+    log.debug("######## compiler_config #############")
+    log.debug(str(compiler_config))
     for i in intel_compilers_config:
         compiler_config.append(i)
 
