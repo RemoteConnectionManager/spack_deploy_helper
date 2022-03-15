@@ -8,15 +8,18 @@ import json
 
 logging.debug("__file__:" + os.path.realpath(__file__))
 
+spack_version = ''
+generated_subdir = ''
 for h in cascade_yaml_config.CascadeYamlConfig.instances:
-  spack_version = cascade_yaml_config.CascadeYamlConfig.instances[h][['defaults','spack_version']]
-  generated_subdir = cascade_yaml_config.CascadeYamlConfig.instances[h][['defaults','generated_subdir']]
+  _spack_version = cascade_yaml_config.CascadeYamlConfig.instances[h][['defaults','spack_version']]
+  _generated_subdir = cascade_yaml_config.CascadeYamlConfig.instances[h][['defaults','generated_subdir']]
+  if _spack_version: spack_version = _spack_version
+  if _generated_subdir: generated_subdir = _generated_subdir
 
 cascade_yaml_config.global_key_subst['DEPLOY_GENERATED_DIR'] = os.path.join(
                             cascade_yaml_config.global_key_subst['DEPLOY_PARENT_PARENT_ROOTPATH'],
                             generated_subdir,
                             spack_version + '_' + cascade_yaml_config.global_key_subst['DEPLOY_WORKNAME'])
-
 def is_workdir(path):
     ret = False
     for subpath in ['defaults.yaml', 'spack.yaml']:
