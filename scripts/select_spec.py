@@ -227,7 +227,12 @@ if __name__ == '__main__':
             common_subst.update( spec_subst(get_external_spec(spec), named_subst=True)  )
      
     substitutions = common_subst.copy()
-    args_specs_list = [select_spec(spec) for spec in args.specs]
+    args_specs_list = []
+    for spec in args.specs:
+        selected_spec = select_spec(spec)
+        if selected_spec: 
+            args_specs_list.append(selected_spec)
+    #args_specs_list = [select_spec(spec) for spec in args.specs]
 
     if args.lockfile:
         installed_specs=installed_root_specs(args.lockfile, onlyroot=args.onlyroot) 
