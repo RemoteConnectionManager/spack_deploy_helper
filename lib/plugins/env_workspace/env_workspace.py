@@ -358,16 +358,17 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             
             last_file = '' 
             phase_files=[]
-            for phase in command_phases:
+            for phase in ('PRE','BUILD','POST'):
                 if separate_files :
                     curr_file = os.path.join(spack_env_dir, phase + '.sh')
                 else:
                     curr_file = os.path.join(spack_env_dir,'build.sh')
                 write_on_file = { 'none': True, 'all': False}.get(immediate, phase.lower() != immediate)
-                if write_on_file and curr_file != last_file:
-                    last_file = curr_file
-                    f = open(curr_file, 'w')
-                    f.write(header)
+                if write_on_file:
+                    if curr_file != last_file:
+                        last_file = curr_file
+                        f = open(curr_file, 'w')
+                        f.write(header)
                     f.write('# phase: ' + phase + '\n')
                     
                 for command in command_phases[phase]:
