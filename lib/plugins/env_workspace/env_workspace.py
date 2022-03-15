@@ -244,14 +244,32 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                      cache='cache',
                      install='install',
                      modules='modules',
-                     clearconfig=True,
-                     separate_files=False,
-                     spackfile='spack.yaml'):
+                     spack_commands=[],
+                     clearconfig=True):
 
 
+        if spack_root [0] != '/':
+            spack_root = os.path.join(self.base_path, spack_root)
+
+        spack_config_dir = os.path.abspath(os.path.join(spack_root, 'etc','spack'))
         current_key_subst = self._upstream_owner_spack_setup(spack_root,install,cache,modules, user_cache)
 
 
+        if os.path.exists(spack_config_dir) :
+            self._merge_yaml_files(merge_config_folders,
+                              current_key_subst, 
+                              spack_config_dir, 
+                              clearconfig,
+                              self.manager_conf.get('config', dict()).get('spack_yaml_files',[]))
+
+            for command in spack_commands:
+                templ= utils.stringtemplate(command)
+                cmd=templ.safe_substitute(current_key_subst)
+                if self.dry_run :
+                    print("############## dry run  executing: " + cmd) 
+                else:
+                    (ret,out,err)=utils.run(cmd.split(),logger=self.logger,pipe_output=True)
+                    self.logger.info("  " + out )
 
         env_dict = self._merge_yaml_file_into_dict( merge_config_folders, 'env.yaml')
         for envname in env_dict:
@@ -316,6 +334,15 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             ####   write out build and post command shell files,
             ####   header taken from defined headerfile
             headerfile = env_dict[envname].get('headerfile', '')
+            immediate = env_dict[envname].get('immediate', 'pre')
+            separate_files = env_dict[envname].get('separate_files', False)
+            execute_at_end = env_dict[envname].get('execute_at_end', False)
+
+            command_phases = {'PRE':   env_dict[envname].get('pre_commands', []),
+                              'BUILD': env_dict[envname].get('build_commands', []),
+                              'POST':  env_dict[envname].get('post_commands', [])}
+
+
             header='#!/bin/bash \n'
             if headerfile:
                 if os.path.exists(headerfile):
@@ -329,23 +356,34 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
             header += ('source ' + os.path.join(spack_root,'share','spack','setup-env.sh') + '\n')
             
-            command_phases = {'PRE':   env_dict[envname].get('pre_commands', []),
-                              'BUILD': env_dict[envname].get('build_commands', []),
-                              'POST':  env_dict[envname].get('post_commands', [])}
-
-            if not separate_files :
-                f = open(os.path.join(spack_env_dir,'build.sh'), 'w')                
-                f.write(header)
+            last_file = '' 
+            phase_files=[]
             for phase in command_phases:
                 if separate_files :
-                    f = open(os.path.join(spack_env_dir, phase + '.sh'), 'w')                
+                    curr_file = os.path.join(spack_env_dir, phase + '.sh')
+                else:
+                    curr_file = os.path.join(spack_env_dir,'build.sh')
+                write_on_file = { 'none': True, 'all': False}.get(immediate, phase.lower() != immediate)
+                if write_on_file and curr_file != last_file:
+                    last_file = curr_file
+                    f = open(curr_file, 'w')
                     f.write(header)
-                f.write('# phase: ' + phase + '\n')
+                    f.write('# phase: ' + phase + '\n')
+                    
                 for command in command_phases[phase]:
                     cmd = utils.stringtemplate(command).safe_substitute(substitutions)
-                    f.write(cmd + '\n')
+                    if write_on_file:
+                        f.write(cmd + '\n')
+                    else:
+                        (ret,out,err)=utils.run(cmd.split(),logger=self.logger,pipe_output=True)
                 if separate_files :
                     f.close()
+                    phase_files.append(curr_file)
             if not separate_files :
                 f.close()
+                phase_files.append(curr_file)
+            if execute_at_end:
+                for shellfile in phase_files:
+                        (ret,out,err)=utils.run(['/bin/bash', shellfile],logger=self.logger,pipe_output=True)
+                    
 

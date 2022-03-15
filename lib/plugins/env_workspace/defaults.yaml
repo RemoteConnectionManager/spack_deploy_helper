@@ -14,10 +14,13 @@ defaults:
     spack_commands: 
      - 'spack config get config'
   generate_env:
-    spackfile: 'bootstrap_spack.yaml'
-    headerfile: "{{DEPLOY_PARENT_ROOTPATH}}/setup.sh"
-    pre_commands: 
-     - 'spack config get config'
+    config_commands: 
+    - 'spack config update -y config'
+    - 'spack config update -y compilers'
+    - 'spack config update -y packages'
+    - 'spack config update -y modules'
+    - 'spack compiler add --scope site'
+
 
 
 
@@ -119,14 +122,10 @@ argparse:
             action: 'store_true'
             default : "{{ defaults.clearconfig }}"
             help: 'clear existing spack configurations'
-          separate_files :
-            action: 'store_true'
-            default : "{{ defaults.separate_files }}"
-            help: 'write separate build files'
-          spackfile :
+          spack_commands:
             action: 'store'
-            default: "{{ defaults.generate_env.spackfile }}"
-            help: 'Envirot filenames inside merge_config_folders to be merged into a template environment spack file'
+            default: "{{ defaults.generate_env.config_commands }}"
+            help: 'spack commands to execute for configuring spack root'
 
 logging_configs:
   loggers:
