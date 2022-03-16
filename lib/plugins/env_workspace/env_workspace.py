@@ -74,12 +74,11 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
     def _merge_yaml_file_into_dict(self,
                           merge_config_folders,
                           yaml_file): 
-        print("-------------- " + yaml_file)
         merge_files=[]
         for p in merge_config_folders:
             test=os.path.abspath(os.path.join(p,yaml_file))
             if os.path.exists(test):
-                 print("#### config file: " + test)
+                 self.logger.debug("#### config file: " + test)
                  merge_files = merge_files +[test]
 
         if merge_files :
@@ -162,7 +161,7 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         if user_cache :
             current_key_subst['DEPLOY_SPACK_USER_CACHE_PATH'] = user_cache
             os.environ['SPACK_USER_CACHE_PATH'] = user_cache
-            self.logger.warning("Spack commands should use SPACK_USER_CACHE_PATH  to: " + user_cache)
+            self.logger.info("Spack commands should use SPACK_USER_CACHE_PATH  to: " + user_cache)
         for subst_key in current_key_subst:
             utils.hiyapyco.jinja2env.globals[subst_key] = current_key_subst[subst_key]
 
@@ -245,8 +244,16 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                      install='install',
                      modules='modules',
                      spack_commands=[],
+                     skip_steps=[],
                      clearconfig=True):
 
+        def to_skip(skip_steps,step_name):
+            skip = False
+            for step_to_skip in skip_steps:
+                if step_to_skip in step_name:
+                    skip = True
+                    break
+            return skip
 
         if spack_root [0] != '/':
             spack_root = os.path.join(self.base_path, spack_root)
@@ -255,7 +262,8 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         current_key_subst = self._upstream_owner_spack_setup(spack_root,install,cache,modules, user_cache)
 
 
-        if os.path.exists(spack_config_dir) :
+        if os.path.exists(spack_config_dir) and not to_skip(skip_steps,'config') :
+            self.logger.info("processing config")
             self._merge_yaml_files(merge_config_folders,
                               current_key_subst, 
                               spack_config_dir, 
@@ -270,9 +278,16 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 else:
                     (ret,out,err)=utils.run(cmd.split(),logger=self.logger,pipe_output=True)
                     self.logger.info("  " + out )
+        else:
+            self.logger.info("skipping config" )
 
         env_dict = self._merge_yaml_file_into_dict( merge_config_folders, 'env.yaml')
         for envname in env_dict:
+            if to_skip(skip_steps,envname):
+                self.logger.info("skipping step: " + envname)
+                continue 
+            else:
+                self.logger.info("processing step: " + envname)
             susbstitutions_info = env_dict[envname].get('substitutions', {})
             #substitutions = copy.deepcopy(cascade_yaml_config.global_key_subst)
             substitutions={}
@@ -308,7 +323,7 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 substitution_commands.append(init_command)
             for c in susbstitutions_info.get('commands', []):
                 substitution_commands.append(c)
-            print(substitution_commands)
+            self.logger.debug(str(substitution_commands))
             if substitution_commands:
                 ret =  utils.source(os.path.join(spack_root,'share','spack','setup-env.sh'))
 
