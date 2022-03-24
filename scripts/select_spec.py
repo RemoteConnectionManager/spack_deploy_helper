@@ -43,8 +43,14 @@ def select_compiler(comp_spec, sysinstalled=True):
 def select_spec(in_spec):
     
     log = logging.getLogger(__name__)
-    package_available_versions = spack.repo.get(in_spec).versions.keys()
-    installed_specs = spack.store.db.query(in_spec)
+    try:
+        package_available_versions = spack.repo.get(in_spec).versions.keys()
+    except Exception as exception :
+        log.error("unable to extract " + in_spec + " from spack.repo.get due to exeception: " + str(exception))
+    try:
+        installed_specs = spack.store.db.query(in_spec)
+    except Exception as exception :
+        log.error("unable to extract " + in_spec + " from spack.store.db.query due to exeception: " + str(exception))
     matching_specs=sorted([s for s in installed_specs if not s.external and s.version in package_available_versions], reverse=True, key=lambda spc: extended_version(spc))
     if len(matching_specs) == 0:
         log.error('no matching installed spec to ' + in_spec)
