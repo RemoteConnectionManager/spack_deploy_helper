@@ -14,6 +14,10 @@ defaults:
     integration_branch: '{{ defaults.integration_type }}{{DEPLOY_WORKNAME}}_{{ defaults.spack_version }}'
     url : 'https://github.com/RemoteConnectionManager/spack.git'
     master: 'clean/{{ defaults.spack_version }}'
+    branches:
+      - 'backport/26256'
+      - 'packages/0.17/fix_mumps_mk'
+      - 'packages/0.17/fix_petsc_fftw_intel'
 
   upstream_rebase: 'True'
   upstream_update: 'True'
