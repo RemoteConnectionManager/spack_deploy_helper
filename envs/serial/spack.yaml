@@ -11,6 +11,7 @@ spack:
     - zlib
     - libszip
     - cgal
+    - libmatheval
       #- libint tune=cp2k-lmax-7 +fortran
       #- libint tune=molgw-lmax-7 +fortran
 

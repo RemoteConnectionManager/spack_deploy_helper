@@ -13,7 +13,8 @@ spack:
     - parmetis 
     - py-mpi4py 
     - cgal 
-      #- petsc +mpi   ^openmpi
+  - libraries_petsc:
+    - petsc +mpi +mumps +scalapack +fftw   
 
   - libraries_gcc:
       #- openmpi +cuda +legacylaunchers +pmi ~gpfs +pmix fabrics=ucx schedulers=slurm
@@ -37,9 +38,13 @@ spack:
     - intel-oneapi-mpi
     - intel-oneapi-mkl
 
-  - applications: 
+  - applications: []
+  - applications_gromacs: 
     - plumed@2.7.2
     - gromacs +mpi+openmp+plumed +lapack
+    - openblas
+
+  - applications_cp2k: 
     #- cp2k +mpi+elpa+plumed lmax=6 
     - cp2k +mpi+plumed lmax=6 
 
@@ -58,6 +63,7 @@ spack:
   - compilers: ['%${COMPILER}']
   - all:
     - $libraries
+    - $libraries_petsc
     - $libraries_${COMPILER_NAME}
     - $applications
     - $applications_${COMPILER_NAME}
