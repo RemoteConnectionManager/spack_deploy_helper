@@ -40,7 +40,7 @@ def select_compiler(comp_spec, sysinstalled=True):
     matched_compilers = [s['compiler']['spec'] for s in configured_compilers if (bool( not sysinstalled) ^ str(s['compiler']['paths']['cc']).startswith('/usr') ) and (s['compiler']['spec'].split('@')[0] == compiler_name )]
     return( sorted(matched_compilers))
 
-def select_spec(in_spec):
+def select_spec(in_spec, include_external=False):
     
     log = logging.getLogger(__name__)
     try:
@@ -51,7 +51,9 @@ def select_spec(in_spec):
         installed_specs = spack.store.db.query(in_spec)
     except Exception as exception :
         log.error("unable to extract " + in_spec + " from spack.store.db.query due to exeception: " + str(exception))
-    matching_specs=sorted([s for s in installed_specs if not s.external and s.version in package_available_versions], reverse=True, key=lambda spc: extended_version(spc))
+    matching_specs=sorted([s for s in installed_specs
+                              if (include_external and s.external) or ((not s.external) and s.version in package_available_versions)],
+                           reverse=True, key=lambda spc: extended_version(spc))
     if len(matching_specs) == 0:
         log.error('no matching installed spec to ' + in_spec)
         return(None)
@@ -235,7 +237,7 @@ if __name__ == '__main__':
     substitutions = common_subst.copy()
     args_specs_list = []
     for spec in args.specs:
-        selected_spec = select_spec(spec)
+        selected_spec = select_spec(spec, include_external=(args.lockfile_option == 'exclude'))
         if selected_spec: 
             args_specs_list.append(selected_spec)
     #args_specs_list = [select_spec(spec) for spec in args.specs]
