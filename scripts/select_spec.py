@@ -207,6 +207,8 @@ if __name__ == '__main__':
     sys_gcc_compilers = select_compiler('gcc') 
     if len(sys_gcc_compilers) > 0:
         compilers_subst['SYS_GCC'] = sys_gcc_compilers[0] 
+        compilers_subst['COMPILER'] = sys_gcc_compilers[0]
+        compilers_subst['COMPILER_NAME'] = sys_gcc_compilers[0].split('@')[0] 
     if args.compiler:
         compspecs = select_compiler(args.compiler, sysinstalled=False)
         if len(compspecs) > 0:
