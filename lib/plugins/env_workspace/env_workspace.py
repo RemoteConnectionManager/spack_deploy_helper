@@ -5,6 +5,7 @@ import copy
 import utils
 import cascade_yaml_config
 import json
+import re
 
 logging.debug("__file__:" + os.path.realpath(__file__))
 
@@ -25,6 +26,72 @@ def is_workdir(path):
     for subpath in ['defaults.yaml', 'spack.yaml']:
         ret = ret or os.path.exists(os.path.join(path, subpath))
     return ret
+
+class CustomYamlMerger(object):
+    def __init__(self, logger=None):
+        if logger:
+            self.logger = logger
+        else:
+            self.logger = logging.getLogger("CustomYamlMerger")
+        self.references={}
+        self.ref_regex = re.compile(r"@REF{([^}]*)}")
+
+    def print_curr_reference(self):
+        print("#### current refernce dict:")
+        print(self.references)
+
+    def _parse_yaml_dict(self,yaml_dict, path=''):
+        classname = yaml_dict.__class__.__name__
+        #print(path + ' --> ' + yaml_dict.__class__.__name__)
+        if classname == 'list':
+            simple=True
+            for element in yaml_dict:
+                if element.__class__.__name__ == 'OrderedDict':
+                    simple=False
+                    #for key in element:
+                    #    newpath = path + '.' + key
+                    #    print("### recursive list call: " + newpath)
+                    #    self._parse_yaml_dict(element[key], path=newpath)
+                    self._parse_yaml_dict(element, path=path)
+            if simple:
+                self.logger.debug("###SIMPLE LIST: " + path + ' --> ' + str(yaml_dict))
+                pass
+            return()
+            
+        if classname == 'OrderedDict':
+            for key in yaml_dict:
+                if path : 
+                    newpath = path + '.' + key
+                else:
+                    newpath = key
+                if newpath in self.references:
+                    if self.references[newpath] == newpath:
+                        self.logger.info("registering " + newpath + "-->" + str(yaml_dict[key]))
+                        self.references[newpath] = yaml_dict[key]
+                #print("##key## "+key+" type: " + yaml_dict[key].__class__.__name__)
+                if yaml_dict[key].__class__.__name__ == 'str':
+                    #print("###########----> " + yaml_dict[key])
+                    m = self.ref_regex.match(yaml_dict[key])
+                    if m:
+                        ref_name = m.group(1)
+                        if ref_name in self.references:
+                            if self.references[ref_name] == ref_name:
+                                self.logger.info("Waiting to fill reference: " + ref_name)
+                            else:
+                                self.logger.info("Substituting " + newpath + "-->" + str(self.references[ref_name]))
+                                yaml_dict[key] = copy.deepcopy(self.references[ref_name])
+                        else:
+                            self.logger.info("Found: " + ref_name)
+                            self.references[ref_name] = ref_name
+                    else:
+                        self._parse_yaml_dict(yaml_dict[key], path=newpath)
+                else:
+                    self._parse_yaml_dict(yaml_dict[key], path=newpath)
+            return()
+        else:
+            self.logger.debug("@@@@@@ got classname:" + classname + " path: "+ path + " ---> " + str(yaml_dict))
+
+        #print("######path: " + path + " ---> " + str(yaml_dict))
 
 class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
@@ -73,7 +140,9 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
     def _merge_yaml_file_into_dict(self,
                           merge_config_folders,
-                          yaml_file): 
+                          yaml_file,
+                          interpolate=True,
+                          do_ref_subst=False): 
         merge_files=[]
         for p in merge_config_folders:
             test=os.path.abspath(os.path.join(p,yaml_file))
@@ -84,12 +153,61 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         if merge_files :
             self.logger.debug("configuring "+ yaml_file + " with files: "+str(merge_files))
 
-            merged_f = utils.hiyapyco.load(
-                *merge_files,
-                interpolate=True,
-                method=utils.hiyapyco.METHOD_MERGE,
-                failonmissingfiles=True
-            )
+            if do_ref_subst:
+                print("#######  doing ref subst #######")
+                merge_strings = []
+                current_merged_string=''
+                for f in merge_files:
+                #for i in range(len(merge_files)):
+                #    files = merge_files[:i+1]
+                #    print("### doing rf subst for file: " + str(files))
+                    print("### doing rf subst for file: " + f)
+                    if current_merged_string:
+                        to_load = [current_merged_string, f]
+                    else:
+                        to_load = [f]
+                    file_dict = utils.hiyapyco.load(
+                        *to_load,
+                    #    f,
+                    #    *files,
+                        interpolate=False,
+                        method=utils.hiyapyco.METHOD_MERGE,
+                        failonmissingfiles=True
+                    )
+                    merger = CustomYamlMerger(logger=self.logger)
+                    #print(env_dict) 
+                    #print("### 0 #####")
+                    #merger.print_curr_reference()
+                    merger._parse_yaml_dict(file_dict)
+                    print("### 1 #####")
+                    merger.print_curr_reference()
+                    merger._parse_yaml_dict(file_dict)
+                    print("### 2 #####")
+                    merger.print_curr_reference()
+                    self.logger.debug("@@@@@@@@@@@@@@@@@@@@@ dict @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n" +
+                                      str(file_dict) +
+                                      "\n###################################################################### #####")
+                    current_merged_string = utils.hiyapyco.dump(file_dict, default_flow_style=False)
+                    print(current_merged_string)
+
+                    merge_strings.append(current_merged_string)
+
+                merged_f = utils.hiyapyco.load(
+                    current_merged_string,
+                    #*merge_strings,
+                    interpolate=interpolate,
+                    method=utils.hiyapyco.METHOD_MERGE,
+                    failonmissingfiles=True
+                )
+ 
+                    
+            else:
+                merged_f = utils.hiyapyco.load(
+                    *merge_files,
+                    interpolate=interpolate,
+                    method=utils.hiyapyco.METHOD_MERGE,
+                    failonmissingfiles=True
+                )
             return(merged_f)
         else:
             self.logger.info("no template file for "+ yaml_file + " : skipping ")
@@ -170,7 +288,7 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             self.logger.warning("Spack setup env failed  EXITING ")
             exit(1) 
         
-
+        
     def config_setup(self,
                      spack_root='spack',
                      out_config_dir = os.path.join('etc','spack'),
@@ -248,7 +366,7 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                      clearconfig=True):
 
         def to_skip(skip_steps,step_name):
-            skip = False
+            skip = 'env' != step_name[0:3]
             for step_to_skip in skip_steps:
                 if step_to_skip in step_name:
                     skip = True
@@ -281,7 +399,20 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         else:
             self.logger.info("skipping config" )
 
-        env_dict = self._merge_yaml_file_into_dict( merge_config_folders, 'env.yaml')
+        env_dict = self._merge_yaml_file_into_dict( merge_config_folders, 'env.yaml',interpolate=True, do_ref_subst=True)
+        merger = CustomYamlMerger(logger=self.logger)
+        print(env_dict) 
+        print("### 0 #####")
+        #merger.print_curr_reference()
+        #merger._parse_yaml_dict(env_dict)
+        print("### 1 #####")
+        #merger.print_curr_reference()
+        #merger._parse_yaml_dict(env_dict)
+        print("### 2 #####")
+        #merger.print_curr_reference()
+        #merger._parse_yaml_dict(env_dict)
+        #print("### 3 #####")
+        #merger.print_curr_reference()
         for envname in env_dict:
             if to_skip(skip_steps,envname):
                 self.logger.info("skipping step: " + envname)
