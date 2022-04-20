@@ -37,8 +37,8 @@ class CustomYamlMerger(object):
         self.ref_regex = re.compile(r"@REF{([^}]*)}")
 
     def print_curr_reference(self):
-        print("#### current refernce dict:")
-        print(self.references)
+        self.logger.debug("#### current refernce dict:")
+        self.logger.debug(str(self.references))
 
     def _parse_yaml_dict(self,yaml_dict, path=''):
         classname = yaml_dict.__class__.__name__
@@ -66,7 +66,8 @@ class CustomYamlMerger(object):
                     newpath = key
                 if newpath in self.references:
                     if self.references[newpath] == newpath:
-                        self.logger.info("registering " + newpath + "-->" + str(yaml_dict[key]))
+                        self.logger.info("registering " + newpath )
+                        self.logger.debug( str(yaml_dict[key]))
                         self.references[newpath] = yaml_dict[key]
                 #print("##key## "+key+" type: " + yaml_dict[key].__class__.__name__)
                 if yaml_dict[key].__class__.__name__ == 'str':
@@ -78,7 +79,18 @@ class CustomYamlMerger(object):
                             if self.references[ref_name] == ref_name:
                                 self.logger.info("Waiting to fill reference: " + ref_name)
                             else:
-                                self.logger.info("Substituting " + newpath + "-->" + str(self.references[ref_name]))
+                                self.logger.info("Substituting " + newpath)
+                                yamllines = utils.hiyapyco.dump(self.references[ref_name], default_flow_style=False).split('\n')
+                                if len(yamllines) > 9:
+                                    for s in yamllines[:4]:
+                                        self.logger.info("    " + s)
+                                    self.logger.info("   ............")
+                                    for s in yamllines[-4:]:
+                                        self.logger.info("    " + s)
+                                else:
+                                    for s in yamllines:
+                                        self.logger.info("    " + s)
+                                   
                                 yaml_dict[key] = copy.deepcopy(self.references[ref_name])
                         else:
                             self.logger.info("Found: " + ref_name)
@@ -154,14 +166,14 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             self.logger.debug("configuring "+ yaml_file + " with files: "+str(merge_files))
 
             if do_ref_subst:
-                print("#######  doing ref subst #######")
+                self.logger.debug("#######  doing ref subst #######")
                 merge_strings = []
                 current_merged_string=''
                 for f in merge_files:
                 #for i in range(len(merge_files)):
                 #    files = merge_files[:i+1]
                 #    print("### doing rf subst for file: " + str(files))
-                    print("### doing rf subst for file: " + f)
+                    self.logger.info("### doing rf subst for file: " + f)
                     if current_merged_string:
                         to_load = [current_merged_string, f]
                     else:
@@ -179,16 +191,16 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                     #print("### 0 #####")
                     #merger.print_curr_reference()
                     merger._parse_yaml_dict(file_dict)
-                    print("### 1 #####")
+                    self.logger.debug("### 1 #####")
                     merger.print_curr_reference()
                     merger._parse_yaml_dict(file_dict)
-                    print("### 2 #####")
+                    self.logger.debug("### 2 #####")
                     merger.print_curr_reference()
                     self.logger.debug("@@@@@@@@@@@@@@@@@@@@@ dict @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n" +
                                       str(file_dict) +
                                       "\n###################################################################### #####")
                     current_merged_string = utils.hiyapyco.dump(file_dict, default_flow_style=False)
-                    print(current_merged_string)
+                    self.logger.debug("@@@@@@@@@@@@@@@@@@@@@ current_merged_string @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n" + current_merged_string)
 
                     merge_strings.append(current_merged_string)
 
@@ -369,6 +381,7 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             skip = 'env' != step_name[0:3]
             for step_to_skip in skip_steps:
                 if step_to_skip in step_name:
+                    self.logger.info("skipping step: " + step_name)
                     skip = True
                     break
             return skip
@@ -401,21 +414,10 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
         env_dict = self._merge_yaml_file_into_dict( merge_config_folders, 'env.yaml',interpolate=True, do_ref_subst=True)
         merger = CustomYamlMerger(logger=self.logger)
-        print(env_dict) 
-        print("### 0 #####")
-        #merger.print_curr_reference()
-        #merger._parse_yaml_dict(env_dict)
-        print("### 1 #####")
-        #merger.print_curr_reference()
-        #merger._parse_yaml_dict(env_dict)
-        print("### 2 #####")
-        #merger.print_curr_reference()
-        #merger._parse_yaml_dict(env_dict)
-        #print("### 3 #####")
-        #merger.print_curr_reference()
+
         for envname in env_dict:
             if to_skip(skip_steps,envname):
-                self.logger.info("skipping step: " + envname)
+                self.logger.debug("skipping step: " + envname)
                 continue 
             else:
                 self.logger.info("processing step: " + envname)
@@ -431,7 +433,7 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 for key in subst_info:
                     value = subst_info[key]
                     subst_value = utils.stringtemplate(value).safe_substitute(substitutions)
-                    print("adding: "+ key + " value: " + value + " -->" + subst_value)
+                    self.logger.debug("adding: "+ key + " value: " + value + " -->" + subst_value)
                     substitutions[key] =  subst_value
 
             # parse accumulators (list) substitutionsnd convert them into space separated string
