@@ -378,7 +378,7 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                      clearconfig=True):
 
         def to_skip(skip_steps,step_name):
-            skip = 'env' != step_name[0:3]
+            skip = 'env' != step_name[0:3] and step_name != 'config'
             for step_to_skip in skip_steps:
                 if step_to_skip in step_name:
                     self.logger.info("skipping step: " + step_name)
