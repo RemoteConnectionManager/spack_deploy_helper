@@ -20,7 +20,7 @@ if __name__ == '__main__':
     #parser.add_argument("spec", help="input partial spec")
 
     parser.add_argument("--maincompiler", help="installed spec for main compiler", default='intel-oneapi-compilers')
-    parser.add_argument("--auxcompiler", help="installed spec for auxiliary compiler", default='gcc')
+    parser.add_argument("--auxcompiler", help="installed spec for auxiliary compiler", default='none')
     parser.add_argument("-o", "--outdir", help="output config dir", default='')
     parser.add_argument("-l", "--lockfile", help="lockfile file to parse for installed specs", default='')
     parser.add_argument( "--loglevel", help="log level", default='warning')
