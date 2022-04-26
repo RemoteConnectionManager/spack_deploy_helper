@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 currpath=$(realpath $1)
 rootpath=$(realpath $currpath/../..)
  
