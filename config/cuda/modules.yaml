@@ -1,0 +1,6 @@
+modules:
+  tcl:
+    all:
+      suffixes:
+        ^cuda: 'cuda--{^cuda.version}'
+
