@@ -1,0 +1,11 @@
+modules:
+  tcl:
+    intel-oneapi-mpi:
+      environment:
+        set:
+          MPICC: mpiicc
+          MPICXX: mpiicpc
+          MPIF90: mpiifort
+          MPIF77: mpiifort
+          MPIFC: mpiifort
+
