@@ -1,0 +1,11 @@
+defaults:
+  origin :
+    branches :
+      # this patch remove slurm dependency from openmpi when variant ~pmi
+      - 'packages/0.17/openmpi_no_slurm_dep_without_pmi'
+
+
+
+
+
+
