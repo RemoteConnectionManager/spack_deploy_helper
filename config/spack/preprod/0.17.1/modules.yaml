@@ -1,9 +1,3 @@
 modules:
   default:
     arch_folder: false
-  tcl:
-    all:
-      suffixes:
-        ^cuda: '{^cuda.name}-{^cuda.version}'
-        ^python: '{^python.name}-{^python.version}'
-        ^mpi: '{^mpi.name}-{^mpi.version}'

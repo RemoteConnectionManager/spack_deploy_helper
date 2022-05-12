@@ -1,0 +1,8 @@
+modules:
+  tcl:
+    projections:
+      emacs: '{name}/{version}'
+      cmake: '{name}/{version}'
+      curl: '{name}/{version}'
+      openssl: '{name}/{version}'
+

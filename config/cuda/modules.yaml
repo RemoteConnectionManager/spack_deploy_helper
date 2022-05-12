@@ -2,5 +2,8 @@ modules:
   tcl:
     all:
       suffixes:
-        ^cuda: 'cuda--{^cuda.version}'
+        ^cuda: '{^cuda.name}-{^cuda.version}'
+
+    projections:
+      cuda: '{name}/{version}'
 
