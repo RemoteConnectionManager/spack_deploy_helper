@@ -37,7 +37,7 @@ def extended_version(in_spec):
 def select_compiler(comp_spec, sysinstalled=True):
     configured_compilers = spack.config.get('compilers')
     compiler_name = comp_spec.split('@')[0]
-    matched_compilers = [s['compiler']['spec'] for s in configured_compilers if (bool( not sysinstalled) ^ str(s['compiler']['paths']['cc']).startswith('/usr') ) and (s['compiler']['spec'].split('@')[0] == compiler_name )]
+    matched_compilers = [s['compiler']['spec'] for s in configured_compilers if (bool( not sysinstalled) ^ str(s['compiler']['paths']['cc']).startswith('/usr') ^ str(s['compiler']['paths']['cc']).startswith('/bin')) and (s['compiler']['spec'].split('@')[0] == compiler_name )]
     return( sorted(matched_compilers))
 
 def select_spec(in_spec, include_external=False):
