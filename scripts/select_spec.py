@@ -167,6 +167,32 @@ def map_intel_compilers(oneapi_prefix, gcc_prefix=''):
         intel_compilers_config.append(compiler_dict)
     return(intel_compilers_config)
 
+def compilers_config_force_os(compilers_config, operating_system=''):
+    if operating_system:
+        compilers_config_out=[]
+        for cc in compilers_config:
+            cc_copy=copy.deepcopy(cc)
+            cc_copy['compiler']['operating_system'] = operating_system
+            compilers_config_out.append(cc_copy)
+        return(compilers_config_out)
+    else:
+        return(compilers_config)
+    
+
+def find_new_compiler_config(prefixes=[]):
+    compilers = spack.compilers.find_new_compilers(prefixes, scope=None)
+    compilers_config = []
+    for c in compilers:
+        c_dict = spack.compilers._to_dict(c)
+        if c_dict:
+            compilers_config.append(c_dict)
+            
+    if compilers_config:
+       return(compilers_config)
+    else:
+       log.warning("unable to extract any compilers in prefixes: " + str(prefixes) )
+
+
 
 if __name__ == '__main__':
     import argparse
