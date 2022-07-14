@@ -515,6 +515,7 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 if write_on_file:
                     if curr_file != last_file:
                         last_file = curr_file
+                        self.logger.info("writing on  " + curr_file)
                         f = open(curr_file, 'w')
                         f.write(header)
                     f.write('# phase: ' + phase + '\n')
@@ -533,6 +534,7 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                 phase_files.append(curr_file)
             if execute_at_end:
                 for shellfile in phase_files:
-                        (ret,out,err)=utils.run(['/bin/bash', shellfile],logger=self.logger,pipe_output=True)
+                    self.logger.info("Executing  " + shellfile)
+                    (ret,out,err)=utils.run(['/bin/bash', shellfile],logger=self.logger,pipe_output=True)
                     
 
