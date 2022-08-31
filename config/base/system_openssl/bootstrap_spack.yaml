@@ -1,5 +1,0 @@
-spack:
-  definitions:
-  - all:
-    - ${openssl_SPEC}
-
