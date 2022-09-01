@@ -8,4 +8,3 @@ defaults:
       - 'export SYS_GCC=$(spack-python {{DEPLOY_ROOTPATH}}/scripts/select_spec.py); spack config  --scope site add -f $(spack-python {{DEPLOY_ROOTPATH}}/scripts/select_spec.py --tplfile external_tpl.yaml  --outfile config_external_common_tools.yaml --header packages: --add  perl%$SYS_GCC)'
       #- 'export SYS_GCC=$(spack-python {{DEPLOY_ROOTPATH}}/scripts/select_spec.py); spack config  --scope site add -f $(spack-python {{DEPLOY_ROOTPATH}}/scripts/select_spec.py --tplfile external_tpl.yaml  --outfile config_external_common_tools.yaml --header packages: --add  python%$SYS_GCC  perl%$SYS_GCC)'
 
-      #- '/bin/bash {{DEPLOY_ROOTPATH}}/scripts/add_external.sh gcc autoconf automake cmake '

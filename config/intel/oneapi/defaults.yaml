@@ -21,9 +21,6 @@ defaults:
       # define installed intel-oneapi-<component>  as external
       #- 'spack-python {{DEPLOY_ROOTPATH}}/scripts/select_spec.py --tplfile external_tpl.yaml  --outfile {{DEPLOY_PARENT_PARENT_ROOTPATH}}/generated_envs/{{ defaults.spack_version }}_{{DEPLOY_WORKNAME}}/config_external_oneapi_libs.yaml --header packages: --add  intel-oneapi-mpi intel-oneapi-mkl intel-oneapi-tbb intel-oneapi-vtune'
       - 'export ADD_CONFIG_FILE=$(spack-python {{DEPLOY_ROOTPATH}}/scripts/select_spec.py --tplfile external_tpl.yaml  --outfile config_external_oneapi_libs.yaml --header packages: --add  intel-oneapi-mpi intel-oneapi-mkl intel-oneapi-tbb intel-oneapi-vtune); spack config  --scope site add -f $ADD_CONFIG_FILE'
-      #- '/bin/bash {{DEPLOY_ROOTPATH}}/scripts/add_external.sh oneapi intel-oneapi-mpi intel-oneapi-mkl intel-oneapi-tbb intel-oneapi-vtune'
-      # define some build tools as external
-      #- '/bin/bash {{DEPLOY_ROOTPATH}}/scripts/add_external.sh oneapi autoconf automake cmake '
 
       # generate environments
       - '{{DEPLOY_ROOTPATH}}/envs/build.sh serial intel'

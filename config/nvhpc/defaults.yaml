@@ -7,6 +7,4 @@ defaults:
       # map new nvhpc compiler
       - 'export dummy; spack load $(spack-python {{DEPLOY_ROOTPATH}}/scripts/select_spec.py --tplfile spec_tpl.yaml --add nvhpc); spack compiler find --scope site; spack unload nvhpc'
 
-      # define some build tools as external
-      #- '/bin/bash {{DEPLOY_ROOTPATH}}/scripts/add_external.sh nvhpc autoconf automake cmake cuda'
 
