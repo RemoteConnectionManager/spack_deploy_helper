@@ -1,8 +1,4 @@
 defaults:
-  config_setup:
-    spack_commands:
-      - 'spack external find --scope site openssl'
-
   generate_env:
     config_commands:
       - 'spack external find --scope site openssl'
