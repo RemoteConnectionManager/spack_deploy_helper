@@ -1,17 +1,18 @@
 modules:
-  tcl:
-    intel-oneapi-mpi:
-      environment:
-        set:
-          MPICC: mpiicc
-          MPICXX: mpiicpc
-          MPIF90: mpiifort
-          MPIF77: mpiifort
-          MPIFC: mpiifort
+  default:
+    tcl:
+      intel-oneapi-mpi:
+        environment:
+          set:
+            MPICC: mpiicc
+            MPICXX: mpiicpc
+            MPIF90: mpiifort
+            MPIF77: mpiifort
+            MPIFC: mpiifort
 
-    projections:
-      'intel-oneapi-compilers': '{name}/{version}'
-      'intel-oneapi-mkl%intel': '{name}/{version}'
-      'intel-oneapi-mpi%intel': '{name}/{version}'
-      'intel-oneapi-vtune%intel': '{name}/{version}'
+      projections:
+        'intel-oneapi-compilers': '{name}/{version}'
+        'intel-oneapi-mkl%intel': '{name}/{version}'
+        'intel-oneapi-mpi%intel': '{name}/{version}'
+        'intel-oneapi-vtune%intel': '{name}/{version}'
  
