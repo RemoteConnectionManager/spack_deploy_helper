@@ -4,6 +4,8 @@
 
 
 defaults:
+  generated_subdir : 'generated_envs'
+
   debug : 'info'
 
 argparse:
