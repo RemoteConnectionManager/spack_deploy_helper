@@ -1,0 +1,5 @@
+#maybe_not_needed#
+defaults:
+  origin:
+    branches:
+      - 'packages/0.18/external_libfabric_depend_intelmpi'
