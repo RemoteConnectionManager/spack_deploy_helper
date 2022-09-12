@@ -67,7 +67,7 @@ class CustomYamlMerger(object):
                 if newpath in self.references:
                     if self.references[newpath] == newpath:
                         self.logger.info("registering " + newpath )
-                        self.logger.debug( str(yaml_dict[key]))
+                        #self.logger.debug( str(yaml_dict[key]))
                         self.references[newpath] = yaml_dict[key]
                 #print("##key## "+key+" type: " + yaml_dict[key].__class__.__name__)
                 if yaml_dict[key].__class__.__name__ == 'str':
@@ -77,23 +77,23 @@ class CustomYamlMerger(object):
                         ref_name = m.group(1)
                         if ref_name in self.references:
                             if self.references[ref_name] == ref_name:
-                                self.logger.info("Waiting to fill reference: " + ref_name)
+                                self.logger.debug("Waiting to fill reference: " + ref_name)
                             else:
                                 self.logger.info("Substituting " + newpath)
                                 yamllines = utils.hiyapyco.dump(self.references[ref_name], default_flow_style=False).split('\n')
                                 if len(yamllines) > 9:
                                     for s in yamllines[:4]:
-                                        self.logger.info("    " + s)
-                                    self.logger.info("   ............")
+                                        self.logger.debug("    " + s)
+                                    self.logger.debug("   ............")
                                     for s in yamllines[-4:]:
-                                        self.logger.info("    " + s)
+                                        self.logger.debug("    " + s)
                                 else:
                                     for s in yamllines:
-                                        self.logger.info("    " + s)
+                                        self.logger.debug("    " + s)
                                    
                                 yaml_dict[key] = copy.deepcopy(self.references[ref_name])
                         else:
-                            self.logger.info("Found: " + ref_name)
+                            self.logger.debug("Found: " + ref_name)
                             self.references[ref_name] = ref_name
                     else:
                         self._parse_yaml_dict(yaml_dict[key], path=newpath)
@@ -244,12 +244,11 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
 
             for f in yaml_files :
-                print("-------------- " + f)
                 merge_files=[]
                 for p in merge_config_folders:
                     test=os.path.abspath(os.path.join(p,f))
                     if os.path.exists(test):
-                         print("#### config file: " + test)
+                         self.logger.info("#### config file: " + test)
                          merge_files = merge_files +[test]
 
                 if merge_files :
