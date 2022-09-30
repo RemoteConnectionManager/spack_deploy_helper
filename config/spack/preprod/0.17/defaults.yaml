@@ -1,0 +1,11 @@
+defaults:
+  spack_major_version : '0.17'
+  spack_minor_version : '1'
+  spack_version : '0.17.1'
+  origin :
+    branches:
+      - 'backport/26256'
+      - 'packages/0.17/fix_mumps_mk'
+      - 'packages/0.17/fix_petsc_fftw_intel'
+
+

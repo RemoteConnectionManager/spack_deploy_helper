@@ -1,0 +1,22 @@
+defaults:
+  upstream :
+    master : "v{{defaults.spack_major_version}}.{{defaults.spack_minor_version}}"
+    prs :
+      - '25727' #Modules: Allow spec formatting in suffixes
+
+  origin :
+    integration_branch: '{{ defaults.integration_type }}{{DEPLOY_WORKNAME}}_{{defaults.spack_major_version}}.{{defaults.spack_minor_version}}'
+    url : 'https://github.com/RemoteConnectionManager/spack.git'
+    master: 'clean/{{defaults.spack_major_version}}.{{defaults.spack_minor_version}}'
+  upstream_rebase: 'True'
+  upstream_update: 'True'
+
+  runconfig: 'True'
+  integration: 'True'
+logging_configs:
+  loggers:
+    cascade_yaml_config:
+      level: WARNING
+
+
+

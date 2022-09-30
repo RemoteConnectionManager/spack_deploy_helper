@@ -1,0 +1,4 @@
+defaults:
+  spack_major_version : '0.18'
+  spack_minor_version : '1'
+  spack_version : '0.18.1'
