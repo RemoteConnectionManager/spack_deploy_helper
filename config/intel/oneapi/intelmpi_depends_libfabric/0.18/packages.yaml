@@ -1,5 +1,6 @@
 packages:
   intel-oneapi-mpi:
     variants:
-    - +external-fabric
+    - +external-libfabric
+    - +rpath-libfabric
 
