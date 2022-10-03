@@ -145,7 +145,7 @@ def installed_root_specs(env_lockfile, onlyroot=True):
                 #print(root_spec_hashes[c])     
     return root_spec_hashes
 
-def map_intel_compilers(oneapi_prefix, gcc_prefix=''):
+def map_intel_compilers(oneapi_prefix, gcc_prefix='', prepend_prefix=''):
     postfix1='compiler/latest/linux/bin/intel64'
     postfix2='compiler/latest/linux/bin'
     gcc_flags_schema={
@@ -160,10 +160,18 @@ def map_intel_compilers(oneapi_prefix, gcc_prefix=''):
         if gcc_compilers:
             for f in gcc_flags_schema:
                  flags[f] = gcc_flags_schema[f][0] + spack.compilers._to_dict(gcc_compilers[0])['compiler']['paths'][gcc_flags_schema[f][1]]
+
+    environment={}
+    if prepend_prefix:
+        environment ['prepend_path'] = { 'PATH': os.path.join(prepend_prefix,'bin') } 
+   
     intel_compilers_config=[]
     for intel_compiler in intel_compilers:
         compiler_dict = spack.compilers._to_dict(intel_compiler)
-        compiler_dict['compiler']['flags']=flags
+        if compiler_dict['compiler']['spec'].startswith('intel'):
+            compiler_dict['compiler']['flags']=flags
+        if compiler_dict['compiler']['spec'].startswith('oneapi'):
+            compiler_dict['compiler']['environment']=environment
         intel_compilers_config.append(compiler_dict)
     return(intel_compilers_config)
 

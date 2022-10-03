@@ -21,6 +21,7 @@ if __name__ == '__main__':
 
     parser.add_argument("--maincompiler", help="installed spec for main compiler", default='intel-oneapi-compilers')
     parser.add_argument("--auxcompiler", help="installed spec for auxiliary compiler", default='none')
+    parser.add_argument("--prepend", help="installed spec to prepend", default='none')
     parser.add_argument("-o", "--outdir", help="output config dir", default='')
     parser.add_argument("-l", "--lockfile", help="lockfile file to parse for installed specs", default='')
     parser.add_argument( "--loglevel", help="log level", default='warning')
@@ -38,7 +39,7 @@ if __name__ == '__main__':
         p=preferred_spec_tuples[h]
         log.debug(p[0] + " --- " + p[1])
     prefixes = {}
-    for p in ['maincompiler','auxcompiler']:
+    for p in ['maincompiler','auxcompiler','prepend']:
         in_spec = vars(args)[p]
         selected_spec_tuple = select_spec.select_spec(in_spec)
         if selected_spec_tuple:
@@ -50,7 +51,7 @@ if __name__ == '__main__':
     log.info(prefixes)
 
     
-    intel_compilers_config = select_spec.map_intel_compilers(prefixes['maincompiler'], prefixes.get('auxcompiler', ''))
+    intel_compilers_config = select_spec.map_intel_compilers(prefixes['maincompiler'], prefixes.get('auxcompiler', ''), prefixes.get('prepend', ''))
     log.debug("######## intel_compilers_config #############")
     log.debug(str(intel_compilers_config))
     compiler_config = spack.compilers.get_compiler_config('site')
