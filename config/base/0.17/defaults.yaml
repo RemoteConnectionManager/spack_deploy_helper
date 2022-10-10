@@ -5,3 +5,5 @@ defaults:
       - 'packages/0.16/base/gsl_update'
       - 'packages/0.16/base/fix_plumed_cblas'
       - 'packages/0.17/fix_gdal_json-c#23943'
+      - 'packages/0.17/fix_mpfr'
+
