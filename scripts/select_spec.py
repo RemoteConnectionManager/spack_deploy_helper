@@ -148,18 +148,31 @@ def installed_root_specs(env_lockfile, onlyroot=True):
 def map_intel_compilers(oneapi_prefix, gcc_prefix='', prepend_prefix=''):
     postfix1='compiler/latest/linux/bin/intel64'
     postfix2='compiler/latest/linux/bin'
-    gcc_flags_schema={
-             'cflags': ('-gcc-name=','cc'),
-             'cxxflags': ('-gxx-name=','cxx'),
-             'fflags': ('-gcc-name=','cc')}
 
-    intel_compilers = spack.compilers.find_new_compilers([os.path.join(oneapi_prefix,postfix1),os.path.join(oneapi_prefix,postfix2)], scope=None)
-    flags={}
-    if gcc_prefix:
-        gcc_compilers = spack.compilers.find_new_compilers([gcc_prefix], scope=None)
+    def intel_flags(gcc_compilers):
+        gcc_flags_schema={
+                 'cflags':   ('-gcc-name=','cc'),
+                 'cxxflags': ('-gxx-name=','cxx'),
+                 'fflags':   ('-gcc-name=','cc')}
+        flags={}
         if gcc_compilers:
             for f in gcc_flags_schema:
-                 flags[f] = gcc_flags_schema[f][0] + spack.compilers._to_dict(gcc_compilers[0])['compiler']['paths'][gcc_flags_schema[f][1]]
+                flags[f] = gcc_flags_schema[f][0] + spack.compilers._to_dict(gcc_compilers[0])['compiler']['paths'][gcc_flags_schema[f][1]]
+        return flags
+
+    def oneapi_flags(gcc_compilers):
+        flags={}
+        if gcc_compilers:
+            cc_path = spack.compilers._to_dict(gcc_compilers[0])['compiler']['paths']['cc']
+            flags['fflags'] = '-gcc-name=' + cc_path
+            flags['cxxflags'] = '--gcc-toolchain=' + os.path.dirname(os.path.dirname(cc_path))
+        return flags
+
+
+    intel_compilers = spack.compilers.find_new_compilers([os.path.join(oneapi_prefix,postfix1),os.path.join(oneapi_prefix,postfix2)], scope=None)
+    gcc_compilers=[]
+    if gcc_prefix:
+        gcc_compilers = spack.compilers.find_new_compilers([gcc_prefix], scope=None)
 
     environment={}
     if prepend_prefix:
@@ -169,8 +182,9 @@ def map_intel_compilers(oneapi_prefix, gcc_prefix='', prepend_prefix=''):
     for intel_compiler in intel_compilers:
         compiler_dict = spack.compilers._to_dict(intel_compiler)
         if compiler_dict['compiler']['spec'].startswith('intel'):
-            compiler_dict['compiler']['flags']=flags
+            compiler_dict['compiler']['flags']=intel_flags(gcc_compilers)
         if compiler_dict['compiler']['spec'].startswith('oneapi'):
+            compiler_dict['compiler']['flags']=oneapi_flags(gcc_compilers)
             compiler_dict['compiler']['environment']=environment
         intel_compilers_config.append(compiler_dict)
     return(intel_compilers_config)
