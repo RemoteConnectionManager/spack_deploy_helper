@@ -1,0 +1,11 @@
+defaults:
+  spackmodule:
+    config_upstream:  |
+      upstreams:
+        upstream-production:
+          install_tree: @{DEPLOY_SPACK_INSTALL}
+
+    modulepath_code: ''
+
+
+
