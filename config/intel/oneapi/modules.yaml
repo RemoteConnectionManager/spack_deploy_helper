@@ -10,9 +10,4 @@ modules:
             MPIF77: mpiifort
             MPIFC: mpiifort
 
-      projections:
-        'intel-oneapi-compilers': '{name}/{version}'
-        'intel-oneapi-mkl%intel': '{name}/{version}'
-        'intel-oneapi-mpi%intel': '{name}/{version}'
-        'intel-oneapi-vtune%intel': '{name}/{version}'
  
