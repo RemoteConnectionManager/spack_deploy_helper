@@ -241,6 +241,7 @@ if __name__ == '__main__':
                          default='select',
                         help="option deciding how spec specified as arguments are combined with selection from spec extracted from lockfile")
     parser.add_argument( "--header", help="header string", default='')
+    parser.add_argument( "--headerfile", help="header file", default='')
     parser.add_argument( "--loglevel", help="log level", default='warning')
     args = parser.parse_args()
 
@@ -324,8 +325,21 @@ if __name__ == '__main__':
             log.info("void template string, output substitutions in json form")
             outstring = json.dumps(substitutions)
         
-    if args.header:
-        outstring = args.header + "\n" + outstring
+    header_string=args.header
+    if args.headerfile:
+        if args.headerfile[0] == '/':
+            headerfile = args.headerfile
+        else:
+            headerfile = os.path.normpath(os.path.join(os. getcwd(),args.headerfile))
+            if not os.path.exists(headerfile):
+                headerfile = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(lambda: None))),args.headerfile)
+        try:
+            with open(headerfile) as f:
+                header_string = f.read()
+        except Exception: 
+            log.warning("unable to read header from:" + headerfile)
+    if header_string:
+        outstring = header_string + "\n" + outstring
     if args.outfile:
         if args.outfile[0] == '/':
             outfile = args.outfile
