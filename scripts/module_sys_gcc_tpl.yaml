@@ -1,0 +1,10 @@
+modules:
+  default:
+    tcl:
+      projections:
+        '%${SYS_GCC}': '{name}/{version}'
+      blacklist:
+      - '%${SYS_GCC}'
+
+
+

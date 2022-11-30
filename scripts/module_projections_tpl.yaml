@@ -1,0 +1,3 @@
+        ${NAME}%${COMPILER}: '{name}/{version}--{compiler.name}--{compiler.version}'
+
+
