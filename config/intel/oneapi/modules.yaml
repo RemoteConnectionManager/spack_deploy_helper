@@ -1,6 +1,12 @@
 modules:
   default:
     tcl:
+      blacklist:
+      - openssl%intel
+      - openssl%oneapi
+      whitelist:
+      - intel-oneapi-compilers
+
       intel-oneapi-mpi:
         environment:
           set:
@@ -11,3 +17,8 @@ modules:
             MPIFC: mpiifort
 
  
+      intel-oneapi-mpi%oneapi:
+        environment:
+          set:
+            MPICC: mpiicc -cc=icx
+            MPICXX: mpiicpc -cxx=icpx
