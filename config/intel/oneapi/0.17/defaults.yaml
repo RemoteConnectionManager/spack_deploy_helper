@@ -5,3 +5,5 @@ defaults:
       - 'packages/0.17/fix_boost_intel_on_compute_nodes'
       - 'packages/0.17/fix_nwchem'
       - 'packages/0.17/fix_nco_intel_issue_243'
+      - 'packages/0.17/fix_petsc_fftw_intel'
+
