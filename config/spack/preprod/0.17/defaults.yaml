@@ -6,6 +6,9 @@ defaults:
     branches:
       - 'backport/26256'
       - 'packages/0.17/fix_mumps_mk'
-      - 'packages/0.17/fix_petsc_fftw_intel'
+
+  upstream :
+    prs :
+      - '25727' #Modules: Allow spec formatting in suffixes
 
 

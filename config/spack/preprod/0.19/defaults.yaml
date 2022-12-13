@@ -1,0 +1,9 @@
+defaults:
+  spack_major_version : '0.19'
+  spack_minor_version : '0'
+  spack_version : '0.19.0'
+
+  origin :
+    branches :
+      - 'backport/0.19/25727_improve_module_suffixes'
+
