@@ -1,0 +1,13 @@
+defaults:
+  origin :
+    branches :
+      - 'packages/0.17/turbovnc'
+      - 'packages/0.19/libjpeg-turbo'
+      - 'packages/0.19/xkeyboard-config'
+      - 'packages/0.19/xkbcomp'
+
+
+
+
+
+
