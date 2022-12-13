@@ -1,0 +1,6 @@
+argparse:
+  subparser:
+    EnvWorkspaceManager:
+      config:
+        spack_yaml_files :
+          - 'concretizer.yaml'
