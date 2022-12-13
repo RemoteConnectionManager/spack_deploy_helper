@@ -44,7 +44,10 @@ def select_spec(in_spec, include_external=False):
     
     log = logging.getLogger(__name__)
     try:
-        package_available_versions = spack.repo.get(in_spec).versions.keys()
+        if callable(getattr(spack.repo,'get',None)):
+            package_available_versions = spack.repo.get(in_spec).versions.keys()
+        else:
+            package_available_versions = spack.repo.path.get_pkg_class(spack.spec.Spec(in_spec).name).versions.keys()
     except Exception as exception :
         log.error("unable to extract " + in_spec + " from spack.repo.get due to exeception: " + str(exception))
     try:
