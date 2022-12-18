@@ -1,0 +1,18 @@
+modules:
+  default:
+    tcl:
+      exclude_implicits: true
+      include:
+      - python
+      - ^python
+      - r
+      - ^r
+      - perl
+      - ^perl
+      - emacs
+      - gcc
+      - git
+      - maven
+      - openjdk
+      - anaconda3
+

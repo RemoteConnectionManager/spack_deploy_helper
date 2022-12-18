@@ -1,0 +1,18 @@
+modules:
+  default:
+    tcl:
+      blacklist_implicits: true
+      whitelist:
+      - python
+      - ^python
+      - r
+      - ^r
+      - perl
+      - ^perl
+      - emacs
+      - gcc
+      - git
+      - maven
+      - openjdk
+      - anaconda3
+
