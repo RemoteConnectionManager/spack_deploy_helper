@@ -1,0 +1,5 @@
+modules:
+  default:
+    tcl:
+      include:
+      - turbovnc

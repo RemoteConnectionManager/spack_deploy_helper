@@ -1,0 +1,4 @@
+modules:
+  tcl:
+    whitelist:
+    - turbovnc_aaaa_0.19
