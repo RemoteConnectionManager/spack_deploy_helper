@@ -1,0 +1,9 @@
+modules:
+  default:
+    tcl:
+      blacklist:
+      - openssl%intel
+      - openssl%oneapi
+      whitelist:
+      - intel-oneapi-compilers
+

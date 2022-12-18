@@ -1,6 +1,11 @@
 modules:
   default:
     tcl:
+      exclude:
+      - openssl%intel
+      - openssl%oneapi
+      include:
+      - intel-oneapi-compilers
 
       intel-oneapi-mpi:
         environment:
