@@ -1,6 +1,6 @@
 modules:
   default:
     tcl:
-      whitelist:
+      ${MODULE_WHITELIST}:
 
 

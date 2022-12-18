@@ -217,7 +217,16 @@ def find_new_compiler_config(prefixes=[]):
     else:
        log.warning("unable to extract any compilers in prefixes: " + str(prefixes) )
 
+def spack_major_version():
+    return('.'.join(spack.main.get_version().split(' ')[0].split('.')[:2]))
 
+def spack_version_keyword_subst():
+    curr_version = spack_major_version()
+    return({
+            "MODULE_BLACKLIST" : ("blacklist", "exclude")[curr_version >= "0.19"],
+            "MODULE_WHITELIST" : ("whitelist", "include")[curr_version >= "0.19"],
+            "MODULE_BLACKLIST_IMPLICITS" : ("blacklist_implicits", "exclude_implicits")[curr_version >= "0.19"]})
+    
 
 if __name__ == '__main__':
     import argparse
@@ -255,17 +264,17 @@ if __name__ == '__main__':
     else:
          log.info("Merging mode:")
   
-    compilers_subst={}
+    current_subst=spack_version_keyword_subst().copy()
     sys_gcc_compilers = select_compiler('gcc') 
     if len(sys_gcc_compilers) > 0:
-        compilers_subst['SYS_GCC'] = sys_gcc_compilers[0] 
-        compilers_subst['COMPILER'] = sys_gcc_compilers[0]
-        compilers_subst['COMPILER_NAME'] = sys_gcc_compilers[0].split('@')[0] 
+        current_subst['SYS_GCC'] = sys_gcc_compilers[0] 
+        current_subst['COMPILER'] = sys_gcc_compilers[0]
+        current_subst['COMPILER_NAME'] = sys_gcc_compilers[0].split('@')[0] 
     if args.compiler:
         compspecs = select_compiler(args.compiler, sysinstalled=False)
         if len(compspecs) > 0:
-            compilers_subst['COMPILER'] = compspecs[0] 
-            compilers_subst['COMPILER_NAME'] = compspecs[0].split('@')[0] 
+            current_subst['COMPILER'] = compspecs[0] 
+            current_subst['COMPILER_NAME'] = compspecs[0].split('@')[0] 
 
     template=args.tplstr
     tpldir=''
@@ -283,7 +292,7 @@ if __name__ == '__main__':
         except Exception: 
             log.warning("unable to read template from:" + tplfile)
     outstring = ''
-    common_subst = compilers_subst.copy()
+    common_subst = current_subst.copy()
     if args.external:
         for spec in args.external:
             common_subst.update( spec_subst(get_external_spec(spec), named_subst=True)  )
@@ -342,7 +351,7 @@ if __name__ == '__main__':
         except Exception: 
             log.warning("unable to read header from:" + headerfile)
     if header_string:
-        outstring = header_string + "\n" + outstring
+        outstring = string.Template(header_string).safe_substitute(substitutions) + "\n" + outstring
     if args.outfile:
         if args.outfile[0] == '/':
             outfile = args.outfile

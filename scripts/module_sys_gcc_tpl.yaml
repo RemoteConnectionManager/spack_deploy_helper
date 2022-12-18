@@ -3,7 +3,7 @@ modules:
     tcl:
       projections:
         '%${SYS_GCC}': '{name}/{version}'
-      blacklist:
+      ${MODULE_BLACKLIST}:
       - '%${SYS_GCC}'
 
 
