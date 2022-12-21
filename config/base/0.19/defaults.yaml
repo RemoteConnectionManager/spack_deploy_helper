@@ -1,0 +1,10 @@
+defaults:
+  origin:
+    branches:
+#to check      - 'packages/0.18/fix_plumed_gromacs'
+      - 'packages/0.16/base/gsl_update'
+#      - 'packages/0.16/base/fix_plumed_cblas'
+#seems not needed      - 'packages/0.17/fix_gdal_json-c#23943'
+#null change branch      - 'packages/0.18/fix_gdal_json-c#30809'
+#to_check      - 'packages/0.17/fix_mpfr'
+#to_check      - 'packages/0.18/fix_eccodes_intel_openmp'
