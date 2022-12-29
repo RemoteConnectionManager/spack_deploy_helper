@@ -1,8 +1,9 @@
 defaults:
   origin:
     branches:
-#to check      - 'packages/0.18/fix_plumed_gromacs'
-      - 'packages/0.16/base/gsl_update'
+      - 'packages/0.19/plumed_update'
+      - 'packages/0.19/base/gsl_update'
+      - 'packages/0.19/fix_nwchem_python3.10'
 #      - 'packages/0.16/base/fix_plumed_cblas'
 #seems not needed      - 'packages/0.17/fix_gdal_json-c#23943'
 #null change branch      - 'packages/0.18/fix_gdal_json-c#30809'
