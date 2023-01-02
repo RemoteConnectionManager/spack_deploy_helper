@@ -48,7 +48,7 @@ class commandintrospect(baseintrospect):
     def test(self,cmd,key=None):
         try :
             logging.getLogger(__name__).debug("introspect command-->"+cmd+"<<-")
-            (ret,o,e)=run(cmd.split(),stop_on_error=False)
+            (ret,o,e)=run(cmd.split(),stop_on_error=False,show_errors=False)
             if not e :
                 if not key : key=cmd
                 self.commands[key]=o.strip()
@@ -96,7 +96,7 @@ class myintrospect(commandintrospect):
                           'DEPLOY_NVIDIA_IMG' ]:
 
             for k in self.tags:
-                print("searching tag " + k)
+                #print("searching tag " + k)
                 if self.sysintro.get(parameter,None) == k:
                     tags[parameter] = self.tags[k]
                 elif self.commands.get(parameter,None) == k:
