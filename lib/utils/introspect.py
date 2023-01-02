@@ -30,20 +30,20 @@ class baseintrospect:
         self.sysintro['sysplatform']=platform.platform()
         self.sysintro['commandline']=' '.join(sys.argv)
         self.sysintro['workdir']=os.path.abspath('.')
-        self.sysintro['DEPLOY_HOST']=socket.getfqdn()
-        self.sysintro['DEPLOY_CLUSTER']='.'.join(self.sysintro['DEPLOY_HOST'].split('.')[1:][:1])
-        self.sysintro['DEPLOY_DOMAIN']='.'.join(self.sysintro['DEPLOY_HOST'].split('.')[-2:])
+        self.sysintro['DEPLOY_HOST']=os.environ.get('FORCED_DEPLOY_HOST',socket.getfqdn())
+        self.sysintro['DEPLOY_CLUSTER']=os.environ.get('FORCED_DEPLOY_CLUSTER','.'.join(self.sysintro['DEPLOY_HOST'].split('.')[1:][:1]))
+        self.sysintro['DEPLOY_DOMAIN']=os.environ.get('FORCED_DEPLOY_DOMAIN','.'.join(self.sysintro['DEPLOY_HOST'].split('.')[-2:]))
         self.sysintro['DEPLOY_DISTRO']=distro_name()
 
         logging.getLogger(__name__).debug("sysintro-->"+str(self.sysintro)+"<<-")
         #print("sysintro-->"+str(self.sysintro)+"<<-")
 
 class commandintrospect(baseintrospect):
-    def __init__(self,commands=[]):
+    def __init__(self,commands={}):
         baseintrospect.__init__(self)
         self.commands=dict()
-        for c in commands:
-            self.test(c)
+        for k in commands:
+            self.test(commands[k],key=k)
 
     def test(self,cmd,key=None):
         try :
@@ -60,7 +60,11 @@ class commandintrospect(baseintrospect):
 class myintrospect(commandintrospect):
     def __init__(self,tags={}):
 
-        commandintrospect.__init__(self,[])
+        commandintrospect.__init__(self,{
+            'DEPLOY_NVIDIA_DRIVER':'nvidia-smi --query-gpu=driver_version --format=csv,noheader',
+            'DEPLOY_NVIDIA_NAME':  'nvidia-smi --query-gpu=name --format=csv,noheader',
+            'DEPLOY_NVIDIA_IMG':   'nvidia-smi --query-gpu=inforom.img --format=csv,noheader',
+            })
 
         #self.test('git config --get remote.origin.url',key='giturl')
         self.tags=tags
@@ -83,11 +87,20 @@ class myintrospect(commandintrospect):
     def multi_platform_tag(self):
         #Return a list off all tags matching , in priority order of host, cluster, domain, distname
         tags=OrderedDict()
-        for parameter in ['DEPLOY_HOST', 'DEPLOY_CLUSTER', 'DEPLOY_DOMAIN', 'DEPLOY_DISTRO']:
+        for parameter in ['DEPLOY_HOST', 
+                          'DEPLOY_CLUSTER',
+                          'DEPLOY_DOMAIN',
+                          'DEPLOY_DISTRO',
+                          'DEPLOY_NVIDIA_DRIVER',
+                          'DEPLOY_NVIDIA_NAME',
+                          'DEPLOY_NVIDIA_IMG' ]:
+
             for k in self.tags:
-                if self.sysintro[parameter] == k:
+                print("searching tag " + k)
+                if self.sysintro.get(parameter,None) == k:
                     tags[parameter] = self.tags[k]
-                    break
+                elif self.commands.get(parameter,None) == k:
+                    tags[parameter] = self.tags[k]
         return tags
 
 
@@ -96,7 +109,7 @@ if __name__ == '__main__':
 
     print("__file__:" + os.path.realpath(__file__))
     for k,v in baseintrospect().sysintro.items() : print("sysintro["+ k +"]=" + v )
-    me=myintrospect(tags={'calori': 'ws_mint', 'galileo':'galileo', 'marconi':'marconi','m100':'m100', 'rhel8':'rhel8','centos.8':'centos8','centos':'centos','Linux':'genericlinux' })
+    me=myintrospect(tags={'calori': 'ws_mint', 'galileo':'galileo', 'marconi':'marconi','m100':'m100', 'rhel8':'rhel8','centos.8':'centos8','centos':'centos','Linux':'genericlinux','NVIDIA GeForce':'GEFORCE','510.108.03':'CUDA_11.6' })
     for k,v in me.commands.items() : print("commands["+ k +"]=" + str(v) )
     print("myintrospection:  host->" + me.platform_tag())
     print("myintrospection:  tags->" + str(me.multi_platform_tag()))
