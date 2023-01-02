@@ -46,16 +46,19 @@ class commandintrospect(baseintrospect):
             self.test(commands[k],key=k)
 
     def test(self,cmd,key=None):
-        try :
-            logging.getLogger(__name__).debug("introspect command-->"+cmd+"<<-")
-            (ret,o,e)=run(cmd.split(),stop_on_error=False,show_errors=False)
-            if not e :
-                if not key : key=cmd
-                self.commands[key]=o.strip()
-        except :
-            logging.getLogger(__name__).exception("introspection failed: "+cmd)
-            #print("failed: "+cmd)
-            pass
+        if key in os.environ:
+            self.commands[key]=os.environ[key]
+        else:
+            try :
+                logging.getLogger(__name__).debug("introspect command-->"+cmd+"<<-")
+                (ret,o,e)=run(cmd.split(),stop_on_error=False,show_errors=False)
+                if not e :
+                    if not key : key=cmd
+                    self.commands[key]=o.strip().splitlines()[0]
+            except :
+                logging.getLogger(__name__).exception("introspection failed: "+cmd)
+                #print("failed: "+cmd)
+                pass
 
 class myintrospect(commandintrospect):
     def __init__(self,tags={}):
