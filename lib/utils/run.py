@@ -13,7 +13,8 @@ def run(cmd,logger=None,
         stop_on_error=True,
         dry_run=False,
         folder='.',
-        pipe_output=False):
+        pipe_output=False,
+        show_errors=True):
     logger = logger or module_logger
     logger_in  = logging.getLogger(logger.name + '.' + __name__.split('.')[-1:][0] + '.input')
     logger_out = logging.getLogger(logger.name + '.' + __name__.split('.')[-1:][0] + '.output')
@@ -29,7 +30,8 @@ def run(cmd,logger=None,
             myprocess = subprocess.Popen(cmd, cwd=folder,stdout=subprocess.PIPE,stderr=subprocess.PIPE, env=os.environ,  bufsize=1, universal_newlines=True)
         except OSError as e:
             if e.errno == errno.ENOENT:
-                logger.warning("bad executable: " + cmd[0] + " try to use shell on:  " +' '.join(cmd))
+                if show_errors:
+                    logger.warning("bad executable: " + cmd[0] + " try to use shell on:  " +' '.join(cmd))
                 myprocess = subprocess.Popen(' '.join(cmd), cwd=folder,stdout=subprocess.PIPE,stderr=subprocess.PIPE, env=os.environ, shell=True, bufsize=1, universal_newlines=True)
         if pipe_output:
             # for f in [myprocess.stdout, myprocess.stderr]:
@@ -76,7 +78,8 @@ def run(cmd,logger=None,
         ret = myprocess.returncode
         if ret:
             #print("ERROR:",ret,"Exiting")
-            logger.error("ERROR CODE : " + str(ret) + '\n' + err_buf +'\nexecuting ->' + ' '.join(cmd) + '\n' + str(traceback.format_stack()))
+            if show_errors:
+                logger.error("ERROR CODE : " + str(ret) + '\n' + err_buf +'\nexecuting ->' + ' '.join(cmd) + '\n' + str(traceback.format_stack()))
             if stop_on_error :
                 sys.exit()
         # print("############################",stdout)
