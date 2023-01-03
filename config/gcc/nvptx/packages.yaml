@@ -1,0 +1,6 @@
+packages:
+
+  gcc:
+    variants:
+    -  +nvptx 
+    -  ~bootstrap
