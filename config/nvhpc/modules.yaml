@@ -1,5 +1,6 @@
 modules:
-  tcl:
-    projections:
-      'nvhpc': '{name}/{version}'
+  default:
+    tcl:
+      projections:
+        'nvhpc': '{name}/{version}'
 
