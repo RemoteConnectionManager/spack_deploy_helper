@@ -90,13 +90,15 @@ class myintrospect(commandintrospect):
     def multi_platform_tag(self):
         #Return a list off all tags matching , in priority order of host, cluster, domain, distname
         tags=OrderedDict()
-        for parameter in ['DEPLOY_HOST', 
-                          'DEPLOY_CLUSTER',
-                          'DEPLOY_DOMAIN',
+        for parameter in [
                           'DEPLOY_DISTRO',
+                          'DEPLOY_DOMAIN',
+                          'DEPLOY_CLUSTER',
+                          'DEPLOY_HOST', 
                           'DEPLOY_NVIDIA_DRIVER',
                           'DEPLOY_NVIDIA_NAME',
-                          'DEPLOY_NVIDIA_IMG' ]:
+                          'DEPLOY_NVIDIA_IMG',
+                          ]:
 
             for k in self.tags:
                 #print("searching tag " + k)
