@@ -411,7 +411,7 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         else:
             self.logger.info("skipping config" )
 
-        env_dict = self._merge_yaml_file_into_dict( merge_config_folders, 'env.yaml',interpolate=True, do_ref_subst=True)
+        env_dict = self._merge_yaml_file_into_dict( sorted(merge_config_folders), 'env.yaml',interpolate=True, do_ref_subst=True)
         merger = CustomYamlMerger(logger=self.logger)
 
         for envname in env_dict:
