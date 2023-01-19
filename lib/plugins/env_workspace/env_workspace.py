@@ -11,16 +11,19 @@ logging.debug("__file__:" + os.path.realpath(__file__))
 
 spack_version = ''
 generated_subdir = ''
+subtag = ''
 for h in cascade_yaml_config.CascadeYamlConfig.instances:
   _spack_version = cascade_yaml_config.CascadeYamlConfig.instances[h][['defaults','spack_version']]
   _generated_subdir = cascade_yaml_config.CascadeYamlConfig.instances[h][['defaults','generated_subdir']]
+  _subtag = cascade_yaml_config.CascadeYamlConfig.instances[h][['defaults','subtag']]
   if _spack_version: spack_version = _spack_version
   if _generated_subdir: generated_subdir = _generated_subdir
+  if _subtag: subtag = _subtag
 
 cascade_yaml_config.global_key_subst['DEPLOY_GENERATED_DIR'] = os.path.join(
                             cascade_yaml_config.global_key_subst['DEPLOY_PARENT_PARENT_ROOTPATH'],
                             generated_subdir,
-                            spack_version + '_' + cascade_yaml_config.global_key_subst['DEPLOY_WORKNAME'])
+                            spack_version + '_' + cascade_yaml_config.global_key_subst['DEPLOY_WORKNAME'] + subtag)
 def is_workdir(path):
     ret = False
     for subpath in ['defaults.yaml', 'spack.yaml']:
@@ -161,6 +164,12 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
             if os.path.exists(test):
                  self.logger.debug("#### config file: " + test)
                  merge_files = merge_files +[test]
+
+        envdir = cascade_yaml_config.global_key_subst['DEPLOY_GENERATED_DIR']
+        if not os.path.exists(envdir) : os.makedirs(envdir)
+        with open(os.path.join(envdir,'config_env_files.txt'),"w") as outfile:
+            for  f in merge_files:
+                outfile.write(f +"\n")
 
         if merge_files :
             self.logger.debug("configuring "+ yaml_file + " with files: "+str(merge_files))
@@ -385,6 +394,51 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
                     break
             return skip
 
+        def config_dir_hierarchy_tag(path):
+            path_folders=path.strip(os.path.sep).split(os.path.sep)
+            if 'config' in path_folders:
+                after_config_folders=path_folders[path_folders.index('config'):]
+                tag=''
+                for folder in after_config_folders:
+                    if folder == 'config':
+                        tag+='0'
+                    if folder == 'begin':
+                        tag+='1'
+                    elif folder == 'end':
+                        tag+='9'
+                    else:
+                        tag+='5'
+            else:
+                 tag=''
+            return tag
+
+        def config_dir_flat_tag(path):
+            path_folders=path.strip(os.path.sep).split(os.path.sep)
+            if 'config' in path_folders:
+                after_config_folders=path_folders[path_folders.index('config')+1:]
+                tag=''
+                for folder in after_config_folders:
+                    if folder == 'begin':
+                        tag='1'
+                        break
+                    elif folder == 'end':
+                        tag='9'
+                        break
+                    else:
+                        tag='5'
+            else:
+                 tag=''
+            return tag
+
+        def config_dir_path_tag(path):
+            return path
+
+        def sort_config_dir(folder_list,tag_function):
+            zipped_pairs = zip([tag_function(_) for _ in folder_list], folder_list)
+            z = [x for _, x in sorted(zipped_pairs)]
+            return z
+
+       
         if spack_root [0] != '/':
             spack_root = os.path.join(self.base_path, spack_root)
 
@@ -394,6 +448,9 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
         if os.path.exists(spack_config_dir) and not to_skip(skip_steps,'config') :
             self.logger.info("processing config")
+            for  f in merge_config_folders:
+                self.logger.info("config  -->"+f)
+
             self._merge_yaml_files(merge_config_folders,
                               current_key_subst, 
                               spack_config_dir, 
@@ -411,7 +468,15 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
         else:
             self.logger.info("skipping config" )
 
-        env_dict = self._merge_yaml_file_into_dict( sorted(merge_config_folders), 'env.yaml',interpolate=True, do_ref_subst=True)
+        self.logger.info("processing envs")
+        #reordered_merge_config_folders = sort_config_dir(merge_config_folders,config_dir_path_tag)
+        reordered_merge_config_folders = sort_config_dir(merge_config_folders,config_dir_hierarchy_tag)
+        envdir = cascade_yaml_config.global_key_subst['DEPLOY_GENERATED_DIR']
+        if not os.path.exists(envdir) : os.makedirs(envdir)
+        with open(os.path.join(envdir,'config_folders.txt'),"w") as outfile:
+            for  f in reordered_merge_config_folders:
+                outfile.write(f +"\n")
+        env_dict = self._merge_yaml_file_into_dict( reordered_merge_config_folders, 'env.yaml',interpolate=True, do_ref_subst=True)
         merger = CustomYamlMerger(logger=self.logger)
 
         for envname in env_dict:
