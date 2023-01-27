@@ -3,6 +3,7 @@ defaults:
     branches:
       - 'packages/0.19/fix_petsc_fftw_intel'
       - 'packages/0.19/fix_gdal_oneapi_2022.2.1'
+      - 'packages/0.19/backport_update_intel_compiler'
 
 
 
