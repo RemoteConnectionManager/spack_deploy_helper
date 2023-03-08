@@ -3,3 +3,7 @@ defaults:
     config_commands:
       - 'spack external find --scope site openssl'
 
+  origin:
+    branches:
+      - 'packages/0.19/fix_rust_system_openssl'
+
