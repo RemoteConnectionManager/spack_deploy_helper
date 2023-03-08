@@ -1,0 +1,4 @@
+defaults:
+  origin:
+    branches:
+      - 'packages/0.19/fix_elpa_stdc'
