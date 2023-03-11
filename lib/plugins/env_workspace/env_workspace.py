@@ -502,14 +502,15 @@ class EnvWorkspaceManager(cascade_yaml_config.ArgparseSubcommandManager):
 
             # parse accumulators (list) substitutionsnd convert them into space separated string
             # TODO: allow for customizable separator
-            accumulators_info = susbstitutions_info.get('accumulators', [])
-            for subst_info in accumulators_info:
-                for key in subst_info:
-                    values = subst_info[key]
-                    values_string = ''
-                    for value in values:
-                        values_string += utils.stringtemplate(value).safe_substitute(substitutions) + ' '
-                    substitutions[key] =  values_string
+            accumulators_info = susbstitutions_info.get('accumulators', {})
+            for key in accumulators_info:
+                print("key--->" + str(key))
+                values = accumulators_info.get(key, [])
+                print("values--->" + str(values))
+                values_string = ''
+                for value in values:
+                    values_string += utils.stringtemplate(value).safe_substitute(substitutions) + ' '
+                substitutions[key] =  values_string
 
             # parse commands: each command must return on stdout a  json string represting a dict for substitutions
             # init_command is a single entry that can be overriden by hiyapico simple overriding, while commands is a list, where files in different dirs
