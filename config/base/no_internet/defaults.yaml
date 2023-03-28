@@ -1,0 +1,6 @@
+defaults:
+  origin:
+    branches:
+      - 'packages/0.19/pthreadpool_resource_download'
+      - 'packages/0.19/QE_no_internet_hack'
+
