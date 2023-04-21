@@ -2,5 +2,5 @@ defaults:
   origin:
     branches:
       - 'packages/0.19/backport_update_nvhpc_compiler'
-      - ' packages/0.19/libxc_nvhpc_conflict_cuda'
+      - 'packages/0.19/libxc_nvhpc_conflict_cuda'
 
