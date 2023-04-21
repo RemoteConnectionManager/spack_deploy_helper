@@ -4,4 +4,5 @@ defaults:
       - 'packages/0.19/pthreadpool_resource_download'
       - 'packages/0.19/QE_no_internet_hack'
       - 'packages/0.19/yambo_fix_gpu_nointernet'
+      - 'packages/0.19/lammps_fix_gtest_no_internet'
 
