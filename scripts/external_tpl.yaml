@@ -1,4 +1,5 @@
   ${NAME}:
+    require: "${NAME}@${VERSION}"
     externals:
     - spec: ${NAME}@${VERSION}${VARIANTS}
       prefix: ${PREFIX}
