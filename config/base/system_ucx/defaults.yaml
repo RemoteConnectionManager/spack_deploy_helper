@@ -1,6 +1,0 @@
-defaults:
-  generate_env:
-    config_commands:
-      - 'spack external find --scope site ucx'
-
-
