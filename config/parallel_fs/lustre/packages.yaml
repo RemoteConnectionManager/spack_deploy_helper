@@ -3,7 +3,7 @@ packages:
   openmpi:
     variants:
     - ~gpfs
-#    - +lustre
+    - +lustre
 
   mpifileutils:
     variants:
