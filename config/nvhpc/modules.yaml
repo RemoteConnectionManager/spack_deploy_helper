@@ -4,3 +4,9 @@ modules:
       projections:
         'nvhpc': '{name}/{version}'
 
+      nvhpc:
+        environment:
+          prepend_path:
+            LD_LIBRARY_PATH: '{prefix}/Linux_x86_64/{version}/math_libs/lib64'
+
+
