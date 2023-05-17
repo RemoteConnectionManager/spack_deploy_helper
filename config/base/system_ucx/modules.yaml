@@ -1,6 +1,10 @@
 modules:
   default:
     tcl:
-      exclude:
-      - ucx
+#     exclude:
+#     - ucx
+      ucx:
+        environment:
+          set:
+            UCX_WARN_UNUSED_ENV_VARS: 'n'
 
