@@ -14,7 +14,6 @@ modules:
             C_INCLUDE_PATH: '{^cuda.prefix}/include'
             CPLUS_INCLUDE_PATH: '{^cuda.prefix}/include'
           set:
-            CUDA_HOME: '{^cuda.prefix}'
             CUDA_LIB:  '{^cuda.prefix}/lib64'
             CUDA_INC:  '{^cuda.prefix}/include'
             CUDA_INCLUDE: '{^cuda.prefix}/include'
