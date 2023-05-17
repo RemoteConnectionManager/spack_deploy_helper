@@ -1,0 +1,8 @@
+modules:
+  default:
+    tcl:
+      ^cuda%gcc@11.3:
+        environment:
+          set:
+            CUDA_HOME: '{^cuda.prefix}'
+
