@@ -1,0 +1,32 @@
+spack:
+  packages:
+    binutils:
+      'externals:': []
+      variants:
+      - +ld
+      - +gas
+    all:
+      variants:
+      - +X
+  definitions:
+  - current_compiler:
+    - gcc@11.3.0
+  - openssl:
+    - openssl@1.1.1k build_system=generic certs=mozilla ~docs ~shared
+  - libraries: []
+  - libraries_specific: []
+  - tools:
+    - gnuplot +X
+  - applications: []
+  - all:
+    - $libraries
+    - $libraries_specific
+    - $tools
+    - $applications
+  specs:
+  - matrix:
+    - - $all
+    - - $%current_compiler
+  view: false
+  concretizer:
+    unify: true

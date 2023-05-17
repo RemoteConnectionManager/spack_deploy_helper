@@ -1,0 +1,28 @@
+spack:
+  definitions:
+  - current_compiler: [nvhpc@23.1]
+  - openssl:
+    - openssl@1.1.1k build_system=generic certs=mozilla ~docs ~shared
+  - applications_yambo:
+    - yambo@5.1.1+cuda-fortran+mpi+nl+openmp+parallel_io+ph+rt+sc linalg=parallel,slepc
+      profile=memory,time
+  - libraries:
+    
+    #- openblas --> secondo me non va esplicitata sia perché è seriale sia perché è il provider di default nel packages.yaml
+    - fftw
+    - petsc~cuda
+    - slepc~cuda
+
+  - libraries_specific:
+    - openmpi@4.1.4
+  - all:
+    - $libraries
+    - $libraries_specific
+    - $applications_yambo
+  specs:
+  - matrix:
+    - - $all
+    - - $%current_compiler
+  view: false
+  concretizer:
+    unify: true
