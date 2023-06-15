@@ -1,6 +1,8 @@
 modules:
   default:
     tcl:
+      include:
+      - cuda
       ^cuda:
         suffixes:
           +cuda: '{^cuda.name}-{^cuda.version}'
