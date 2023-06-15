@@ -1,0 +1,44 @@
+spack:
+  definitions:
+  - current_compiler: [nvhpc@23.1]
+  - openssl:
+    - openssl@1.1.1k build_system=generic certs=mozilla ~docs ~shared
+  - benchmarks:
+    - osu-micro-benchmarks
+  - applications_yambo:
+    - quantum-espresso+mpi~scalapack^intel-oneapi-mkl+cluster%gcc
+  - libraries:
+    
+#   - petsc
+#   - slepc
+    - adios
+    - boost +mpi
+    - hdf5  +hl
+    - netcdf-c +mpi +parallel-netcdf
+    - netcdf-fortran
+    - parallel-netcdf
+    - parmetis
+  - libraries_petsc:
+    - petsc +mpi +mumps +scalapack +fftw
+  - libraries_specific:
+    
+#   - netlib-scalapack
+    - openmpi@4.1.4
+      #- openblas --> secondo me non ci va qui, sia perché è seriale sia perché nel packages.yaml lo abbiamo impostato come provider di default
+  - all:
+    - $libraries
+    - $applications_yambo
+
+
+
+    
+#   - $libraries_petsc
+    - $libraries_specific
+    - $benchmarks
+  specs:
+  - matrix:
+    - - $all
+    - - $%current_compiler
+  view: false
+  concretizer:
+    unify: true
