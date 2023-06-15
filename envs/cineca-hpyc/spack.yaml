@@ -1,0 +1,32 @@
+spack:
+  definitions:
+  - current_compiler: [gcc@11.3.0]
+  - openmpi: [openmpi@4.1.4]
+  - lapack: [openblas]
+  - libraries:
+    - py-mpi4py
+  - openssl:
+    - openssl@1.1.1k build_system=generic certs=mozilla ~docs ~shared
+  - extensions_python:
+    - py-cupy
+    - py-numba
+    - py-scipy@1.5.4
+    - py-pandas
+    - py-dask +array+bag+dataframe+delayed+diagnostics+distributed+yaml
+    - py-joblib
+    - py-matplotlib
+    - py-notebook
+  - all:
+    - $openssl
+    - $extensions_python
+    - $openmpi
+    - $lapack
+    - $libraries
+
+  specs:
+  - matrix:
+    - - $all
+    - - $%current_compiler
+  view: true
+  concretizer:
+    unify: true

@@ -1,0 +1,46 @@
+spack:
+  definitions:
+  - current_compiler: [gcc@11.3.0]
+  - openmpi: [openmpi@4.1.4]
+  - lapack: [openblas]
+  - libraries:
+    - py-mpi4py
+  - openssl:
+    - openssl@1.1.1k build_system=generic certs=mozilla ~docs ~shared
+  - deeplrn_extensions_python:
+    - arrow+compute+snappy+tensorflow
+    - py-pyarrow+parquet
+    - py-torch +debug
+    - py-torch-geometric
+    - py-torchtext
+    - py-torchfile
+    - py-torchmetrics
+    - py-torch-nvidia-apex
+    - py-tensorflow +dynamic_kernels +mpi +numa +xla
+    - py-keras
+    - py-tensorflow-probability
+    - py-tensorflow-datasets
+    - py-tensorflow-estimator
+    - py-tensorflow-hub
+    - py-horovod
+    - xgboost +nccl build_type=Release
+    - onnx build_type=Release
+    - py-torchvision
+
+  - all:
+    - $openssl
+    - $deeplrn_extensions_python
+    - $openmpi
+    - $lapack
+    - $libraries
+  specs:
+  - matrix:
+    - - $all
+    - - $%current_compiler
+  view:
+    default:
+      root: /leonardo/prod/spack/03/ccsdeploy/spack_deploy/envs/cineca-ai/view
+      exclude: [xpmem]
+      link_type: symlink
+  concretizer:
+    unify: true
