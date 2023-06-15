@@ -1,6 +1,11 @@
 modules:
   default:
     tcl:
+      include:
+      - intel-oneapi-compilers
+      - intel-oneapi-mkl
+      - intel-oneapi-mpi
+      - intel-oneapi-vtune
 
       intel-oneapi-mpi:
         environment:
