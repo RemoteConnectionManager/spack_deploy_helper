@@ -1,0 +1,27 @@
+spack:
+  definitions:
+  - current_compiler:
+    - gcc@11.3.0
+  - openssl:
+    - openssl@1.1.1k build_system=generic certs=mozilla ~docs ~shared
+  - libraries:
+    - hdf5  +hl
+  - libraries_specific:
+    - openmpi
+    - netlib-scalapack
+    - openblas
+    - fftw +mpi
+  - libraries_petsc:
+    - petsc@3.19.0 +mpi +mumps +scalapack +fftw
+  - all:
+    - $openssl
+    - $libraries
+    - $libraries_specific
+    - $libraries_petsc
+  specs:
+  - matrix:
+    - - $all
+    - - $%current_compiler
+  view: false
+  concretizer:
+    unify: true
